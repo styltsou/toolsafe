@@ -1,4 +1,4 @@
-import { request as httpRequest } from 'node:http';
+import { request as httpRequest, type RequestOptions } from 'node:http';
 import { connect as netConnect } from 'node:net';
 import { connect as tlsConnect } from 'node:tls';
 
@@ -7,8 +7,10 @@ export type FetchOptions = {
   proxy?: string;
 };
 
+const PROXY_TIMEOUT = 30_000;
+
 export async function fetchText(url: URL, options?: FetchOptions): Promise<string> {
-  const proxyUrl = resolveProxy(options?.proxy);
+  const proxyUrl = resolveProxy(options?.proxy, url);
 
   if (proxyUrl) {
     return fetchViaProxy(url, new URL(proxyUrl), options?.headers);
@@ -17,13 +19,27 @@ export async function fetchText(url: URL, options?: FetchOptions): Promise<strin
   return fetchDirect(url, options?.headers);
 }
 
-function resolveProxy(proxy?: string): string | undefined {
+function resolveProxy(proxy: string | undefined, targetUrl: URL): string | undefined {
   if (proxy) return proxy;
+
+  const noProxy = process.env.NO_PROXY ?? process.env.no_proxy;
+  if (noProxy && isNoProxy(targetUrl.hostname, noProxy)) return undefined;
+
   if (process.env.HTTPS_PROXY) return process.env.HTTPS_PROXY;
   if (process.env.HTTP_PROXY) return process.env.HTTP_PROXY;
   if (process.env.https_proxy) return process.env.https_proxy;
   if (process.env.http_proxy) return process.env.http_proxy;
   return undefined;
+}
+
+function isNoProxy(hostname: string, noProxy: string): boolean {
+  const patterns = noProxy.split(',').map((p) => p.trim()).filter(Boolean);
+
+  return patterns.some((pattern) => {
+    if (pattern === '*') return true;
+    if (pattern.startsWith('.')) return hostname.endsWith(pattern) || hostname === pattern.slice(1);
+    return hostname === pattern;
+  });
 }
 
 async function fetchDirect(url: URL, headers?: Record<string, string>): Promise<string> {
@@ -61,6 +77,7 @@ function fetchHttpViaProxy(
         path: targetUrl.href,
         method: 'GET',
         headers: { host: targetUrl.host, ...headers },
+        timeout: PROXY_TIMEOUT,
       },
       (res) => {
         let data = '';
@@ -92,58 +109,62 @@ function fetchHttpsViaProxy(
       socket.write(`CONNECT ${targetUrl.hostname}:${targetPort} HTTP/1.1\r\nHost: ${targetUrl.hostname}\r\n\r\n`);
     });
 
-    let connected = false;
+    socket.setTimeout(PROXY_TIMEOUT, () => {
+      socket.destroy();
+      reject(new Error('Proxy CONNECT timed out'));
+    });
+
+    let tunnelEstablished = false;
 
     socket.on('data', (data) => {
-      if (connected) return;
+      if (tunnelEstablished) return;
 
       const response = data.toString();
-      if (response.includes('200')) {
-        connected = true;
+      const statusMatch = response.match(/^HTTP\/\d+\.\d+ (\d+)/);
 
-        const tlsSocket = tlsConnect({ socket, host: targetUrl.hostname });
-
-        tlsSocket.once('secureConnect', () => {
-          const requestLines = [
-            `GET ${targetUrl.pathname}${targetUrl.search} HTTP/1.1`,
-            `Host: ${targetUrl.host}`,
-            ...Object.entries(headers ?? {}).map(([k, v]) => `${k}: ${v}`),
-            '',
-            '',
-          ];
-          tlsSocket.write(requestLines.join('\r\n'));
-        });
-
-        let buffer = '';
-        tlsSocket.on('data', (chunk) => {
-          buffer += chunk.toString();
-        });
-
-        tlsSocket.on('end', () => {
-          const bodyStart = buffer.indexOf('\r\n\r\n');
-          if (bodyStart === -1) {
-            reject(new Error('No HTTP response body found'));
-            return;
-          }
-
-          const statusLine = buffer.substring(0, buffer.indexOf('\r\n'));
-          const statusMatch = statusLine.match(/HTTP\/\d+\.\d+ (\d+)/);
-          const statusCode = statusMatch?.[1] ? parseInt(statusMatch[1], 10) : 0;
-
-          const body = buffer.substring(bodyStart + 4);
-
-          if (statusCode >= 200 && statusCode < 300) {
-            resolve(body);
-          } else {
-            reject(new Error(`HTTP ${statusCode}`));
-          }
-        });
-
-        tlsSocket.on('error', reject);
-      } else {
+      if (!statusMatch || statusMatch[1] !== '200') {
         socket.end();
-        reject(new Error(`Proxy CONNECT failed: ${response.trim()}`));
+        reject(new Error(`Proxy CONNECT failed: ${response.split('\r\n')[0]}`));
+        return;
       }
+
+      tunnelEstablished = true;
+      const tlsSocket = tlsConnect({ socket, host: targetUrl.hostname });
+
+      tlsSocket.setTimeout(PROXY_TIMEOUT, () => {
+        tlsSocket.destroy();
+        reject(new Error('TLS connection timed out'));
+      });
+
+      tlsSocket.once('secureConnect', () => {
+        const req = httpRequest(
+          {
+            hostname: targetUrl.hostname,
+            port: targetPort,
+            path: targetUrl.pathname + targetUrl.search,
+            method: 'GET',
+            headers: { host: targetUrl.host, ...headers },
+            createConnection: () => tlsSocket,
+            timeout: PROXY_TIMEOUT,
+          } satisfies RequestOptions,
+          (res) => {
+            let body = '';
+            res.on('data', (chunk) => (body += chunk));
+            res.on('end', () => {
+              if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+                resolve(body);
+              } else {
+                reject(new Error(`HTTP ${res.statusCode}`));
+              }
+            });
+          },
+        );
+
+        req.on('error', reject);
+        req.end();
+      });
+
+      tlsSocket.on('error', reject);
     });
 
     socket.on('error', reject);
