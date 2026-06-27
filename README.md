@@ -36,6 +36,16 @@ bun install
 bun run build
 ```
 
+### Shell completions (bash / zsh)
+
+```bash
+# bash
+eval "$(toolsafe completion bash)"
+
+# zsh — add to ~/.zshrc
+echo 'eval "$(toolsafe completion zsh)"' >> ~/.zshrc
+```
+
 ## Quick Start
 
 ```bash
