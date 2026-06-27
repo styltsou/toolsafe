@@ -19,7 +19,7 @@ export function registerPolicyCommand(program: Command): void {
     .action(async (filePath: string, options: PolicyOptions) => {
       try {
         const config = loadConfig(options.config);
-        const result = await analyzeOpenApi(filePath, config ?? undefined);
+        const result = await analyzeOpenApi(filePath, config);
         const output = renderPolicyYaml(generatePolicyDraft(result));
 
         if (options.out) {

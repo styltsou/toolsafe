@@ -127,7 +127,7 @@ describe('toolsafe --config CLI flag', () => {
     expect(withCliOverride.exitCode).toBe(0);
   });
 
-  test('nonexistent --config path causes no errors (treated as no config)', async () => {
+  test('nonexistent --config path produces an error', async () => {
     const result = await runCli([
       'lint',
       'examples/risky-openapi.yaml',
@@ -137,9 +137,9 @@ describe('toolsafe --config CLI flag', () => {
       'tests/fixtures/nonexistent-config.json',
     ]);
 
-    expect(result.exitCode).toBe(1);
-    const report = JSON.parse(result.stdout);
-    expect(report.findings.length).toBeGreaterThan(0);
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain('Config file not found');
+    expect(result.stdout).toBe('');
   });
 
   test('invalid --config file produces an error', async () => {

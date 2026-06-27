@@ -64,20 +64,22 @@ function isReadOnlyMethod(method: NormalizedTool['method']): boolean {
 }
 
 function filterRules(rules: Rule[], config?: ToolSafeConfig): Rule[] {
-  if (!config?.rules) {
+  const ruleOverrides = config?.rules;
+  if (!ruleOverrides) {
     return rules;
   }
 
-  return rules.filter((rule) => config.rules![rule.id] !== 'off');
+  return rules.filter((rule) => ruleOverrides[rule.id] !== 'off');
 }
 
 function overrideSeverities(findings: Finding[], config?: ToolSafeConfig): Finding[] {
-  if (!config?.rules) {
+  const ruleOverrides = config?.rules;
+  if (!ruleOverrides) {
     return findings;
   }
 
   return findings.map((finding) => {
-    const override = config.rules![finding.ruleId];
+    const override = ruleOverrides[finding.ruleId];
 
     if (override && override !== 'off') {
       return { ...finding, severity: override };

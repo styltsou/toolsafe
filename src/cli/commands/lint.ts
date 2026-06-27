@@ -2,6 +2,7 @@ import type { Command } from 'commander';
 import { loadConfig } from '@/config/loader';
 import { parseChoiceOption, renderCommandError } from '@/cli/helpers';
 import { analyzeOpenApi } from '@/core/analyze';
+import type { ToolSafeConfig } from '@/config/types';
 import type { AnalysisResult, FindingSeverity } from '@/core/types';
 import { renderJsonReport, renderTerminalReport } from '@/reporters';
 
@@ -42,7 +43,7 @@ export function registerLintCommand(program: Command): void {
           return;
         }
 
-        const result = await analyzeOpenApi(filePath, config ?? undefined);
+        const result = await analyzeOpenApi(filePath, config);
         process.stdout.write(renderLintResult(result, format));
 
         if (hasThresholdFindings(result, failOn)) {
@@ -61,7 +62,7 @@ function parseFormat(value: string | undefined): LintFormat | undefined {
 
 function resolveFailOn(
   cliValue: string | undefined,
-  config?: import('@/config/types').ToolSafeConfig | null,
+  config?: ToolSafeConfig | undefined,
 ): FailOn | undefined {
   if (cliValue) {
     return parseChoiceOption(cliValue, FAIL_ON_VALUES, { optionName: '--fail-on' });

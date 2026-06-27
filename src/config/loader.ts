@@ -4,11 +4,11 @@ import { ToolSafeConfigSchema, type ToolSafeConfig } from '@/config/types';
 
 const CONFIG_FILENAME = 'toolsafe.config.json';
 
-export function loadConfig(configPath?: string): ToolSafeConfig | null {
+export function loadConfig(configPath?: string): ToolSafeConfig | undefined {
   const resolvedPath = resolveConfigPath(configPath);
 
   if (!resolvedPath) {
-    return null;
+    return undefined;
   }
 
   const raw = readFileSync(resolvedPath, 'utf8');
@@ -27,7 +27,12 @@ export function loadConfig(configPath?: string): ToolSafeConfig | null {
 
 function resolveConfigPath(configPath?: string): string | null {
   if (configPath) {
-    return existsSync(configPath) ? configPath : null;
+    if (!existsSync(configPath)) {
+      throw new Error(
+        `Config file not found at the specified --config path: ${configPath}`,
+      );
+    }
+    return configPath;
   }
 
   const defaultPath = join(process.cwd(), CONFIG_FILENAME);

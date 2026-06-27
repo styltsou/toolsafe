@@ -53,7 +53,9 @@ export function renderTerminalReport(result: AnalysisResult): string {
     lines.push(pc.bold('High-risk operations'));
 
     for (const tool of highRiskTools) {
-      lines.push(`  ${formatRisk(tool.risk)} ${pc.dim(tool.method)} ${tool.path} (${tool.toolName})`);
+      lines.push(
+        `  ${formatRisk(tool.risk)} ${pc.dim(tool.method)} ${tool.path} (${tool.toolName})`,
+      );
 
       for (const reason of tool.reasons.slice(0, 2)) {
         lines.push(`       ${pc.dim(reason)}`);

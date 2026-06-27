@@ -19,7 +19,7 @@ export function registerEvalsCommand(program: Command): void {
     .action(async (filePath: string, options: EvalsOptions) => {
       try {
         const config = loadConfig(options.config);
-        const result = await analyzeOpenApi(filePath, config ?? undefined);
+        const result = await analyzeOpenApi(filePath, config);
         const output = renderEvalIdeasYaml(generateEvalIdeas(result));
 
         if (options.out) {

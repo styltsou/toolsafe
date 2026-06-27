@@ -33,7 +33,7 @@ export function registerReportCommand(program: Command): void {
 
       try {
         const config = loadConfig(options.config);
-        const result = await analyzeOpenApi(filePath, config ?? undefined);
+        const result = await analyzeOpenApi(filePath, config);
         const output = renderReport(result, format);
 
         if (options.out) {
