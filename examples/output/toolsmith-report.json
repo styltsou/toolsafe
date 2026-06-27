@@ -1,0 +1,252 @@
+{
+  "input": {
+    "filePath": "examples/risky-openapi.yaml",
+    "title": "Risky Example API",
+    "version": "1.0.0"
+  },
+  "summary": {
+    "totalTools": 5,
+    "readOnlyTools": 1,
+    "mutatingTools": 4,
+    "destructiveTools": 1,
+    "highRiskTools": 3,
+    "findingCounts": {
+      "info": 0,
+      "warning": 14,
+      "error": 1
+    }
+  },
+  "scores": {
+    "overall": 34,
+    "safety": 66,
+    "schema": 92,
+    "docs": 100,
+    "errors": 80,
+    "agentUsability": 96,
+    "auth": 100
+  },
+  "tools": [
+    {
+      "toolId": "sendEmail",
+      "toolName": "sendEmail",
+      "method": "POST",
+      "path": "/emails/send",
+      "risk": "high",
+      "reasons": ["HTTP method POST can mutate state", "Risk keyword: email"]
+    },
+    {
+      "toolId": "chargePayment",
+      "toolName": "chargePayment",
+      "method": "POST",
+      "path": "/payments/charge",
+      "risk": "high",
+      "reasons": ["HTTP method POST can mutate state", "Risk keyword: payment"]
+    },
+    {
+      "toolId": "listUsers",
+      "toolName": "listUsers",
+      "method": "GET",
+      "path": "/users",
+      "risk": "low",
+      "reasons": ["HTTP method GET is generally read-only"]
+    },
+    {
+      "toolId": "createUser",
+      "toolName": "createUser",
+      "method": "POST",
+      "path": "/users",
+      "risk": "medium",
+      "reasons": ["HTTP method POST can mutate state"]
+    },
+    {
+      "toolId": "deleteUser",
+      "toolName": "deleteUser",
+      "method": "DELETE",
+      "path": "/users/{id}",
+      "risk": "high",
+      "reasons": ["HTTP method DELETE is destructive"]
+    }
+  ],
+  "findings": [
+    {
+      "ruleId": "safety/destructive-requires-guard",
+      "severity": "error",
+      "category": "safety",
+      "toolId": "deleteUser",
+      "toolName": "deleteUser",
+      "method": "DELETE",
+      "path": "/users/{id}",
+      "message": "Destructive operation does not declare an explicit agent guard or confirmation signal in the API contract.",
+      "recommendation": "Add a confirmation field, a vendor extension such as x-agent-guard, or a generated guard policy before exposing this operation to autonomous agents.",
+      "evidence": ["HTTP method DELETE"]
+    },
+    {
+      "ruleId": "errors/missing-error-schema",
+      "severity": "warning",
+      "category": "errors",
+      "toolId": "sendEmail",
+      "toolName": "sendEmail",
+      "method": "POST",
+      "path": "/emails/send",
+      "message": "Operation does not define a structured 4xx or 5xx error response schema.",
+      "recommendation": "Define structured error responses with stable error codes and messages so agents can recover safely.",
+      "evidence": ["No 4xx/5xx response with schema"]
+    },
+    {
+      "ruleId": "safety/external-communication-requires-guard",
+      "severity": "warning",
+      "category": "safety",
+      "toolId": "sendEmail",
+      "toolName": "sendEmail",
+      "method": "POST",
+      "path": "/emails/send",
+      "message": "External communication operation does not declare a confirmation or guard signal.",
+      "recommendation": "Add confirmation input or guard metadata before exposing this operation to autonomous agents.",
+      "evidence": ["HTTP method POST", "External communication keyword"]
+    },
+    {
+      "ruleId": "safety/mutating-requires-dry-run",
+      "severity": "warning",
+      "category": "safety",
+      "toolId": "sendEmail",
+      "toolName": "sendEmail",
+      "method": "POST",
+      "path": "/emails/send",
+      "message": "Mutating operation does not expose dry-run, preview, or validate-only mode.",
+      "recommendation": "Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.",
+      "evidence": ["HTTP method POST"]
+    },
+    {
+      "ruleId": "errors/missing-error-schema",
+      "severity": "warning",
+      "category": "errors",
+      "toolId": "chargePayment",
+      "toolName": "chargePayment",
+      "method": "POST",
+      "path": "/payments/charge",
+      "message": "Operation does not define a structured 4xx or 5xx error response schema.",
+      "recommendation": "Define structured error responses with stable error codes and messages so agents can recover safely.",
+      "evidence": ["No 4xx/5xx response with schema"]
+    },
+    {
+      "ruleId": "safety/financial-requires-idempotency",
+      "severity": "warning",
+      "category": "safety",
+      "toolId": "chargePayment",
+      "toolName": "chargePayment",
+      "method": "POST",
+      "path": "/payments/charge",
+      "message": "Financial mutating operation does not expose an idempotency key.",
+      "recommendation": "Add an idempotency key, request ID, or equivalent deduplication field before exposing this operation to agents.",
+      "evidence": ["HTTP method POST", "Financial operation keyword"]
+    },
+    {
+      "ruleId": "safety/mutating-requires-dry-run",
+      "severity": "warning",
+      "category": "safety",
+      "toolId": "chargePayment",
+      "toolName": "chargePayment",
+      "method": "POST",
+      "path": "/payments/charge",
+      "message": "Mutating operation does not expose dry-run, preview, or validate-only mode.",
+      "recommendation": "Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.",
+      "evidence": ["HTTP method POST"]
+    },
+    {
+      "ruleId": "errors/missing-error-schema",
+      "severity": "warning",
+      "category": "errors",
+      "toolId": "listUsers",
+      "toolName": "listUsers",
+      "method": "GET",
+      "path": "/users",
+      "message": "Operation does not define a structured 4xx or 5xx error response schema.",
+      "recommendation": "Define structured error responses with stable error codes and messages so agents can recover safely.",
+      "evidence": ["No 4xx/5xx response with schema"]
+    },
+    {
+      "ruleId": "schema/list-requires-pagination",
+      "severity": "warning",
+      "category": "agent_usability",
+      "toolId": "listUsers",
+      "toolName": "listUsers",
+      "method": "GET",
+      "path": "/users",
+      "message": "List/search operation has no pagination or limit query parameter.",
+      "recommendation": "Expose limit, page, pageSize, cursor, or offset parameters to prevent unbounded agent outputs.",
+      "evidence": ["GET operation appears to return a collection"]
+    },
+    {
+      "ruleId": "errors/missing-error-schema",
+      "severity": "warning",
+      "category": "errors",
+      "toolId": "createUser",
+      "toolName": "createUser",
+      "method": "POST",
+      "path": "/users",
+      "message": "Operation does not define a structured 4xx or 5xx error response schema.",
+      "recommendation": "Define structured error responses with stable error codes and messages so agents can recover safely.",
+      "evidence": ["No 4xx/5xx response with schema"]
+    },
+    {
+      "ruleId": "safety/mutating-requires-dry-run",
+      "severity": "warning",
+      "category": "safety",
+      "toolId": "createUser",
+      "toolName": "createUser",
+      "method": "POST",
+      "path": "/users",
+      "message": "Mutating operation does not expose dry-run, preview, or validate-only mode.",
+      "recommendation": "Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.",
+      "evidence": ["HTTP method POST"]
+    },
+    {
+      "ruleId": "schema/string-should-be-enum",
+      "severity": "warning",
+      "category": "schema",
+      "toolId": "createUser",
+      "toolName": "createUser",
+      "method": "POST",
+      "path": "/users",
+      "message": "String input 'role' appears constrained but has no enum.",
+      "recommendation": "Add enum values so agents can choose valid inputs without guessing API-specific strings.",
+      "evidence": ["String input: role"]
+    },
+    {
+      "ruleId": "schema/vague-boolean",
+      "severity": "warning",
+      "category": "schema",
+      "toolId": "createUser",
+      "toolName": "createUser",
+      "method": "POST",
+      "path": "/users",
+      "message": "Boolean input 'force' is too vague for reliable agent use.",
+      "recommendation": "Rename vague booleans to describe the exact behavior they enable, or replace them with a constrained enum.",
+      "evidence": ["Boolean input: force"]
+    },
+    {
+      "ruleId": "errors/missing-error-schema",
+      "severity": "warning",
+      "category": "errors",
+      "toolId": "deleteUser",
+      "toolName": "deleteUser",
+      "method": "DELETE",
+      "path": "/users/{id}",
+      "message": "Operation does not define a structured 4xx or 5xx error response schema.",
+      "recommendation": "Define structured error responses with stable error codes and messages so agents can recover safely.",
+      "evidence": ["No 4xx/5xx response with schema"]
+    },
+    {
+      "ruleId": "safety/mutating-requires-dry-run",
+      "severity": "warning",
+      "category": "safety",
+      "toolId": "deleteUser",
+      "toolName": "deleteUser",
+      "method": "DELETE",
+      "path": "/users/{id}",
+      "message": "Mutating operation does not expose dry-run, preview, or validate-only mode.",
+      "recommendation": "Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.",
+      "evidence": ["HTTP method DELETE"]
+    }
+  ]
+}

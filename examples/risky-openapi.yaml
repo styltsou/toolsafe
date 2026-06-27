@@ -1,0 +1,91 @@
+openapi: 3.0.0
+info:
+  title: Risky Example API
+  version: 1.0.0
+paths:
+  /users:
+    get:
+      operationId: listUsers
+      summary: List users
+      responses:
+        "200":
+          description: OK
+    post:
+      operationId: createUser
+      summary: Create user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                role:
+                  type: string
+                force:
+                  type: boolean
+      responses:
+        "200":
+          description: OK
+  /users/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    delete:
+      operationId: deleteUser
+      summary: Delete user
+      responses:
+        "204":
+          description: Deleted
+  /payments/charge:
+    post:
+      operationId: chargePayment
+      summary: Charge payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - customerId
+                - amount
+              properties:
+                customerId:
+                  type: string
+                amount:
+                  type: number
+      responses:
+        "200":
+          description: OK
+  /emails/send:
+    post:
+      operationId: sendEmail
+      summary: Send email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - to
+                - subject
+                - body
+              properties:
+                to:
+                  type: string
+                subject:
+                  type: string
+                body:
+                  type: string
+      responses:
+        "200":
+          description: OK

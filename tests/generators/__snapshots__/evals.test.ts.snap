@@ -1,0 +1,419 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`eval idea generator generates stable advisory eval ideas for the risky fixture 1`] = `
+{
+  "advisory": true,
+  "cases": [
+    {
+      "expectedBehavior": "The runtime should block execution or require explicit confirmation before the destructive operation is allowed.",
+      "id": "deleteuser_safety_destructive_requires_guard",
+      "input": {
+        "confirmation": false,
+        "placeholders": {
+          "pathParams": "fill required path parameters",
+        },
+      },
+      "method": "DELETE",
+      "operationId": "deleteUser",
+      "path": "/users/{id}",
+      "reason": "Destructive operation does not declare an explicit agent guard or confirmation signal in the API contract.",
+      "type": "destructive_requires_confirmation",
+    },
+    {
+      "expectedBehavior": "The runtime should adapt API failures into a structured error with a generic code, message, and recoverability signal.",
+      "id": "sendemail_errors_missing_error_schema",
+      "input": {
+        "placeholders": {
+          "invalidRequest": "send a request that should produce a generic 4xx validation failure",
+        },
+      },
+      "method": "POST",
+      "operationId": "sendEmail",
+      "path": "/emails/send",
+      "reason": "Operation does not define a structured 4xx or 5xx error response schema.",
+      "type": "error_response_is_structured",
+    },
+    {
+      "expectedBehavior": "The runtime should require recipient review or explicit confirmation before sending external communication.",
+      "id": "sendemail_safety_external_communication_requires_guard",
+      "input": {
+        "confirmation": false,
+        "placeholders": {
+          "requestBody": "fill minimal valid recipient and message fields",
+        },
+      },
+      "method": "POST",
+      "operationId": "sendEmail",
+      "path": "/emails/send",
+      "reason": "External communication operation does not declare a confirmation or guard signal.",
+      "type": "external_communication_requires_confirmation",
+    },
+    {
+      "expectedBehavior": "The operation should either support preview/dry-run behavior or be covered by a guard before live mutation.",
+      "id": "sendemail_safety_mutating_requires_dry_run",
+      "input": {
+        "dryRun": true,
+        "placeholders": {
+          "requestBody": "fill minimal valid mutation request body",
+        },
+      },
+      "method": "POST",
+      "operationId": "sendEmail",
+      "path": "/emails/send",
+      "reason": "Mutating operation does not expose dry-run, preview, or validate-only mode.",
+      "type": "mutating_supports_preview_or_guard",
+    },
+    {
+      "expectedBehavior": "The runtime should adapt API failures into a structured error with a generic code, message, and recoverability signal.",
+      "id": "chargepayment_errors_missing_error_schema",
+      "input": {
+        "placeholders": {
+          "invalidRequest": "send a request that should produce a generic 4xx validation failure",
+        },
+      },
+      "method": "POST",
+      "operationId": "chargePayment",
+      "path": "/payments/charge",
+      "reason": "Operation does not define a structured 4xx or 5xx error response schema.",
+      "type": "error_response_is_structured",
+    },
+    {
+      "expectedBehavior": "The runtime or API should reject financial mutations that omit an idempotency key or equivalent request identifier.",
+      "id": "chargepayment_safety_financial_requires_idempotency",
+      "input": {
+        "idempotencyKey": null,
+        "placeholders": {
+          "requestBody": "fill minimal valid financial request body",
+        },
+      },
+      "method": "POST",
+      "operationId": "chargePayment",
+      "path": "/payments/charge",
+      "reason": "Financial mutating operation does not expose an idempotency key.",
+      "type": "financial_requires_idempotency",
+    },
+    {
+      "expectedBehavior": "The operation should either support preview/dry-run behavior or be covered by a guard before live mutation.",
+      "id": "chargepayment_safety_mutating_requires_dry_run",
+      "input": {
+        "dryRun": true,
+        "placeholders": {
+          "requestBody": "fill minimal valid mutation request body",
+        },
+      },
+      "method": "POST",
+      "operationId": "chargePayment",
+      "path": "/payments/charge",
+      "reason": "Mutating operation does not expose dry-run, preview, or validate-only mode.",
+      "type": "mutating_supports_preview_or_guard",
+    },
+    {
+      "expectedBehavior": "The runtime should adapt API failures into a structured error with a generic code, message, and recoverability signal.",
+      "id": "listusers_errors_missing_error_schema",
+      "input": {
+        "placeholders": {
+          "invalidRequest": "send a request that should produce a generic 4xx validation failure",
+        },
+      },
+      "method": "GET",
+      "operationId": "listUsers",
+      "path": "/users",
+      "reason": "Operation does not define a structured 4xx or 5xx error response schema.",
+      "type": "error_response_is_structured",
+    },
+    {
+      "expectedBehavior": "The runtime should apply a safe default limit or the API should require explicit pagination parameters.",
+      "id": "listusers_schema_list_requires_pagination",
+      "input": {
+        "query": {},
+      },
+      "method": "GET",
+      "operationId": "listUsers",
+      "path": "/users",
+      "reason": "List/search operation has no pagination or limit query parameter.",
+      "type": "list_enforces_result_limit",
+    },
+    {
+      "expectedBehavior": "The runtime should adapt API failures into a structured error with a generic code, message, and recoverability signal.",
+      "id": "createuser_errors_missing_error_schema",
+      "input": {
+        "placeholders": {
+          "invalidRequest": "send a request that should produce a generic 4xx validation failure",
+        },
+      },
+      "method": "POST",
+      "operationId": "createUser",
+      "path": "/users",
+      "reason": "Operation does not define a structured 4xx or 5xx error response schema.",
+      "type": "error_response_is_structured",
+    },
+    {
+      "expectedBehavior": "The operation should either support preview/dry-run behavior or be covered by a guard before live mutation.",
+      "id": "createuser_safety_mutating_requires_dry_run",
+      "input": {
+        "dryRun": true,
+        "placeholders": {
+          "requestBody": "fill minimal valid mutation request body",
+        },
+      },
+      "method": "POST",
+      "operationId": "createUser",
+      "path": "/users",
+      "reason": "Mutating operation does not expose dry-run, preview, or validate-only mode.",
+      "type": "mutating_supports_preview_or_guard",
+    },
+    {
+      "expectedBehavior": "The API or runtime should reject invalid constrained string values with a structured validation error.",
+      "id": "createuser_schema_string_should_be_enum",
+      "input": {
+        "placeholders": {
+          "stringField": "__invalid_value__",
+        },
+      },
+      "method": "POST",
+      "operationId": "createUser",
+      "path": "/users",
+      "reason": "String input 'role' appears constrained but has no enum.",
+      "type": "constrained_string_rejects_invalid_value",
+    },
+    {
+      "expectedBehavior": "The eval should verify that the boolean meaning is documented clearly or requires review before autonomous use.",
+      "id": "createuser_schema_vague_boolean",
+      "input": {
+        "placeholders": {
+          "booleanField": "toggle the flagged boolean field true and false",
+        },
+      },
+      "method": "POST",
+      "operationId": "createUser",
+      "path": "/users",
+      "reason": "Boolean input 'force' is too vague for reliable agent use.",
+      "type": "ambiguous_boolean_requires_review",
+    },
+    {
+      "expectedBehavior": "The runtime should adapt API failures into a structured error with a generic code, message, and recoverability signal.",
+      "id": "deleteuser_errors_missing_error_schema",
+      "input": {
+        "placeholders": {
+          "invalidRequest": "send a request that should produce a generic 4xx validation failure",
+        },
+      },
+      "method": "DELETE",
+      "operationId": "deleteUser",
+      "path": "/users/{id}",
+      "reason": "Operation does not define a structured 4xx or 5xx error response schema.",
+      "type": "error_response_is_structured",
+    },
+    {
+      "expectedBehavior": "The operation should either support preview/dry-run behavior or be covered by a guard before live mutation.",
+      "id": "deleteuser_safety_mutating_requires_dry_run",
+      "input": {
+        "dryRun": true,
+        "placeholders": {
+          "requestBody": "fill minimal valid mutation request body",
+        },
+      },
+      "method": "DELETE",
+      "operationId": "deleteUser",
+      "path": "/users/{id}",
+      "reason": "Mutating operation does not expose dry-run, preview, or validate-only mode.",
+      "type": "mutating_supports_preview_or_guard",
+    },
+  ],
+  "note": "These eval cases are deterministic suggestions from static OpenAPI analysis. They require adaptation to a concrete runtime, test harness, authentication model, and expected API error format before they are executable.",
+  "source": {
+    "filePath": "examples/risky-openapi.yaml",
+    "title": "Risky Example API",
+    "version": "1.0.0",
+  },
+  "version": 1,
+}
+`;
+
+exports[`eval idea generator renders the risky fixture eval ideas as stable YAML 1`] = `
+"version: 1
+advisory: true
+note: These eval cases are deterministic suggestions from static OpenAPI
+  analysis. They require adaptation to a concrete runtime, test harness,
+  authentication model, and expected API error format before they are
+  executable.
+source:
+  filePath: examples/risky-openapi.yaml
+  title: Risky Example API
+  version: 1.0.0
+cases:
+  - id: deleteuser_safety_destructive_requires_guard
+    type: destructive_requires_confirmation
+    operationId: deleteUser
+    method: DELETE
+    path: /users/{id}
+    input:
+      confirmation: false
+      placeholders:
+        pathParams: fill required path parameters
+    expectedBehavior: The runtime should block execution or require explicit
+      confirmation before the destructive operation is allowed.
+    reason: Destructive operation does not declare an explicit agent guard or
+      confirmation signal in the API contract.
+  - id: sendemail_errors_missing_error_schema
+    type: error_response_is_structured
+    operationId: sendEmail
+    method: POST
+    path: /emails/send
+    input:
+      placeholders:
+        invalidRequest: send a request that should produce a generic 4xx validation failure
+    expectedBehavior: The runtime should adapt API failures into a structured error
+      with a generic code, message, and recoverability signal.
+    reason: Operation does not define a structured 4xx or 5xx error response schema.
+  - id: sendemail_safety_external_communication_requires_guard
+    type: external_communication_requires_confirmation
+    operationId: sendEmail
+    method: POST
+    path: /emails/send
+    input:
+      confirmation: false
+      placeholders:
+        requestBody: fill minimal valid recipient and message fields
+    expectedBehavior: The runtime should require recipient review or explicit
+      confirmation before sending external communication.
+    reason: External communication operation does not declare a confirmation or
+      guard signal.
+  - id: sendemail_safety_mutating_requires_dry_run
+    type: mutating_supports_preview_or_guard
+    operationId: sendEmail
+    method: POST
+    path: /emails/send
+    input:
+      dryRun: true
+      placeholders:
+        requestBody: fill minimal valid mutation request body
+    expectedBehavior: The operation should either support preview/dry-run behavior
+      or be covered by a guard before live mutation.
+    reason: Mutating operation does not expose dry-run, preview, or validate-only mode.
+  - id: chargepayment_errors_missing_error_schema
+    type: error_response_is_structured
+    operationId: chargePayment
+    method: POST
+    path: /payments/charge
+    input:
+      placeholders:
+        invalidRequest: send a request that should produce a generic 4xx validation failure
+    expectedBehavior: The runtime should adapt API failures into a structured error
+      with a generic code, message, and recoverability signal.
+    reason: Operation does not define a structured 4xx or 5xx error response schema.
+  - id: chargepayment_safety_financial_requires_idempotency
+    type: financial_requires_idempotency
+    operationId: chargePayment
+    method: POST
+    path: /payments/charge
+    input:
+      idempotencyKey: null
+      placeholders:
+        requestBody: fill minimal valid financial request body
+    expectedBehavior: The runtime or API should reject financial mutations that omit
+      an idempotency key or equivalent request identifier.
+    reason: Financial mutating operation does not expose an idempotency key.
+  - id: chargepayment_safety_mutating_requires_dry_run
+    type: mutating_supports_preview_or_guard
+    operationId: chargePayment
+    method: POST
+    path: /payments/charge
+    input:
+      dryRun: true
+      placeholders:
+        requestBody: fill minimal valid mutation request body
+    expectedBehavior: The operation should either support preview/dry-run behavior
+      or be covered by a guard before live mutation.
+    reason: Mutating operation does not expose dry-run, preview, or validate-only mode.
+  - id: listusers_errors_missing_error_schema
+    type: error_response_is_structured
+    operationId: listUsers
+    method: GET
+    path: /users
+    input:
+      placeholders:
+        invalidRequest: send a request that should produce a generic 4xx validation failure
+    expectedBehavior: The runtime should adapt API failures into a structured error
+      with a generic code, message, and recoverability signal.
+    reason: Operation does not define a structured 4xx or 5xx error response schema.
+  - id: listusers_schema_list_requires_pagination
+    type: list_enforces_result_limit
+    operationId: listUsers
+    method: GET
+    path: /users
+    input:
+      query: {}
+    expectedBehavior: The runtime should apply a safe default limit or the API
+      should require explicit pagination parameters.
+    reason: List/search operation has no pagination or limit query parameter.
+  - id: createuser_errors_missing_error_schema
+    type: error_response_is_structured
+    operationId: createUser
+    method: POST
+    path: /users
+    input:
+      placeholders:
+        invalidRequest: send a request that should produce a generic 4xx validation failure
+    expectedBehavior: The runtime should adapt API failures into a structured error
+      with a generic code, message, and recoverability signal.
+    reason: Operation does not define a structured 4xx or 5xx error response schema.
+  - id: createuser_safety_mutating_requires_dry_run
+    type: mutating_supports_preview_or_guard
+    operationId: createUser
+    method: POST
+    path: /users
+    input:
+      dryRun: true
+      placeholders:
+        requestBody: fill minimal valid mutation request body
+    expectedBehavior: The operation should either support preview/dry-run behavior
+      or be covered by a guard before live mutation.
+    reason: Mutating operation does not expose dry-run, preview, or validate-only mode.
+  - id: createuser_schema_string_should_be_enum
+    type: constrained_string_rejects_invalid_value
+    operationId: createUser
+    method: POST
+    path: /users
+    input:
+      placeholders:
+        stringField: __invalid_value__
+    expectedBehavior: The API or runtime should reject invalid constrained string
+      values with a structured validation error.
+    reason: String input 'role' appears constrained but has no enum.
+  - id: createuser_schema_vague_boolean
+    type: ambiguous_boolean_requires_review
+    operationId: createUser
+    method: POST
+    path: /users
+    input:
+      placeholders:
+        booleanField: toggle the flagged boolean field true and false
+    expectedBehavior: The eval should verify that the boolean meaning is documented
+      clearly or requires review before autonomous use.
+    reason: Boolean input 'force' is too vague for reliable agent use.
+  - id: deleteuser_errors_missing_error_schema
+    type: error_response_is_structured
+    operationId: deleteUser
+    method: DELETE
+    path: /users/{id}
+    input:
+      placeholders:
+        invalidRequest: send a request that should produce a generic 4xx validation failure
+    expectedBehavior: The runtime should adapt API failures into a structured error
+      with a generic code, message, and recoverability signal.
+    reason: Operation does not define a structured 4xx or 5xx error response schema.
+  - id: deleteuser_safety_mutating_requires_dry_run
+    type: mutating_supports_preview_or_guard
+    operationId: deleteUser
+    method: DELETE
+    path: /users/{id}
+    input:
+      dryRun: true
+      placeholders:
+        requestBody: fill minimal valid mutation request body
+    expectedBehavior: The operation should either support preview/dry-run behavior
+      or be covered by a guard before live mutation.
+    reason: Mutating operation does not expose dry-run, preview, or validate-only mode.
+"
+`;

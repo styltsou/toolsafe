@@ -1,0 +1,11 @@
+{
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "ignorePatterns": ["node_modules/**", "dist/**", "coverage/**", "bun.lock", "*.md"],
+  "rules": {
+    "no-console": "off"
+  }
+}

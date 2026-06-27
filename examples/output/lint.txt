@@ -1,0 +1,83 @@
+Toolsmith Agent-Readiness Report
+
+Input: examples/risky-openapi.yaml
+API: Risky Example API 1.0.0
+Operations analyzed: 5
+Overall score: 34/100
+Findings: 1 error, 14 warning, 0 info
+
+High-risk operations
+  HIGH POST /emails/send (sendEmail)
+       HTTP method POST can mutate state
+       Risk keyword: email
+  HIGH POST /payments/charge (chargePayment)
+       HTTP method POST can mutate state
+       Risk keyword: payment
+  HIGH DELETE /users/{id} (deleteUser)
+       HTTP method DELETE is destructive
+
+Errors
+  ERROR DELETE /users/{id} (safety/destructive-requires-guard)
+       Destructive operation does not declare an explicit agent guard or confirmation signal in the API contract.
+       Recommendation: Add a confirmation field, a vendor extension such as x-agent-guard, or a generated guard policy before exposing this operation to autonomous agents.
+       Evidence: HTTP method DELETE
+
+Warnings
+  WARN  POST /emails/send (errors/missing-error-schema)
+       Operation does not define a structured 4xx or 5xx error response schema.
+       Recommendation: Define structured error responses with stable error codes and messages so agents can recover safely.
+       Evidence: No 4xx/5xx response with schema
+  WARN  POST /emails/send (safety/external-communication-requires-guard)
+       External communication operation does not declare a confirmation or guard signal.
+       Recommendation: Add confirmation input or guard metadata before exposing this operation to autonomous agents.
+       Evidence: HTTP method POST
+       Evidence: External communication keyword
+  WARN  POST /emails/send (safety/mutating-requires-dry-run)
+       Mutating operation does not expose dry-run, preview, or validate-only mode.
+       Recommendation: Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.
+       Evidence: HTTP method POST
+  WARN  POST /payments/charge (errors/missing-error-schema)
+       Operation does not define a structured 4xx or 5xx error response schema.
+       Recommendation: Define structured error responses with stable error codes and messages so agents can recover safely.
+       Evidence: No 4xx/5xx response with schema
+  WARN  POST /payments/charge (safety/financial-requires-idempotency)
+       Financial mutating operation does not expose an idempotency key.
+       Recommendation: Add an idempotency key, request ID, or equivalent deduplication field before exposing this operation to agents.
+       Evidence: HTTP method POST
+       Evidence: Financial operation keyword
+  WARN  POST /payments/charge (safety/mutating-requires-dry-run)
+       Mutating operation does not expose dry-run, preview, or validate-only mode.
+       Recommendation: Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.
+       Evidence: HTTP method POST
+  WARN  GET /users (errors/missing-error-schema)
+       Operation does not define a structured 4xx or 5xx error response schema.
+       Recommendation: Define structured error responses with stable error codes and messages so agents can recover safely.
+       Evidence: No 4xx/5xx response with schema
+  WARN  GET /users (schema/list-requires-pagination)
+       List/search operation has no pagination or limit query parameter.
+       Recommendation: Expose limit, page, pageSize, cursor, or offset parameters to prevent unbounded agent outputs.
+       Evidence: GET operation appears to return a collection
+  WARN  POST /users (errors/missing-error-schema)
+       Operation does not define a structured 4xx or 5xx error response schema.
+       Recommendation: Define structured error responses with stable error codes and messages so agents can recover safely.
+       Evidence: No 4xx/5xx response with schema
+  WARN  POST /users (safety/mutating-requires-dry-run)
+       Mutating operation does not expose dry-run, preview, or validate-only mode.
+       Recommendation: Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.
+       Evidence: HTTP method POST
+  WARN  POST /users (schema/string-should-be-enum)
+       String input 'role' appears constrained but has no enum.
+       Recommendation: Add enum values so agents can choose valid inputs without guessing API-specific strings.
+       Evidence: String input: role
+  WARN  POST /users (schema/vague-boolean)
+       Boolean input 'force' is too vague for reliable agent use.
+       Recommendation: Rename vague booleans to describe the exact behavior they enable, or replace them with a constrained enum.
+       Evidence: Boolean input: force
+  WARN  DELETE /users/{id} (errors/missing-error-schema)
+       Operation does not define a structured 4xx or 5xx error response schema.
+       Recommendation: Define structured error responses with stable error codes and messages so agents can recover safely.
+       Evidence: No 4xx/5xx response with schema
+  WARN  DELETE /users/{id} (safety/mutating-requires-dry-run)
+       Mutating operation does not expose dry-run, preview, or validate-only mode.
+       Recommendation: Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.
+       Evidence: HTTP method DELETE
