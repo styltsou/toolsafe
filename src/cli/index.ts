@@ -6,6 +6,7 @@ import { registerInitCommand } from '@/cli/commands/init';
 import { registerLintCommand } from '@/cli/commands/lint';
 import { registerReportCommand } from '@/cli/commands/report';
 import { defaultRules } from '@/rules';
+import { generateBashCompletion, generateZshCompletion } from '@/cli/completion';
 import pkg from '../../package.json' with { type: 'json' };
 
 const program = new Command();
@@ -26,6 +27,18 @@ program
   .action(() => {
     for (const rule of defaultRules) {
       console.log(`${rule.id}\t${rule.defaultSeverity}\t${rule.category}\t${rule.description}`);
+    }
+  });
+
+program
+  .command('completion')
+  .description('Generate shell completion script')
+  .argument('[shell]', 'Shell type: bash or zsh')
+  .action((shell?: string) => {
+    if (shell === 'zsh') {
+      console.log(generateZshCompletion());
+    } else {
+      console.log(generateBashCompletion());
     }
   });
 
