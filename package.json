@@ -20,6 +20,12 @@
   "bin": {
     "toolsafe": "./src/cli/index.ts"
   },
+  "files": [
+    "src",
+    "index.ts",
+    "README.md",
+    "tsconfig.json"
+  ],
   "type": "module",
   "scripts": {
     "dev": "bun run src/cli/index.ts",

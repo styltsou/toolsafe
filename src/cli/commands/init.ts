@@ -153,22 +153,23 @@ async function analyzeProject(root: string, config: ToolSafeConfig | undefined):
     return;
   }
 
-  const results: { file: string; result: AnalysisResult }[] = [];
-  const skipped: { file: string; reason: string }[] = [];
+  const entries = await Promise.all(
+    files.map(async (file) => {
+      const relPath = relative(root, file);
+      try {
+        const result = await analyzeOpenApi(file, config);
+        process.stdout.write(`  ${picocolors.green('✓')} ${relPath}  (${formatFindingCount(result)})\n`);
+        return { kind: 'success' as const, file, result };
+      } catch (error) {
+        const reason = renderSkipReason(error);
+        process.stdout.write(`  ${picocolors.dim('-')} ${relPath}  skipped (${reason})\n`);
+        return { kind: 'skipped' as const, file, reason };
+      }
+    }),
+  );
 
-  for (const file of files) {
-    const relPath = relative(root, file);
-
-    try {
-      const result = await analyzeOpenApi(file, config);
-      results.push({ file, result });
-      process.stdout.write(`  ${picocolors.green('✓')} ${relPath}  (${formatFindingCount(result)})\n`);
-    } catch (error) {
-      const reason = renderSkipReason(error);
-      skipped.push({ file, reason });
-      process.stdout.write(`  ${picocolors.dim('-')} ${relPath}  skipped (${reason})\n`);
-    }
-  }
+  const results = entries.filter((e): e is { kind: 'success'; file: string; result: AnalysisResult } => e.kind === 'success');
+  const skipped = entries.filter((e): e is { kind: 'skipped'; file: string; reason: string } => e.kind === 'skipped');
 
   const totalErrors = results.reduce((sum, r) => sum + r.result.summary.findingCounts.error, 0);
   const totalWarnings = results.reduce((sum, r) => sum + r.result.summary.findingCounts.warning, 0);
