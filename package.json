@@ -1,7 +1,7 @@
 {
   "name": "toolsafe",
-  "version": "0.1.1",
-  "description": "Deterministic agent-readiness linter for OpenAPI APIs",
+  "version": "0.1.2",
+  "description": "Lint OpenAPI specs for AI agent safety — detect risky operations, missing guards, destructive endpoints, and schema issues before exposing APIs to LLMs and agents",
   "keywords": [
     "agent",
     "ai",
