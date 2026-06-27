@@ -6,36 +6,36 @@ API: Risky Example API 1.0.0
 
 ## Summary
 
-| Metric                 | Value |
-| ---------------------- | ----: |
-| Operations analyzed    |     5 |
-| Read-only operations   |     1 |
-| Mutating operations    |     4 |
-| Destructive operations |     1 |
-| High-risk operations   |     3 |
-| Errors                 |     1 |
-| Warnings               |    14 |
-| Info                   |     0 |
+| Metric | Value |
+| --- | ---: |
+| Operations analyzed | 5 |
+| Read-only operations | 1 |
+| Mutating operations | 4 |
+| Destructive operations | 1 |
+| High-risk operations | 3 |
+| Errors | 1 |
+| Warnings | 18 |
+| Info | 5 |
 
 ## Scores
 
-| Category        |   Score |
-| --------------- | ------: |
-| Overall         |  34/100 |
-| Safety          |  66/100 |
-| Schema          |  92/100 |
-| Docs            | 100/100 |
-| Errors          |  80/100 |
-| Agent usability |  96/100 |
-| Auth            | 100/100 |
+| Category | Score |
+| --- | ---: |
+| Overall | 13/100 |
+| Safety | 66/100 |
+| Schema | 92/100 |
+| Docs | 79/100 |
+| Errors | 80/100 |
+| Agent usability | 96/100 |
+| Auth | 100/100 |
 
 ## High-Risk Operations
 
-| Risk | Operation                               | Reasons                                                  |
-| ---- | --------------------------------------- | -------------------------------------------------------- |
-| high | `POST /emails/send` (sendEmail)         | HTTP method POST can mutate state; Risk keyword: email   |
+| Risk | Operation | Reasons |
+| --- | --- | --- |
+| high | `POST /emails/send` (sendEmail) | HTTP method POST can mutate state; Risk keyword: email |
 | high | `POST /payments/charge` (chargePayment) | HTTP method POST can mutate state; Risk keyword: payment |
-| high | `DELETE /users/{id}` (deleteUser)       | HTTP method DELETE is destructive                        |
+| high | `DELETE /users/{id}` (deleteUser) | HTTP method DELETE is destructive |
 
 ## Findings
 
@@ -47,6 +47,11 @@ API: Risky Example API 1.0.0
   - Evidence: HTTP method DELETE
 
 ### Warnings
+
+- **docs/mutating-description-mentions-side-effects**: `POST /emails/send`
+  - Mutating operation description does not mention side effects or state changes.
+  - Recommendation: Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").
+  - Evidence: Method: POST; No description provided
 
 - **errors/missing-error-schema**: `POST /emails/send`
   - Operation does not define a structured 4xx or 5xx error response schema.
@@ -62,6 +67,11 @@ API: Risky Example API 1.0.0
   - Mutating operation does not expose dry-run, preview, or validate-only mode.
   - Recommendation: Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.
   - Evidence: HTTP method POST
+
+- **docs/mutating-description-mentions-side-effects**: `POST /payments/charge`
+  - Mutating operation description does not mention side effects or state changes.
+  - Recommendation: Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").
+  - Evidence: Method: POST; No description provided
 
 - **errors/missing-error-schema**: `POST /payments/charge`
   - Operation does not define a structured 4xx or 5xx error response schema.
@@ -88,6 +98,11 @@ API: Risky Example API 1.0.0
   - Recommendation: Expose limit, page, pageSize, cursor, or offset parameters to prevent unbounded agent outputs.
   - Evidence: GET operation appears to return a collection
 
+- **docs/mutating-description-mentions-side-effects**: `POST /users`
+  - Mutating operation description does not mention side effects or state changes.
+  - Recommendation: Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").
+  - Evidence: Method: POST; No description provided
+
 - **errors/missing-error-schema**: `POST /users`
   - Operation does not define a structured 4xx or 5xx error response schema.
   - Recommendation: Define structured error responses with stable error codes and messages so agents can recover safely.
@@ -108,6 +123,11 @@ API: Risky Example API 1.0.0
   - Recommendation: Rename vague booleans to describe the exact behavior they enable, or replace them with a constrained enum.
   - Evidence: Boolean input: force
 
+- **docs/mutating-description-mentions-side-effects**: `DELETE /users/{id}`
+  - Mutating operation description does not mention side effects or state changes.
+  - Recommendation: Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").
+  - Evidence: Method: DELETE; No description provided
+
 - **errors/missing-error-schema**: `DELETE /users/{id}`
   - Operation does not define a structured 4xx or 5xx error response schema.
   - Recommendation: Define structured error responses with stable error codes and messages so agents can recover safely.
@@ -117,3 +137,30 @@ API: Risky Example API 1.0.0
   - Mutating operation does not expose dry-run, preview, or validate-only mode.
   - Recommendation: Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.
   - Evidence: HTTP method DELETE
+
+### Info
+
+- **docs/weak-description**: `POST /emails/send`
+  - Description is too short to be useful for agent tool selection.
+  - Recommendation: Expand the description to clearly explain what the operation does and when to use it.
+  - Evidence: Description length: 10 characters
+
+- **docs/weak-description**: `POST /payments/charge`
+  - Description is too short to be useful for agent tool selection.
+  - Recommendation: Expand the description to clearly explain what the operation does and when to use it.
+  - Evidence: Description length: 14 characters
+
+- **docs/weak-description**: `GET /users`
+  - Description is too short to be useful for agent tool selection.
+  - Recommendation: Expand the description to clearly explain what the operation does and when to use it.
+  - Evidence: Description length: 10 characters
+
+- **docs/weak-description**: `POST /users`
+  - Description is too short to be useful for agent tool selection.
+  - Recommendation: Expand the description to clearly explain what the operation does and when to use it.
+  - Evidence: Description length: 11 characters
+
+- **docs/weak-description**: `DELETE /users/{id}`
+  - Description is too short to be useful for agent tool selection.
+  - Recommendation: Expand the description to clearly explain what the operation does and when to use it.
+  - Evidence: Description length: 11 characters

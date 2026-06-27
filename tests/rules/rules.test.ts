@@ -3,17 +3,22 @@ import type { NormalizedTool } from '@/core/types';
 import { normalizeOpenApi } from '@/core/normalize';
 import { parseOpenApi } from '@/parsers/openapi';
 import {
+  batchOperationRequiresLimitRule,
+  dangerousAuthScopeRule,
   destructiveRequiresGuardRule,
   externalCommunicationRequiresGuardRule,
   financialRequiresIdempotencyRule,
   listRequiresPaginationRule,
   missingDescriptionRule,
   missingErrorSchemaRule,
+  mutatingDescriptionMentionsSideEffectsRule,
   mutatingRequiresDryRunRule,
   runRules,
   sensitiveResponseFieldsRule,
   stringShouldBeEnumRule,
+  unconstrainedFileUploadRule,
   vagueBooleanRule,
+  weakDescriptionRule,
 } from '@/rules';
 
 describe('default rule engine', () => {
@@ -24,20 +29,29 @@ describe('default rule engine', () => {
 
     expect(findings.map((finding) => finding.ruleId)).toEqual([
       'safety/destructive-requires-guard',
+      'docs/mutating-description-mentions-side-effects',
       'errors/missing-error-schema',
       'safety/external-communication-requires-guard',
       'safety/mutating-requires-dry-run',
+      'docs/mutating-description-mentions-side-effects',
       'errors/missing-error-schema',
       'safety/financial-requires-idempotency',
       'safety/mutating-requires-dry-run',
       'errors/missing-error-schema',
       'schema/list-requires-pagination',
+      'docs/mutating-description-mentions-side-effects',
       'errors/missing-error-schema',
       'safety/mutating-requires-dry-run',
       'schema/string-should-be-enum',
       'schema/vague-boolean',
+      'docs/mutating-description-mentions-side-effects',
       'errors/missing-error-schema',
       'safety/mutating-requires-dry-run',
+      'docs/weak-description',
+      'docs/weak-description',
+      'docs/weak-description',
+      'docs/weak-description',
+      'docs/weak-description',
     ]);
   });
 });
@@ -451,6 +465,340 @@ describe('errors/missing-error-schema', () => {
     });
 
     const findings = missingErrorSchemaRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+});
+
+describe('docs/weak-description', () => {
+  test('flags descriptions that are too short', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/health',
+      name: 'getHealth',
+      description: 'Short desc',
+    });
+
+    const findings = weakDescriptionRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.severity).toBe('info');
+  });
+
+  test('flags descriptions with placeholder text', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/users',
+      name: 'createUser',
+      description: 'TODO: write a description',
+    });
+
+    const findings = weakDescriptionRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(1);
+  });
+
+  test('does not flag substantive descriptions', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/users',
+      name: 'listUsers',
+      description:
+        'Returns a paginated list of users with their profile information and account status.',
+    });
+
+    const findings = weakDescriptionRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag missing description (handled by docs/missing-description)', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/health',
+      name: 'getHealth',
+    });
+
+    const findings = weakDescriptionRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+});
+
+describe('docs/mutating-description-mentions-side-effects', () => {
+  test('flags mutating operations without side-effect verbs in the description', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/users',
+      name: 'createUser',
+      description: 'User operation',
+    });
+
+    const findings = mutatingDescriptionMentionsSideEffectsRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(1);
+  });
+
+  test('does not flag mutating operations with side-effect verbs', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/users',
+      name: 'createUser',
+      description: 'Creates a new user account',
+    });
+
+    const findings = mutatingDescriptionMentionsSideEffectsRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag read-only operations', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/users',
+      name: 'listUsers',
+      description: 'List users',
+    });
+
+    const findings = mutatingDescriptionMentionsSideEffectsRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+});
+
+describe('safety/batch-operation-requires-limit', () => {
+  test('flags batch operations without a limit parameter', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/users/batch',
+      name: 'batchCreateUsers',
+      summary: 'Batch create users',
+    });
+
+    const findings = batchOperationRequiresLimitRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(1);
+  });
+
+  test('does not flag batch operations with a limit parameter', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/users/batch',
+      name: 'batchCreateUsers',
+      summary: 'Batch create users',
+      parameters: [
+        {
+          name: 'limit',
+          in: 'query',
+          required: false,
+        },
+      ],
+    });
+
+    const findings = batchOperationRequiresLimitRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag non-batch operations', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/users',
+      name: 'listUsers',
+      summary: 'List users',
+    });
+
+    const findings = batchOperationRequiresLimitRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+});
+
+describe('auth/dangerous-auth-scope', () => {
+  test('flags operations with a broad admin scope', () => {
+    const tool = makeTool({
+      method: 'DELETE',
+      path: '/users/{id}',
+      name: 'deleteUser',
+      security: [{ oauth2: ['admin'] }],
+    });
+
+    const findings = dangerousAuthScopeRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.severity).toBe('warning');
+  });
+
+  test('flags operations with wildcard scope', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/users',
+      name: 'listUsers',
+      security: [{ oauth2: ['read', '*'] }],
+    });
+
+    const findings = dangerousAuthScopeRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(1);
+  });
+
+  test('does not flag fine-grained scopes', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/users',
+      name: 'listUsers',
+      security: [{ oauth2: ['users:read'] }],
+    });
+
+    const findings = dangerousAuthScopeRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag operations with no security', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/health',
+      name: 'getHealth',
+    });
+
+    const findings = dangerousAuthScopeRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+});
+
+describe('schema/unconstrained-file-upload', () => {
+  test('flags unconstrained file upload with binary format', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/documents/upload',
+      name: 'uploadDocument',
+      parameters: [
+        {
+          name: 'file',
+          in: 'query',
+          required: true,
+          schema: { type: 'string', format: 'binary' },
+        },
+      ],
+    });
+
+    const findings = unconstrainedFileUploadRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(1);
+  });
+
+  test('flags unconstrained file upload in request body', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/avatars/upload',
+      name: 'uploadAvatar',
+      requestBodySchema: {
+        type: 'object',
+        properties: {
+          avatar: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    });
+
+    const findings = unconstrainedFileUploadRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(1);
+  });
+
+  test('does not flag file upload with maxLength constraint', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/documents/upload',
+      name: 'uploadDocument',
+      parameters: [
+        {
+          name: 'file',
+          in: 'query',
+          required: true,
+          schema: { type: 'string', format: 'binary', maxLength: 1048576 },
+        },
+      ],
+    });
+
+    const findings = unconstrainedFileUploadRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag non-file inputs', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/users',
+      name: 'createUser',
+      requestBodySchema: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          email: { type: 'string' },
+        },
+      },
+    });
+
+    const findings = unconstrainedFileUploadRule.check({
       tool,
       allTools: [tool],
     });

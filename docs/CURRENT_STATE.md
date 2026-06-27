@@ -110,17 +110,50 @@ The project now includes:
 - Sample outputs under `examples/output/`.
 - GitHub Actions CI for typecheck, lint, format check, and tests.
 
+### Milestone 11: SARIF Output
+
+The report command now supports SARIF 2.1.0 output via `--format sarif`. SARIF results include:
+
+- Full rule metadata in `tool.driver.rules`.
+- Each finding as a SARIF result with `error`, `warning`, or `note` level.
+- Source file URI and operation snippet in each result location.
+- Extra properties for category, tool ID, method, and path.
+
+SARIF output enables GitHub code scanning and GitLab SAST integration.
+
+### Milestone 12: Publishing And README
+
+The package is now publishable to npm:
+
+- `"private": true` removed, added metadata, license, and repository fields.
+- Version is derived from `package.json` (the single source of truth).
+- `bin` entry points directly to `src/cli/index.ts` — Bun's native TS support handles it.
+- README rewritten with install instructions, full CLI reference, output format docs, and CI examples.
+
+### Milestone 13: Remaining PRD Rules
+
+Five more rules from the PRD were added, bringing the default set to 15:
+
+- `safety/batch-operation-requires-limit` — flags batch operations without limits.
+- `auth/dangerous-auth-scope` — flags overly broad security scopes.
+- `docs/weak-description` — flags short or placeholder descriptions.
+- `docs/mutating-description-mentions-side-effects` — flags mutating ops whose descriptions lack side-effect verbs.
+- `schema/unconstrained-file-upload` — flags file uploads without size constraints.
+
+### Milestone 14: Terminal Polish And Example Checks
+
+- Terminal output now shows a per-category score breakdown and dims evidence/recommendation text for easier scanning.
+- `bun run examples:check` regenerates examples into a temp dir and diffs against committed files, keeping sample outputs current.
+
 ## Not Implemented Yet
 
 The following are planned or mentioned in product docs but are not complete at this point:
 
 - Config files and severity overrides.
-- SARIF output.
 - Remote URL input.
 - Runtime API execution or proxy behavior.
 - MCP server generation.
 - LLM-based suggestions.
-- npm publishing.
 
 ## Important Scope Notes
 

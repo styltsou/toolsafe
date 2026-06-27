@@ -20,6 +20,16 @@ exports[`eval idea generator generates stable advisory eval ideas for the risky 
       "type": "destructive_requires_confirmation",
     },
     {
+      "expectedBehavior": "Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").",
+      "id": "sendemail_docs_mutating_description_mentions_side_effects",
+      "input": {},
+      "method": "POST",
+      "operationId": "sendEmail",
+      "path": "/emails/send",
+      "reason": "Mutating operation description does not mention side effects or state changes.",
+      "type": "finding_requires_eval",
+    },
+    {
       "expectedBehavior": "The runtime should adapt API failures into a structured error with a generic code, message, and recoverability signal.",
       "id": "sendemail_errors_missing_error_schema",
       "input": {
@@ -62,6 +72,16 @@ exports[`eval idea generator generates stable advisory eval ideas for the risky 
       "path": "/emails/send",
       "reason": "Mutating operation does not expose dry-run, preview, or validate-only mode.",
       "type": "mutating_supports_preview_or_guard",
+    },
+    {
+      "expectedBehavior": "Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").",
+      "id": "chargepayment_docs_mutating_description_mentions_side_effects",
+      "input": {},
+      "method": "POST",
+      "operationId": "chargePayment",
+      "path": "/payments/charge",
+      "reason": "Mutating operation description does not mention side effects or state changes.",
+      "type": "finding_requires_eval",
     },
     {
       "expectedBehavior": "The runtime should adapt API failures into a structured error with a generic code, message, and recoverability signal.",
@@ -134,6 +154,16 @@ exports[`eval idea generator generates stable advisory eval ideas for the risky 
       "type": "list_enforces_result_limit",
     },
     {
+      "expectedBehavior": "Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").",
+      "id": "createuser_docs_mutating_description_mentions_side_effects",
+      "input": {},
+      "method": "POST",
+      "operationId": "createUser",
+      "path": "/users",
+      "reason": "Mutating operation description does not mention side effects or state changes.",
+      "type": "finding_requires_eval",
+    },
+    {
       "expectedBehavior": "The runtime should adapt API failures into a structured error with a generic code, message, and recoverability signal.",
       "id": "createuser_errors_missing_error_schema",
       "input": {
@@ -191,6 +221,16 @@ exports[`eval idea generator generates stable advisory eval ideas for the risky 
       "type": "ambiguous_boolean_requires_review",
     },
     {
+      "expectedBehavior": "Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").",
+      "id": "deleteuser_docs_mutating_description_mentions_side_effects",
+      "input": {},
+      "method": "DELETE",
+      "operationId": "deleteUser",
+      "path": "/users/{id}",
+      "reason": "Mutating operation description does not mention side effects or state changes.",
+      "type": "finding_requires_eval",
+    },
+    {
       "expectedBehavior": "The runtime should adapt API failures into a structured error with a generic code, message, and recoverability signal.",
       "id": "deleteuser_errors_missing_error_schema",
       "input": {
@@ -218,6 +258,56 @@ exports[`eval idea generator generates stable advisory eval ideas for the risky 
       "path": "/users/{id}",
       "reason": "Mutating operation does not expose dry-run, preview, or validate-only mode.",
       "type": "mutating_supports_preview_or_guard",
+    },
+    {
+      "expectedBehavior": "Expand the description to clearly explain what the operation does and when to use it.",
+      "id": "sendemail_docs_weak_description",
+      "input": {},
+      "method": "POST",
+      "operationId": "sendEmail",
+      "path": "/emails/send",
+      "reason": "Description is too short to be useful for agent tool selection.",
+      "type": "finding_requires_eval",
+    },
+    {
+      "expectedBehavior": "Expand the description to clearly explain what the operation does and when to use it.",
+      "id": "chargepayment_docs_weak_description",
+      "input": {},
+      "method": "POST",
+      "operationId": "chargePayment",
+      "path": "/payments/charge",
+      "reason": "Description is too short to be useful for agent tool selection.",
+      "type": "finding_requires_eval",
+    },
+    {
+      "expectedBehavior": "Expand the description to clearly explain what the operation does and when to use it.",
+      "id": "listusers_docs_weak_description",
+      "input": {},
+      "method": "GET",
+      "operationId": "listUsers",
+      "path": "/users",
+      "reason": "Description is too short to be useful for agent tool selection.",
+      "type": "finding_requires_eval",
+    },
+    {
+      "expectedBehavior": "Expand the description to clearly explain what the operation does and when to use it.",
+      "id": "createuser_docs_weak_description",
+      "input": {},
+      "method": "POST",
+      "operationId": "createUser",
+      "path": "/users",
+      "reason": "Description is too short to be useful for agent tool selection.",
+      "type": "finding_requires_eval",
+    },
+    {
+      "expectedBehavior": "Expand the description to clearly explain what the operation does and when to use it.",
+      "id": "deleteuser_docs_weak_description",
+      "input": {},
+      "method": "DELETE",
+      "operationId": "deleteUser",
+      "path": "/users/{id}",
+      "reason": "Description is too short to be useful for agent tool selection.",
+      "type": "finding_requires_eval",
     },
   ],
   "note": "These eval cases are deterministic suggestions from static OpenAPI analysis. They require adaptation to a concrete runtime, test harness, authentication model, and expected API error format before they are executable.",
@@ -255,6 +345,17 @@ cases:
       confirmation before the destructive operation is allowed.
     reason: Destructive operation does not declare an explicit agent guard or
       confirmation signal in the API contract.
+  - id: sendemail_docs_mutating_description_mentions_side_effects
+    type: finding_requires_eval
+    operationId: sendEmail
+    method: POST
+    path: /emails/send
+    input: {}
+    expectedBehavior: Update the description to clearly state what side effects this
+      operation has (e.g., "Creates a new user account" rather than just "Create
+      user").
+    reason: Mutating operation description does not mention side effects or state
+      changes.
   - id: sendemail_errors_missing_error_schema
     type: error_response_is_structured
     operationId: sendEmail
@@ -291,6 +392,17 @@ cases:
     expectedBehavior: The operation should either support preview/dry-run behavior
       or be covered by a guard before live mutation.
     reason: Mutating operation does not expose dry-run, preview, or validate-only mode.
+  - id: chargepayment_docs_mutating_description_mentions_side_effects
+    type: finding_requires_eval
+    operationId: chargePayment
+    method: POST
+    path: /payments/charge
+    input: {}
+    expectedBehavior: Update the description to clearly state what side effects this
+      operation has (e.g., "Creates a new user account" rather than just "Create
+      user").
+    reason: Mutating operation description does not mention side effects or state
+      changes.
   - id: chargepayment_errors_missing_error_schema
     type: error_response_is_structured
     operationId: chargePayment
@@ -347,6 +459,17 @@ cases:
     expectedBehavior: The runtime should apply a safe default limit or the API
       should require explicit pagination parameters.
     reason: List/search operation has no pagination or limit query parameter.
+  - id: createuser_docs_mutating_description_mentions_side_effects
+    type: finding_requires_eval
+    operationId: createUser
+    method: POST
+    path: /users
+    input: {}
+    expectedBehavior: Update the description to clearly state what side effects this
+      operation has (e.g., "Creates a new user account" rather than just "Create
+      user").
+    reason: Mutating operation description does not mention side effects or state
+      changes.
   - id: createuser_errors_missing_error_schema
     type: error_response_is_structured
     operationId: createUser
@@ -392,6 +515,17 @@ cases:
     expectedBehavior: The eval should verify that the boolean meaning is documented
       clearly or requires review before autonomous use.
     reason: Boolean input 'force' is too vague for reliable agent use.
+  - id: deleteuser_docs_mutating_description_mentions_side_effects
+    type: finding_requires_eval
+    operationId: deleteUser
+    method: DELETE
+    path: /users/{id}
+    input: {}
+    expectedBehavior: Update the description to clearly state what side effects this
+      operation has (e.g., "Creates a new user account" rather than just "Create
+      user").
+    reason: Mutating operation description does not mention side effects or state
+      changes.
   - id: deleteuser_errors_missing_error_schema
     type: error_response_is_structured
     operationId: deleteUser
@@ -415,5 +549,50 @@ cases:
     expectedBehavior: The operation should either support preview/dry-run behavior
       or be covered by a guard before live mutation.
     reason: Mutating operation does not expose dry-run, preview, or validate-only mode.
+  - id: sendemail_docs_weak_description
+    type: finding_requires_eval
+    operationId: sendEmail
+    method: POST
+    path: /emails/send
+    input: {}
+    expectedBehavior: Expand the description to clearly explain what the operation
+      does and when to use it.
+    reason: Description is too short to be useful for agent tool selection.
+  - id: chargepayment_docs_weak_description
+    type: finding_requires_eval
+    operationId: chargePayment
+    method: POST
+    path: /payments/charge
+    input: {}
+    expectedBehavior: Expand the description to clearly explain what the operation
+      does and when to use it.
+    reason: Description is too short to be useful for agent tool selection.
+  - id: listusers_docs_weak_description
+    type: finding_requires_eval
+    operationId: listUsers
+    method: GET
+    path: /users
+    input: {}
+    expectedBehavior: Expand the description to clearly explain what the operation
+      does and when to use it.
+    reason: Description is too short to be useful for agent tool selection.
+  - id: createuser_docs_weak_description
+    type: finding_requires_eval
+    operationId: createUser
+    method: POST
+    path: /users
+    input: {}
+    expectedBehavior: Expand the description to clearly explain what the operation
+      does and when to use it.
+    reason: Description is too short to be useful for agent tool selection.
+  - id: deleteuser_docs_weak_description
+    type: finding_requires_eval
+    operationId: deleteUser
+    method: DELETE
+    path: /users/{id}
+    input: {}
+    expectedBehavior: Expand the description to clearly explain what the operation
+      does and when to use it.
+    reason: Description is too short to be useful for agent tool selection.
 "
 `;

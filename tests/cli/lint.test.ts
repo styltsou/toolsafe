@@ -26,7 +26,7 @@ describe('toolsafe lint CLI', () => {
     const result = await runCli(['lint', 'tests/fixtures/simple-openapi.json']);
 
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toContain('Findings: 0 error, 1 warning, 0 info');
+    expect(result.stdout).toContain('Findings: 0 error, 1 warning, 1 info');
   });
 
   test('exits 1 when warnings meet the configured threshold', async () => {

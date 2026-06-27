@@ -18,16 +18,20 @@ operations:
     mode: require_confirmation
     reasons:
       - HTTP method POST can mutate state
-      - 'Risk keyword: email'
+      - "Risk keyword: email"
       - External communication operation does not declare a confirmation or
         guard signal.
       - Mutating operation does not expose dry-run, preview, or validate-only
         mode.
     recommendedControls:
       - Require explicit user confirmation before execution.
+      - Update the description to clearly state what side effects this operation
+        has (e.g., "Creates a new user account" rather than just "Create user").
       - Normalize unstructured API errors before returning them to agents.
       - Require recipient review before external communication is sent.
       - Prefer dry-run, preview, or validate-only mode before mutation.
+      - Expand the description to clearly explain what the operation does and
+        when to use it.
   chargePayment:
     operationId: chargePayment
     method: POST
@@ -36,15 +40,19 @@ operations:
     mode: require_confirmation
     reasons:
       - HTTP method POST can mutate state
-      - 'Risk keyword: payment'
+      - "Risk keyword: payment"
       - Financial mutating operation does not expose an idempotency key.
       - Mutating operation does not expose dry-run, preview, or validate-only
         mode.
     recommendedControls:
       - Require explicit user confirmation before execution.
+      - Update the description to clearly state what side effects this operation
+        has (e.g., "Creates a new user account" rather than just "Create user").
       - Normalize unstructured API errors before returning them to agents.
       - Require idempotency keys for financial mutations.
       - Prefer dry-run, preview, or validate-only mode before mutation.
+      - Expand the description to clearly explain what the operation does and
+        when to use it.
   listUsers:
     operationId: listUsers
     method: GET
@@ -56,6 +64,8 @@ operations:
     recommendedControls:
       - Normalize unstructured API errors before returning them to agents.
       - Apply a default result limit when the caller does not provide one.
+      - Expand the description to clearly explain what the operation does and
+        when to use it.
   createUser:
     operationId: createUser
     method: POST
@@ -67,10 +77,14 @@ operations:
       - Mutating operation does not expose dry-run, preview, or validate-only
         mode.
     recommendedControls:
+      - Update the description to clearly state what side effects this operation
+        has (e.g., "Creates a new user account" rather than just "Create user").
       - Normalize unstructured API errors before returning them to agents.
       - Prefer dry-run, preview, or validate-only mode before mutation.
       - Validate constrained string inputs against an allowed set.
       - Require explicit review for ambiguous boolean inputs.
+      - Expand the description to clearly explain what the operation does and
+        when to use it.
   deleteUser:
     operationId: deleteUser
     method: DELETE
@@ -86,5 +100,9 @@ operations:
     recommendedControls:
       - Require explicit user confirmation before execution.
       - Require confirmation or guard metadata for destructive execution.
+      - Update the description to clearly state what side effects this operation
+        has (e.g., "Creates a new user account" rather than just "Create user").
       - Normalize unstructured API errors before returning them to agents.
       - Prefer dry-run, preview, or validate-only mode before mutation.
+      - Expand the description to clearly explain what the operation does and
+        when to use it.

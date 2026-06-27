@@ -17,16 +17,16 @@ describe('analyzeOpenApi', () => {
       destructiveTools: 1,
       highRiskTools: 3,
       findingCounts: {
-        info: 0,
-        warning: 14,
+        info: 5,
+        warning: 18,
         error: 1,
       },
     });
     expect(result.scores).toEqual({
-      overall: 34,
+      overall: 13,
       safety: 66,
       schema: 92,
-      docs: 100,
+      docs: 79,
       errors: 80,
       agentUsability: 96,
       auth: 100,
@@ -38,7 +38,7 @@ describe('analyzeOpenApi', () => {
       ['createUser', 'medium'],
       ['deleteUser', 'high'],
     ]);
-    expect(result.findings).toHaveLength(15);
+    expect(result.findings).toHaveLength(24);
     expect(result.findings[0]).toMatchObject({
       ruleId: 'safety/destructive-requires-guard',
       severity: 'error',

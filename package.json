@@ -28,6 +28,7 @@
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "examples:generate": "bun run scripts/generate-examples.ts",
+    "examples:check": "bun run scripts/check-examples.ts",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
     "check": "bun run typecheck && bun run lint && bun run format:check",

@@ -3,8 +3,16 @@ ToolSafe Agent-Readiness Report
 Input: examples/risky-openapi.yaml
 API: Risky Example API 1.0.0
 Operations analyzed: 5
-Overall score: 34/100
-Findings: 1 error, 14 warning, 0 info
+Overall score: 13/100
+Findings: 1 error, 18 warning, 5 info
+
+Score breakdown
+   66/100 Safety
+   92/100 Schema
+   79/100 Docs
+   80/100 Errors
+   96/100 Agent usability
+  100/100 Auth
 
 High-risk operations
   HIGH POST /emails/send (sendEmail)
@@ -23,6 +31,11 @@ Errors
        Evidence: HTTP method DELETE
 
 Warnings
+  WARN  POST /emails/send (docs/mutating-description-mentions-side-effects)
+       Mutating operation description does not mention side effects or state changes.
+       Recommendation: Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").
+       Evidence: Method: POST
+       Evidence: No description provided
   WARN  POST /emails/send (errors/missing-error-schema)
        Operation does not define a structured 4xx or 5xx error response schema.
        Recommendation: Define structured error responses with stable error codes and messages so agents can recover safely.
@@ -36,6 +49,11 @@ Warnings
        Mutating operation does not expose dry-run, preview, or validate-only mode.
        Recommendation: Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.
        Evidence: HTTP method POST
+  WARN  POST /payments/charge (docs/mutating-description-mentions-side-effects)
+       Mutating operation description does not mention side effects or state changes.
+       Recommendation: Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").
+       Evidence: Method: POST
+       Evidence: No description provided
   WARN  POST /payments/charge (errors/missing-error-schema)
        Operation does not define a structured 4xx or 5xx error response schema.
        Recommendation: Define structured error responses with stable error codes and messages so agents can recover safely.
@@ -57,6 +75,11 @@ Warnings
        List/search operation has no pagination or limit query parameter.
        Recommendation: Expose limit, page, pageSize, cursor, or offset parameters to prevent unbounded agent outputs.
        Evidence: GET operation appears to return a collection
+  WARN  POST /users (docs/mutating-description-mentions-side-effects)
+       Mutating operation description does not mention side effects or state changes.
+       Recommendation: Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").
+       Evidence: Method: POST
+       Evidence: No description provided
   WARN  POST /users (errors/missing-error-schema)
        Operation does not define a structured 4xx or 5xx error response schema.
        Recommendation: Define structured error responses with stable error codes and messages so agents can recover safely.
@@ -73,6 +96,11 @@ Warnings
        Boolean input 'force' is too vague for reliable agent use.
        Recommendation: Rename vague booleans to describe the exact behavior they enable, or replace them with a constrained enum.
        Evidence: Boolean input: force
+  WARN  DELETE /users/{id} (docs/mutating-description-mentions-side-effects)
+       Mutating operation description does not mention side effects or state changes.
+       Recommendation: Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").
+       Evidence: Method: DELETE
+       Evidence: No description provided
   WARN  DELETE /users/{id} (errors/missing-error-schema)
        Operation does not define a structured 4xx or 5xx error response schema.
        Recommendation: Define structured error responses with stable error codes and messages so agents can recover safely.
@@ -81,3 +109,25 @@ Warnings
        Mutating operation does not expose dry-run, preview, or validate-only mode.
        Recommendation: Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.
        Evidence: HTTP method DELETE
+
+Info
+  INFO  POST /emails/send (docs/weak-description)
+       Description is too short to be useful for agent tool selection.
+       Recommendation: Expand the description to clearly explain what the operation does and when to use it.
+       Evidence: Description length: 10 characters
+  INFO  POST /payments/charge (docs/weak-description)
+       Description is too short to be useful for agent tool selection.
+       Recommendation: Expand the description to clearly explain what the operation does and when to use it.
+       Evidence: Description length: 14 characters
+  INFO  GET /users (docs/weak-description)
+       Description is too short to be useful for agent tool selection.
+       Recommendation: Expand the description to clearly explain what the operation does and when to use it.
+       Evidence: Description length: 10 characters
+  INFO  POST /users (docs/weak-description)
+       Description is too short to be useful for agent tool selection.
+       Recommendation: Expand the description to clearly explain what the operation does and when to use it.
+       Evidence: Description length: 11 characters
+  INFO  DELETE /users/{id} (docs/weak-description)
+       Description is too short to be useful for agent tool selection.
+       Recommendation: Expand the description to clearly explain what the operation does and when to use it.
+       Evidence: Description length: 11 characters

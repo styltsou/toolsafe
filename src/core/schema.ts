@@ -83,6 +83,16 @@ export function hasEnum(schema: unknown): boolean {
   return isObject(schema) && Array.isArray((schema as ObjectSchemaLike).enum);
 }
 
+export function hasSchemaConstraint(schema: unknown, constraintNames: readonly string[]): boolean {
+  if (!isObject(schema)) {
+    return false;
+  }
+
+  return constraintNames.some(
+    (name) => typeof (schema as Record<string, unknown>)[name] === 'number',
+  );
+}
+
 function getSchemaType(schema: unknown): string | undefined {
   if (!isObject(schema)) {
     return undefined;

@@ -1,18 +1,21 @@
 import pc from 'picocolors';
 import type { AnalysisResult, Finding, FindingSeverity, RiskLevel } from '@/core/types';
 
+const CATEGORY_KEYS: { key: keyof AnalysisResult['scores']; label: string }[] = [
+  { key: 'safety', label: 'Safety' },
+  { key: 'schema', label: 'Schema' },
+  { key: 'docs', label: 'Docs' },
+  { key: 'errors', label: 'Errors' },
+  { key: 'agentUsability', label: 'Agent usability' },
+  { key: 'auth', label: 'Auth' },
+];
+
 const FINDING_GROUPS: { severity: FindingSeverity; title: string }[] = [
   { severity: 'error', title: 'Errors' },
   { severity: 'warning', title: 'Warnings' },
   { severity: 'info', title: 'Info' },
 ];
 
-/**
- * Concise human-readable lint output for terminals.
- *
- * Detailed machine-readable data belongs in JSON; this view focuses on the
- * summary and actionable findings.
- */
 export function renderTerminalReport(result: AnalysisResult): string {
   const lines: string[] = [];
 
@@ -30,6 +33,17 @@ export function renderTerminalReport(result: AnalysisResult): string {
     `Findings: ${result.summary.findingCounts.error} error, ${result.summary.findingCounts.warning} warning, ${result.summary.findingCounts.info} info`,
   );
 
+  lines.push('');
+  lines.push(pc.bold('Score breakdown'));
+
+  for (const cat of CATEGORY_KEYS) {
+    const score = result.scores[cat.key];
+
+    if (score !== undefined) {
+      lines.push(`  ${formatScoreSmall(score)} ${cat.label}`);
+    }
+  }
+
   const highRiskTools = result.tools.filter(
     (tool) => tool.risk === 'high' || tool.risk === 'critical',
   );
@@ -39,10 +53,10 @@ export function renderTerminalReport(result: AnalysisResult): string {
     lines.push(pc.bold('High-risk operations'));
 
     for (const tool of highRiskTools) {
-      lines.push(`  ${formatRisk(tool.risk)} ${tool.method} ${tool.path} (${tool.toolName})`);
+      lines.push(`  ${formatRisk(tool.risk)} ${pc.dim(tool.method)} ${tool.path} (${tool.toolName})`);
 
       for (const reason of tool.reasons.slice(0, 2)) {
-        lines.push(`       ${reason}`);
+        lines.push(`       ${pc.dim(reason)}`);
       }
     }
   }
@@ -59,11 +73,11 @@ export function renderTerminalReport(result: AnalysisResult): string {
 
     for (const finding of findings) {
       lines.push(formatFinding(finding));
-      lines.push(`       ${finding.message}`);
-      lines.push(`       Recommendation: ${finding.recommendation}`);
+      lines.push(`       ${pc.dim(finding.message)}`);
+      lines.push(`       ${pc.dim(`Recommendation: ${finding.recommendation}`)}`);
 
       for (const evidence of finding.evidence ?? []) {
-        lines.push(`       Evidence: ${evidence}`);
+        lines.push(`       ${pc.dim(`Evidence: ${evidence}`)}`);
       }
     }
   }
@@ -77,7 +91,7 @@ export function renderTerminalReport(result: AnalysisResult): string {
 }
 
 function formatFinding(finding: Finding): string {
-  return `  ${formatSeverity(finding.severity)} ${finding.method} ${finding.path} (${finding.ruleId})`;
+  return `  ${formatSeverity(finding.severity)} ${pc.dim(finding.method)} ${finding.path} (${finding.ruleId})`;
 }
 
 function formatSeverity(severity: FindingSeverity): string {
@@ -106,6 +120,20 @@ function formatRisk(risk: RiskLevel): string {
 
 function formatScore(score: number): string {
   const text = `${score}/100`;
+
+  if (score < 60) {
+    return pc.red(text);
+  }
+
+  if (score < 80) {
+    return pc.yellow(text);
+  }
+
+  return pc.green(text);
+}
+
+function formatScoreSmall(score: number): string {
+  const text = `${String(score).padStart(3)}/100`;
 
   if (score < 60) {
     return pc.red(text);
