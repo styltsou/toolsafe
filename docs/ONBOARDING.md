@@ -11,7 +11,8 @@ It does not call the target API, use an LLM, enforce runtime policy, or generate
 ## First 30 Minutes
 
 1. Run `bun test` to make sure the local environment matches the repo.
-2. Run `bun run src/cli/index.ts lint examples/risky-openapi.yaml` and look at the grouped terminal output.
+2. Run `bun run src/cli/index.ts init --analyze` to scaffold config and discover OpenAPI specs in the project.
+3. Run `bun run src/cli/index.ts lint examples/risky-openapi.yaml` and look at the grouped terminal output.
 3. Run the same command with `--format json` and compare the output to the `AnalysisResult` type in `src/core/types.ts`.
 4. Run `bun run src/cli/index.ts policy examples/risky-openapi.yaml` and note the advisory language at the top.
 5. Run `bun run src/cli/index.ts evals examples/risky-openapi.yaml` and note the placeholder inputs.
@@ -26,10 +27,10 @@ Internal TypeScript imports use the `@/*` path alias for `src/*`. For example, c
 Start with the CLI only to understand command behavior:
 
 - `src/cli/index.ts` creates the Commander program and registers commands.
+- `src/cli/commands/init.ts` scaffolds `toolsafe.config.json` and a CI workflow; `--analyze` discovers and lints OpenAPI specs.
 - `src/cli/commands/lint.ts` owns lint-specific options, output format selection, threshold handling, and exit codes.
 - `src/cli/commands/report.ts` owns JSON/Markdown report output and file writing.
-- `src/cli/commands/policy.ts` owns advisory policy output and file writing.
-- `src/cli/commands/evals.ts` owns advisory eval output and file writing.
+- `src/cli/commands/generate.ts` owns advisory policy and eval output and file writing.
 
 Then move into the core pipeline:
 

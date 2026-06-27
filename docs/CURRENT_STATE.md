@@ -163,6 +163,14 @@ ToolSafe now supports `toolsafe.config.json` for tuning without changing source:
 - Remote URL input support: `toolsafe lint https://...` fetches and parses remote OpenAPI specs.
 - `FETCH_ERROR` error code for network failures during URL fetching.
 
+### Milestone 17: `toolsafe init` — Project Scaffolding
+
+- `toolsafe init` scaffolds `toolsafe.config.json` with sensible defaults (all 15 rules enabled, `lint.failOn: "error"`, `report.format: "markdown"`).
+- Creates `.github/workflows/toolsafe.yml` — a GitHub Actions workflow that runs `toolsafe lint` on changed OpenAPI files in PRs.
+- Overwrite confirmation for existing files in TTY mode; silent skip in non-TTY mode.
+- Template files live in `src/cli/commands/init/` as plain JSON/YAML.
+- `--analyze` flag discovers OpenAPI specs by naming convention (`openapi.*`, `swagger.*`, `spec.*`, or in `openapi/`/`swagger/` dirs) and content sniffing (first 4KB checked for `openapi` key), then lints each and prints a summary.
+
 ## Not Implemented Yet
 
 The following are planned or mentioned in product docs but are not complete at this point:

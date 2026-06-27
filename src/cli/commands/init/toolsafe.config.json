@@ -1,0 +1,25 @@
+{
+  "rules": {
+    "safety/destructive-requires-guard": "error",
+    "safety/batch-operation-requires-limit": "warning",
+    "auth/dangerous-auth-scope": "warning",
+    "safety/financial-requires-idempotency": "warning",
+    "safety/external-communication-requires-guard": "warning",
+    "safety/mutating-requires-dry-run": "warning",
+    "schema/list-requires-pagination": "warning",
+    "schema/unconstrained-file-upload": "warning",
+    "schema/vague-boolean": "warning",
+    "schema/string-should-be-enum": "warning",
+    "schema/sensitive-response-fields": "warning",
+    "docs/missing-description": "warning",
+    "docs/weak-description": "info",
+    "docs/mutating-description-mentions-side-effects": "warning",
+    "errors/missing-error-schema": "warning"
+  },
+  "lint": {
+    "failOn": "error"
+  },
+  "report": {
+    "format": "markdown"
+  }
+}

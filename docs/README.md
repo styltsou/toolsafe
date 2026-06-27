@@ -17,10 +17,10 @@ These notes explain the codebase as it exists through milestone 10. They are mea
 ## Primary Entry Points
 
 - CLI entrypoint: `src/cli/index.ts`
+- Init command: `src/cli/commands/init.ts`
 - Lint command: `src/cli/commands/lint.ts`
 - Report command: `src/cli/commands/report.ts`
-- Policy command: `src/cli/commands/policy.ts`
-- Evals command: `src/cli/commands/evals.ts`
+- Generate command: `src/cli/commands/generate.ts`
 - Analysis pipeline: `src/core/analyze.ts`
 - Policy generator: `src/generators/policy.ts`
 - Eval generator: `src/generators/evals.ts`
@@ -32,9 +32,11 @@ These notes explain the codebase as it exists through milestone 10. They are mea
 
 - Install dependencies: `bun install`
 - Run the CLI: `bun run src/cli/index.ts --help`
+- Bootstrap a new repo: `bun run src/cli/index.ts init`
+- Bootstrap and analyze: `bun run src/cli/index.ts init --analyze`
 - Run lint output: `bun run src/cli/index.ts lint examples/risky-openapi.yaml`
-- Generate a policy draft: `bun run src/cli/index.ts policy examples/risky-openapi.yaml`
-- Generate eval ideas: `bun run src/cli/index.ts evals examples/risky-openapi.yaml`
+- Generate a policy draft: `bun run src/cli/index.ts generate --kind policy examples/risky-openapi.yaml`
+- Generate eval ideas: `bun run src/cli/index.ts generate --kind evals examples/risky-openapi.yaml`
 - Inspect sample outputs: `examples/output/`
 - Regenerate sample outputs: `bun run examples:generate`
 - Run tests: `bun test`

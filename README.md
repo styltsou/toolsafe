@@ -39,6 +39,12 @@ bun run build
 ## Quick Start
 
 ```bash
+# Bootstrap ToolSafe in a new repo
+toolsafe init
+
+# Bootstrap + discover and lint all OpenAPI specs in the project
+toolsafe init --analyze
+
 # Lint an OpenAPI file
 toolsafe lint path/to/openapi.yaml
 
@@ -53,6 +59,38 @@ toolsafe generate --kind policy path/to/openapi.yaml
 ```
 
 ## CLI Reference
+
+### `toolsafe init`
+
+Bootstrap ToolSafe configuration for a new repo. Creates `toolsafe.config.json` and `.github/workflows/toolsafe.yml` in the current directory.
+
+| Option                   | Description                                        |
+| ------------------------ | -------------------------------------------------- |
+| `-a, --analyze`          | Discover and lint all OpenAPI specs in the project |
+
+If either output file already exists, you are prompted before overwriting (interactive TTY) or the file is silently skipped (non-TTY, e.g. CI).
+
+```bash
+toolsafe init
+toolsafe init --analyze
+```
+
+When `--analyze` is used, ToolSafe discovers OpenAPI specs by:
+1. **Naming conventions** — files named `openapi.*`, `swagger.*`, `spec.*`, or inside `openapi/` / `swagger/` directories
+2. **Content sniffing** — other `.yaml`/`.yml`/`.json` files are checked for an `openapi` root key before analysis
+
+```bash
+$ toolsafe init --analyze
+Created toolsafe.config.json
+Created .github/workflows/toolsafe.yml
+
+Analyzing project for OpenAPI specs...
+  ✓ risky-openapi.yaml       (45 operations, 3 errors, 5 warnings)
+  ✓ openapi.json             (5 operations, 0 errors, 1 warning)
+
+Summary: 2 specs analyzed, 0 skipped
+Total: 3 errors, 5 warnings across 50 operations
+```
 
 ### `toolsafe lint <file>`
 
@@ -121,6 +159,8 @@ toolsafe rules
 ## Configuration
 
 ToolSafe auto-detects `toolsafe.config.json` in the current directory. You can also pass an explicit path with `--config`.
+
+Run `toolsafe init` to create a config file with sensible defaults (all rules enabled at their default severity, `lint.failOn: "error"`, `report.format: "markdown"`).
 
 ```json
 {

@@ -2,6 +2,7 @@
 
 import { Command } from 'commander';
 import { registerGenerateCommand } from '@/cli/commands/generate';
+import { registerInitCommand } from '@/cli/commands/init';
 import { registerLintCommand } from '@/cli/commands/lint';
 import { registerReportCommand } from '@/cli/commands/report';
 import { defaultRules } from '@/rules';
@@ -14,6 +15,7 @@ program
   .description('Agent-readiness linting for OpenAPI tools')
   .version(pkg.version);
 
+registerInitCommand(program);
 registerLintCommand(program);
 registerReportCommand(program);
 registerGenerateCommand(program);
