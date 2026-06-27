@@ -1,7 +1,8 @@
 import type { Command } from 'commander';
-import { loadConfig } from '@/config/loader';
 import { parseChoiceOption, renderCommandError, writeOutputFile } from '@/cli/helpers';
-import { analyzeOpenApi } from '@/core/analyze';
+import { loadConfig } from '@/config/loader';
+import type { ToolSafeConfig } from '@/config/types';
+import { resolveConfig, withAnalysis } from '@/cli/analysis';
 import type { AnalysisResult } from '@/core/types';
 import { renderJsonReport, renderMarkdownReport, renderSarifReport } from '@/reporters';
 
@@ -20,32 +21,47 @@ export function registerReportCommand(program: Command): void {
     .command('report')
     .description('Generate a JSON, Markdown, or SARIF ToolSafe report')
     .argument('<file>', 'OpenAPI YAML or JSON file')
-    .option('--format <format>', 'Output format: json, markdown, or sarif', 'markdown')
+    .option('--format <format>', 'Output format: json, markdown, or sarif')
     .option('--out <path>', 'Write report to a file instead of stdout')
     .option('--config <path>', 'Path to toolsafe.config.json')
     .action(async (filePath: string, options: ReportOptions) => {
-      const format = parseReportFormat(options.format);
+      let config: ToolSafeConfig | undefined;
 
-      if (!format) {
+      try {
+        config = loadConfig(options.config);
+      } catch (error) {
+        process.stderr.write(renderCommandError(error));
         process.exitCode = 2;
         return;
       }
 
-      try {
-        const config = loadConfig(options.config);
-        const result = await analyzeOpenApi(filePath, config);
+      const parsedFormat = options.format !== undefined
+        ? parseReportFormat(options.format)
+        : undefined;
+
+      if (options.format !== undefined && parsedFormat === undefined) {
+        process.exitCode = 2;
+        return;
+      }
+
+      const format = resolveConfig(
+        parsedFormat,
+        config?.report?.format,
+        'markdown' as ReportFormat,
+      );
+
+      const outPath = resolveConfig(options.out, config?.report?.out, undefined);
+
+      await withAnalysis(filePath, config, async (result) => {
         const output = renderReport(result, format);
 
-        if (options.out) {
-          await writeOutputFile(options.out, output);
+        if (outPath) {
+          await writeOutputFile(outPath, output);
           return;
         }
 
         process.stdout.write(output);
-      } catch (error) {
-        process.stderr.write(renderCommandError(error));
-        process.exitCode = 2;
-      }
+      });
     });
 }
 

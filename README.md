@@ -1,8 +1,8 @@
 # ToolSafe
 
-ToolSafe is a deterministic, offline-first agent-readiness linter for OpenAPI APIs.
+ToolSafe is a deterministic agent-readiness linter for OpenAPI APIs.
 
-It parses local OpenAPI 3.x YAML or JSON files, normalizes operations into tool-like records, runs static rules, scores the API, and generates reports, advisory guard policies, and advisory eval ideas.
+It parses local or remote OpenAPI 3.x YAML or JSON files, normalizes operations into tool-like records, runs static rules, scores the API, and generates reports, advisory guard policies, and advisory eval ideas.
 
 **Key properties:**
 
@@ -42,11 +42,14 @@ bun run build
 # Lint an OpenAPI file
 toolsafe lint path/to/openapi.yaml
 
+# Lint from a remote URL
+toolsafe lint https://example.com/openapi.json
+
 # Generate a SARIF report (for GitHub code scanning)
 toolsafe report path/to/openapi.yaml --format sarif
 
 # Generate a guard policy draft
-toolsafe policy path/to/openapi.yaml
+toolsafe generate --kind policy path/to/openapi.yaml
 ```
 
 ## CLI Reference
@@ -68,11 +71,13 @@ toolsafe lint api.yaml --fail-on warning
 toolsafe lint api.yaml --config toolsafe.config.json
 ```
 
+Lint supports local files and remote URLs (`https://...`).
+
 **Exit codes:** `0` if no findings at threshold, `1` if findings meet threshold, `2` on error.
 
 ### `toolsafe report <file>`
 
-Generate a detailed report in JSON, Markdown, or SARIF.
+Generate a detailed report in JSON, Markdown, or SARIF. Supports local files and remote URLs.
 
 | Option | Description | Default |
 |--------|-------------|---------|
@@ -87,34 +92,22 @@ toolsafe report api.yaml --format sarif --out results.sarif
 toolsafe report api.yaml --config toolsafe.config.json --format json
 ```
 
-### `toolsafe policy <file>`
+### `toolsafe generate <file>`
 
-Generate an advisory guard policy YAML draft. The policy describes which operations need confirmation, dry-run support, idempotency keys, or other failure-domain guards before an agent calls them.
+Generate an advisory guard policy draft or eval case ideas in YAML.
 
 | Option | Description | Default |
 |--------|-------------|---------|
+| `--kind <policy\|evals>` | Output kind | `policy` |
 | `--out <path>` | Write to file instead of stdout | — |
 | `--config <path>` | Path to config file | Auto-detect `toolsafe.config.json` |
 
 ```bash
-toolsafe policy api.yaml
-toolsafe policy api.yaml --out guard-policy.yaml
-toolsafe policy api.yaml --config toolsafe.config.json
-```
-
-### `toolsafe evals <file>`
-
-Generate advisory eval case ideas in YAML. Each eval case describes a scenario and expected behaviour that can be used to test an agent integration against the API.
-
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--out <path>` | Write to file instead of stdout | — |
-| `--config <path>` | Path to config file | Auto-detect `toolsafe.config.json` |
-
-```bash
-toolsafe evals api.yaml
-toolsafe evals api.yaml --out toolsafe.evals.yaml
-toolsafe evals api.yaml --config toolsafe.config.json
+toolsafe generate --kind policy api.yaml
+toolsafe generate --kind policy api.yaml --out guard-policy.yaml
+toolsafe generate --kind evals api.yaml
+toolsafe generate --kind evals api.yaml --out toolsafe.evals.yaml
+toolsafe generate --kind policy api.yaml --config toolsafe.config.json
 ```
 
 ### `toolsafe rules`
@@ -137,6 +130,10 @@ ToolSafe auto-detects `toolsafe.config.json` in the current directory. You can a
   },
   "lint": {
     "failOn": "warning"
+  },
+  "report": {
+    "format": "sarif",
+    "out": "results.sarif"
   }
 }
 ```
@@ -157,6 +154,15 @@ Each rule ID maps to one of:
 | `failOn` | Minimum severity to exit with code 1 | `"error"` |
 
 **Precedence:** CLI `--fail-on` > config `lint.failOn` > default (`"error"`).
+
+### Report
+
+| Field | Description | Default |
+|-------|-------------|---------|
+| `format` | Default report output format | `"markdown"` |
+| `out` | Default output file path | stdout |
+
+**Precedence:** CLI `--format`/`--out` > config `report.*` > built-in defaults.
 
 ## Output Formats
 

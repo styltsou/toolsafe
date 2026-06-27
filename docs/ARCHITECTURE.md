@@ -2,12 +2,12 @@
 
 ToolSafe is organized around one central idea: every output should come from the same deterministic `AnalysisResult`.
 
-The code should feel closer to a static analyzer than an application server. Data flows in one direction from a local OpenAPI file to normalized operations, findings, risk summaries, scores, reports, and advisory generated artifacts.
+The code should feel closer to a static analyzer than an application server. Data flows in one direction from a local file or remote URL to normalized operations, findings, risk summaries, scores, reports, and advisory generated artifacts.
 
 ## High-Level Flow
 
-1. The CLI receives a local file path and command options.
-2. The parser validates that the file exists, has a supported extension, and is a supported OpenAPI 3.x document.
+1. The CLI receives a local file path or remote URL and command options.
+2. The parser validates that the input exists, has a supported extension, and is a supported OpenAPI 3.x document. Remote URLs are fetched before parsing.
 3. The normalizer converts OpenAPI operations into stable `NormalizedTool` records.
 4. The rule engine runs deterministic checks and emits `Finding` records.
 5. The risk classifier adds operation-level risk labels and evidence.
@@ -28,13 +28,17 @@ Config loading, schema validation, and type definitions for `toolsafe.config.jso
 
 The CLI layer owns command registration, command-specific options, stdout/stderr output, and process exit codes.
 
-It should not own parsing, normalization, scoring, rule logic, or policy logic. Commands call `analyzeOpenApi` and then choose a reporter or generator. Commands load config before calling the analysis pipeline.
+It should not own parsing, normalization, scoring, rule logic, or policy logic. Commands call `analyzeOpenApi` (via the shared `withAnalysis` helper in `src/cli/analysis.ts`) and then choose a reporter or generator.
+
+#### `src/cli/analysis.ts`
+
+Shared CLI bootstrap for commands that need to analyze an OpenAPI document with config support. `withAnalysis` wraps `loadConfig` + `analyzeOpenApi` + error handling so command handlers don't duplicate the try/catch pattern. `resolveConfig` provides a consistent CLI > config > default precedence chain.
 
 ### `src/parsers`
 
-The parser layer turns a local file path into a parsed OpenAPI document plus metadata.
+The parser layer turns a local file path or remote URL into a parsed OpenAPI document plus metadata. Remote URLs are detected by protocol (`http:`, `https:`), fetched, and parsed identically to local files.
 
-It wraps expected user-facing failures in `ToolSafeError` so CLI commands can display stable messages and return exit code 2 for input problems.
+It wraps expected user-facing failures in `ToolSafeError` (including `FETCH_ERROR` for network failures) so CLI commands can display stable messages and return exit code 2 for input problems.
 
 ### `src/core`
 
@@ -63,7 +67,7 @@ The terminal reporter is intentionally concise. JSON output is the complete mach
 
 ### `src/generators`
 
-Generators turn `AnalysisResult` into derived advisory artifacts.
+Generators turn `AnalysisResult` into derived advisory artifacts. They are driven by `toolsafe generate --kind policy|evals`.
 
 The policy generator creates a YAML guard-policy draft from risk summaries and findings. It includes an explicit advisory note because the generated policy is not enforced unless a runtime guard or proxy implements it.
 
@@ -98,4 +102,4 @@ The lint command currently uses three exit states:
 
 The default threshold is `error`. The resolved threshold follows this precedence: `--fail-on` CLI flag > config `lint.failOn` > built-in default (`error`).
 
-The `report`, `policy`, and `evals` commands return `0` when generation succeeds and `2` for input or parse errors.
+The `report` and `generate` commands return `0` when generation succeeds and `2` for input or parse errors.

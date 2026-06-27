@@ -14,6 +14,12 @@ export const ToolSafeConfigSchema = z.object({
       failOn: z.enum(['warning', 'error']).optional(),
     })
     .optional(),
+  report: z
+    .object({
+      format: z.enum(['json', 'markdown', 'sarif']).optional(),
+      out: z.string().optional(),
+    })
+    .optional(),
 });
 
 export type ToolSafeConfig = z.infer<typeof ToolSafeConfigSchema>;

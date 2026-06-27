@@ -1,6 +1,6 @@
 import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join, relative } from 'node:path';
+import { join } from 'node:path';
 import { analyzeOpenApi } from '@/core/analyze';
 import { generateEvalIdeas, renderEvalIdeasYaml } from '@/generators/evals';
 import { generatePolicyDraft, renderPolicyYaml } from '@/generators/policy';
@@ -23,29 +23,34 @@ FILES.push(
 const tmpDir = await mkdtemp(join(tmpdir(), 'toolsafe-examples-'));
 let hasDiff = false;
 
-for (const file of FILES) {
-  const generated = await file.generate();
-  const tmpPath = join(tmpDir, file.name);
-  await writeFile(tmpPath, generated, 'utf8');
+const checks = await Promise.all(
+  FILES.map(async (file) => {
+    const generated = await file.generate();
+    const tmpPath = join(tmpDir, file.name);
+    await writeFile(tmpPath, generated, 'utf8');
 
-  const committedPath = `${OUTPUT_DIR}/${file.name}`;
+    const committedPath = `${OUTPUT_DIR}/${file.name}`;
 
-  try {
-    const committed = await readFile(committedPath, 'utf8');
+    try {
+      const committed = await readFile(committedPath, 'utf8');
 
-    if (generated !== committed) {
-      console.error(`\n❌ ${file.name} differs from committed example.`);
-      console.error(`   Regenerated: ${tmpPath}`);
-      console.error(`   Committed:   ${committedPath}`);
-      hasDiff = true;
-    } else {
+      if (generated !== committed) {
+        console.error(`\n❌ ${file.name} differs from committed example.`);
+        console.error(`   Regenerated: ${tmpPath}`);
+        console.error(`   Committed:   ${committedPath}`);
+        return false;
+      }
+
       console.log(`✅ ${file.name} matches`);
+      return true;
+    } catch {
+      console.error(`\n❌ ${file.name} does not exist at ${committedPath}. Run bun run examples:generate first.`);
+      return false;
     }
-  } catch {
-    console.error(`\n❌ ${file.name} does not exist at ${committedPath}. Run bun run examples:generate first.`);
-    hasDiff = true;
-  }
-}
+  }),
+);
+
+hasDiff = checks.some((ok) => !ok);
 
 if (hasDiff) {
   console.error('\n❌ Some examples differ. Run `bun run examples:generate` to update committed examples.');

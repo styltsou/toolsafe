@@ -1,9 +1,8 @@
 #!/usr/bin/env bun
 
 import { Command } from 'commander';
-import { registerEvalsCommand } from '@/cli/commands/evals';
+import { registerGenerateCommand } from '@/cli/commands/generate';
 import { registerLintCommand } from '@/cli/commands/lint';
-import { registerPolicyCommand } from '@/cli/commands/policy';
 import { registerReportCommand } from '@/cli/commands/report';
 import { defaultRules } from '@/rules';
 import pkg from '../../package.json' with { type: 'json' };
@@ -17,8 +16,7 @@ program
 
 registerLintCommand(program);
 registerReportCommand(program);
-registerPolicyCommand(program);
-registerEvalsCommand(program);
+registerGenerateCommand(program);
 
 program
   .command('rules')

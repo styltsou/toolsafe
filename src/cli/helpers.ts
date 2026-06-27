@@ -9,7 +9,11 @@ export function parseChoiceOption<T extends string>(
     optionName: string;
   },
 ): T | undefined {
-  if (value && choices.includes(value as T)) {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (choices.includes(value as T)) {
     return value as T;
   }
 
@@ -36,3 +40,4 @@ export function renderCommandError(error: unknown): string {
 function formatChoices(choices: readonly string[]): string {
   return choices.join(' or ');
 }
+

@@ -2,7 +2,8 @@ export type ToolSafeErrorCode =
   | 'FILE_NOT_FOUND'
   | 'UNSUPPORTED_FILE_TYPE'
   | 'OPENAPI_PARSE_ERROR'
-  | 'OPENAPI_UNSUPPORTED_VERSION';
+  | 'OPENAPI_UNSUPPORTED_VERSION'
+  | 'FETCH_ERROR';
 
 /**
  * User-facing ToolSafe failure with a stable machine-readable code.

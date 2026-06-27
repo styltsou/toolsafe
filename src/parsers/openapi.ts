@@ -38,18 +38,25 @@ type OpenApiLike = {
   };
 };
 
-function assertSupportedLocalFile(filePath: string): void {
-  if (!existsSync(filePath)) {
-    throw new ToolSafeError('FILE_NOT_FOUND', `File not found: ${filePath}`, filePath);
-  }
+const URL_PROTOCOLS = new Set(['http:', 'https:']);
 
-  const extension = extname(filePath).toLowerCase();
+function isUrl(filePath: string): boolean {
+  try {
+    const url = new URL(filePath);
+    return URL_PROTOCOLS.has(url.protocol);
+  } catch {
+    return false;
+  }
+}
+
+function assertSupportedExtension(path: string, context: string, displayPath: string): void {
+  const extension = extname(path).toLowerCase();
 
   if (!SUPPORTED_EXTENSIONS.has(extension)) {
     throw new ToolSafeError(
       'UNSUPPORTED_FILE_TYPE',
-      'ToolSafe only supports local .yaml, .yml, and .json files in v0.',
-      filePath,
+      `ToolSafe only supports .yaml, .yml, and .json ${context}.`,
+      displayPath,
     );
   }
 }
@@ -67,7 +74,7 @@ function extractMetadata(document: unknown, filePath: string): OpenApiMetadata {
     if (swaggerVersion) {
       throw new ToolSafeError(
         'OPENAPI_UNSUPPORTED_VERSION',
-        `Only OpenAPI 3.x is supported in v0. Received Swagger: ${swaggerVersion}`,
+        `Only OpenAPI 3.x is supported. Received Swagger: ${swaggerVersion}`,
         filePath,
       );
     }
@@ -78,7 +85,7 @@ function extractMetadata(document: unknown, filePath: string): OpenApiMetadata {
   if (!openapiVersion.startsWith('3.')) {
     throw new ToolSafeError(
       'OPENAPI_UNSUPPORTED_VERSION',
-      `Only OpenAPI 3.x is supported in v0. Received: ${openapiVersion}`,
+      `Only OpenAPI 3.x is supported. Received: ${openapiVersion}`,
       filePath,
     );
   }
@@ -90,26 +97,56 @@ function extractMetadata(document: unknown, filePath: string): OpenApiMetadata {
   };
 }
 
-/**
- * Parses and validates a local OpenAPI 3.x YAML/JSON file.
- *
- * The parser wraps expected user-facing failures in `ToolSafeError` so CLI
- * commands can print clean messages without depending on Scalar parser error
- * internals.
- */
-export async function parseOpenApi(filePath: string): Promise<ParsedOpenApi> {
-  assertSupportedLocalFile(filePath);
+async function fetchOpenApiFile(url: URL): Promise<string> {
+  const response = await fetch(url);
 
-  const source = await readFile(filePath, 'utf8');
+  if (!response.ok) {
+    throw new ToolSafeError(
+      'FETCH_ERROR',
+      `Failed to fetch ${url.href}: HTTP ${response.status} ${response.statusText}`,
+      url.href,
+    );
+  }
+
+  return response.text();
+}
+
+async function parseFromSource(source: string, filePath: string): Promise<ParsedOpenApi> {
   await validateOpenApiSource(source, filePath);
   const document = parseOpenApiSource(source, filePath);
   const metadata = extractMetadata(document, filePath);
 
-  return {
-    filePath,
-    document,
-    metadata,
-  };
+  return { filePath, document, metadata };
+}
+
+/**
+ * Parses and validates an OpenAPI 3.x document from a local file or remote URL.
+ *
+ * For local files, checks existence and supported extension before reading.
+ * For URLs (http/https), fetches the content and validates the URL extension.
+ * Wraps expected user-facing failures in `ToolSafeError` so CLI commands can
+ * print clean messages without depending on Scalar parser error internals.
+ */
+export async function parseOpenApi(filePath: string): Promise<ParsedOpenApi> {
+  if (isUrl(filePath)) {
+    const url = new URL(filePath);
+
+    assertSupportedExtension(url.pathname, 'URLs', url.href);
+
+    const source = await fetchOpenApiFile(url);
+
+    return parseFromSource(source, filePath);
+  }
+
+  if (!existsSync(filePath)) {
+    throw new ToolSafeError('FILE_NOT_FOUND', `File not found: ${filePath}`, filePath);
+  }
+
+  assertSupportedExtension(filePath, 'files', filePath);
+
+  const source = await readFile(filePath, 'utf8');
+
+  return parseFromSource(source, filePath);
 }
 
 async function validateOpenApiSource(source: string, filePath: string) {

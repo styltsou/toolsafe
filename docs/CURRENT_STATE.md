@@ -12,7 +12,7 @@ The project has a working Bun and TypeScript setup, a Commander-based CLI entryp
 
 ToolSafe can parse local `.yaml`, `.yml`, and `.json` OpenAPI files. It supports OpenAPI 3.x and returns stable `ToolSafeError` codes for expected file and parse failures.
 
-Remote URLs and non-OpenAPI local files are outside current scope.
+Remote URLs (`http://`, `https://`) are supported: the parser fetches the content, validates the extension, and treats the response identically to a local file. Non-OpenAPI local files are outside current scope.
 
 ### Milestone 2: Operation Normalization
 
@@ -76,7 +76,7 @@ These rules keep the same deterministic, evidence-based shape as the initial rul
 
 ### Milestone 8: Policy Draft Generator
 
-The policy command is available and supports:
+The policy generator is available via `toolsafe generate --kind policy` and supports:
 
 - YAML output to stdout.
 - Writing YAML to disk with `--out`.
@@ -88,7 +88,7 @@ Policy drafts are generated from the same `AnalysisResult` used by lint and repo
 
 ### Milestone 9: Eval Idea Generator
 
-The evals command is available and supports:
+The eval ideas generator is available via `toolsafe generate --kind evals` and supports:
 
 - YAML output to stdout.
 - Writing YAML to disk with `--out`.
@@ -153,13 +153,20 @@ ToolSafe now supports `toolsafe.config.json` for tuning without changing source:
 - Auto-detection of `toolsafe.config.json` in CWD, plus explicit `--config` flag.
 - Rule disabling (`"off"`) and severity overrides (`"info"` / `"warning"` / `"error"`).
 - `lint.failOn` support with config-to-CLI precedence chain.
-- Wired into all four CLI commands (lint, report, policy, evals).
+- `report.format` and `report.out` with the same precedence chain.
+- Wired into all CLI commands (lint, report, generate).
+
+### Milestone 16: CLI Consolidation And Remote URL Support
+
+- `policy` and `evals` unified into `toolsafe generate --kind policy|evals`, reducing command surface area.
+- Shared `withAnalysis` bootstrap extracted to `src/cli/analysis.ts`, eliminating repeated try/catch patterns across commands.
+- Remote URL input support: `toolsafe lint https://...` fetches and parses remote OpenAPI specs.
+- `FETCH_ERROR` error code for network failures during URL fetching.
 
 ## Not Implemented Yet
 
 The following are planned or mentioned in product docs but are not complete at this point:
 
-- Remote URL input.
 - Runtime API execution or proxy behavior.
 - MCP server generation.
 - LLM-based suggestions.

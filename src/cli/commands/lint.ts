@@ -1,7 +1,7 @@
 import type { Command } from 'commander';
 import { loadConfig } from '@/config/loader';
 import { parseChoiceOption, renderCommandError } from '@/cli/helpers';
-import { analyzeOpenApi } from '@/core/analyze';
+import { withAnalysis } from '@/cli/analysis';
 import type { ToolSafeConfig } from '@/config/types';
 import type { AnalysisResult, FindingSeverity } from '@/core/types';
 import { renderJsonReport, renderTerminalReport } from '@/reporters';
@@ -34,25 +34,30 @@ export function registerLintCommand(program: Command): void {
         return;
       }
 
+      let config: ToolSafeConfig | undefined;
+
       try {
-        const config = loadConfig(options.config);
-        const failOn = resolveFailOn(options.failOn, config);
+        config = loadConfig(options.config);
+      } catch (error) {
+        process.stderr.write(renderCommandError(error));
+        process.exitCode = 2;
+        return;
+      }
 
-        if (!failOn) {
-          process.exitCode = 2;
-          return;
-        }
+      const failOn = resolveFailOn(options.failOn, config);
 
-        const result = await analyzeOpenApi(filePath, config);
+      if (!failOn) {
+        process.exitCode = 2;
+        return;
+      }
+
+      await withAnalysis(filePath, config, async (result) => {
         process.stdout.write(renderLintResult(result, format));
 
         if (hasThresholdFindings(result, failOn)) {
           process.exitCode = 1;
         }
-      } catch (error) {
-        process.stderr.write(renderCommandError(error));
-        process.exitCode = 2;
-      }
+      });
     });
 }
 

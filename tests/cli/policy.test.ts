@@ -5,9 +5,9 @@ import { join } from 'node:path';
 import { parse as parseYaml } from 'yaml';
 import { runCli } from '../helpers/cli';
 
-describe('toolsafe policy CLI', () => {
+describe('toolsafe generate --kind policy', () => {
   test('prints advisory YAML to stdout by default', async () => {
-    const result = await runCli(['policy', 'examples/risky-openapi.yaml']);
+    const result = await runCli(['generate', '--kind', 'policy', 'examples/risky-openapi.yaml']);
     const policy = parseYaml(result.stdout);
 
     expect(result.exitCode).toBe(0);
@@ -19,7 +19,14 @@ describe('toolsafe policy CLI', () => {
   test('writes advisory YAML to disk when --out is provided', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'toolsafe-policy-'));
     const outputPath = join(directory, 'policy', 'guard-policy.yaml');
-    const result = await runCli(['policy', 'examples/risky-openapi.yaml', '--out', outputPath]);
+    const result = await runCli([
+      'generate',
+      '--kind',
+      'policy',
+      'examples/risky-openapi.yaml',
+      '--out',
+      outputPath,
+    ]);
     const output = await readFile(outputPath, 'utf8');
     const policy = parseYaml(output);
 
@@ -30,7 +37,7 @@ describe('toolsafe policy CLI', () => {
   });
 
   test('exits 2 for input errors', async () => {
-    const result = await runCli(['policy', 'README.md']);
+    const result = await runCli(['generate', '--kind', 'policy', 'README.md']);
 
     expect(result.exitCode).toBe(2);
     expect(result.stdout).toBe('');

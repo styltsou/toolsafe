@@ -57,8 +57,10 @@ describe('toolsafe --config CLI flag', () => {
     expect(overriddenSeverities).toContain('error');
   });
 
-  test('policy --config works with a config file', async () => {
+  test('generate --kind policy --config works with a config file', async () => {
     const result = await runCli([
+      'generate',
+      '--kind',
       'policy',
       'examples/risky-openapi.yaml',
       '--config',
@@ -70,8 +72,10 @@ describe('toolsafe --config CLI flag', () => {
     expect(result.stderr).toBe('');
   });
 
-  test('evals --config works with a config file', async () => {
+  test('generate --kind evals --config works with a config file', async () => {
     const result = await runCli([
+      'generate',
+      '--kind',
       'evals',
       'examples/risky-openapi.yaml',
       '--config',

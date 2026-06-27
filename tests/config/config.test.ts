@@ -65,6 +65,37 @@ describe('config schema validation', () => {
 
     expect(result.success).toBe(false);
   });
+
+  test('accepts report config', () => {
+    const result = ToolSafeConfigSchema.safeParse({
+      report: {
+        format: 'sarif',
+        out: 'results.sarif',
+      },
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  test('accepts partial report config', () => {
+    const result = ToolSafeConfigSchema.safeParse({
+      report: {
+        format: 'json',
+      },
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  test('rejects unknown report.format values', () => {
+    const result = ToolSafeConfigSchema.safeParse({
+      report: {
+        format: 'html',
+      },
+    });
+
+    expect(result.success).toBe(false);
+  });
 });
 
 describe('config disables rules', () => {
