@@ -1,6 +1,6 @@
-# Toolsmith
+# ToolSafe
 
-Toolsmith is a deterministic, offline-first agent-readiness linter for OpenAPI APIs.
+ToolSafe is a deterministic, offline-first agent-readiness linter for OpenAPI APIs.
 
 It parses local OpenAPI 3.x YAML or JSON files, normalizes operations into tool-like records, runs static rules, scores the API, and generates reports, advisory guard policies, and advisory eval ideas. It does not call the target API and does not use an LLM.
 
@@ -43,7 +43,7 @@ Write generated output to disk:
 ```bash
 bun run src/cli/index.ts report examples/risky-openapi.yaml --format markdown --out TOOLSMITH_REPORT.md
 bun run src/cli/index.ts policy examples/risky-openapi.yaml --out guard-policy.yaml
-bun run src/cli/index.ts evals examples/risky-openapi.yaml --out toolsmith.evals.yaml
+bun run src/cli/index.ts evals examples/risky-openapi.yaml --out toolsafe.evals.yaml
 ```
 
 ## Current Commands
@@ -65,10 +65,10 @@ bun run src/cli/index.ts evals examples/risky-openapi.yaml --out toolsmith.evals
 See `examples/output/` for generated outputs from `examples/risky-openapi.yaml`:
 
 - `lint.txt`
-- `toolsmith-report.json`
+- `toolsafe-report.json`
 - `TOOLSMITH_REPORT.md`
 - `guard-policy.yaml`
-- `toolsmith.evals.yaml`
+- `toolsafe.evals.yaml`
 
 ## Development
 

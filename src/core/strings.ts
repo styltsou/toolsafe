@@ -4,9 +4,9 @@ export function includesAny(text: string, keywords: readonly string[]): boolean 
 
 export function normalizeIdentifier(value: string, options: { lowercase?: boolean } = {}): string {
   const identifier = value
-    .replace(/[^a-zA-Z0-9_]+/g, "_")
-    .replace(/_+/g, "_")
-    .replace(/^_+|_+$/g, "");
+    .replace(/[^a-zA-Z0-9_]+/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_+|_+$/g, '');
 
   return options.lowercase ? identifier.toLowerCase() : identifier;
 }
@@ -18,5 +18,5 @@ export function matchesNormalizedName(value: string, names: readonly string[]): 
 }
 
 function normalizeComparableName(value: string): string {
-  return value.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+  return value.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 }

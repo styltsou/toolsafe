@@ -10,7 +10,7 @@ The project has a working Bun and TypeScript setup, a Commander-based CLI entryp
 
 ### Milestone 1: OpenAPI Parsing
 
-Toolsmith can parse local `.yaml`, `.yml`, and `.json` OpenAPI files. It supports OpenAPI 3.x and returns stable `ToolsmithError` codes for expected file and parse failures.
+ToolSafe can parse local `.yaml`, `.yml`, and `.json` OpenAPI files. It supports OpenAPI 3.x and returns stable `ToolSafeError` codes for expected file and parse failures.
 
 Remote URLs and non-OpenAPI local files are outside current scope.
 
@@ -38,7 +38,7 @@ Rules return stable findings sorted by severity, path, method, and rule ID.
 
 Risk classification is heuristic and evidence-based. Scores are deterministic and intended as comparison signals, not formal security grades.
 
-### Milestone 5: `toolsmith lint`
+### Milestone 5: `toolsafe lint`
 
 The lint command is available and supports:
 
@@ -124,10 +124,10 @@ The following are planned or mentioned in product docs but are not complete at t
 
 ## Important Scope Notes
 
-Toolsmith is deterministic and offline-first. Current behavior should be explainable from source code and tests.
+ToolSafe is deterministic and offline-first. Current behavior should be explainable from source code and tests.
 
 Generated findings are static-analysis signals. They should not be presented as proof that a real backend is unsafe or safe.
 
-Confirmation and guard detection are based only on explicit contract signals in the OpenAPI document, such as fields or vendor extensions. Toolsmith cannot know whether an external approval process exists outside the spec.
+Confirmation and guard detection are based only on explicit contract signals in the OpenAPI document, such as fields or vendor extensions. ToolSafe cannot know whether an external approval process exists outside the spec.
 
 Policy output is an advisory draft unless a separate runtime component enforces it. Eval output is an advisory set of test ideas unless a project adapts it to a concrete runtime.

@@ -1,10 +1,10 @@
 # Onboarding
 
-This guide is for an engineer opening Toolsmith for the first time. The fastest way to understand the project is to follow the data from CLI input to final output.
+This guide is for an engineer opening ToolSafe for the first time. The fastest way to understand the project is to follow the data from CLI input to final output.
 
-## What Toolsmith Does
+## What ToolSafe Does
 
-Toolsmith is a deterministic OpenAPI analyzer for agent-readiness. It reads a local OpenAPI 3.x YAML or JSON file, normalizes each API operation into a tool-like model, runs static rules, classifies operation risk, calculates scores, prints reports, and can generate advisory policy drafts and eval ideas.
+ToolSafe is a deterministic OpenAPI analyzer for agent-readiness. It reads a local OpenAPI 3.x YAML or JSON file, normalizes each API operation into a tool-like model, runs static rules, classifies operation risk, calculates scores, prints reports, and can generate advisory policy drafts and eval ideas.
 
 It does not call the target API, use an LLM, enforce runtime policy, or generate an MCP server in the current implementation.
 
@@ -33,7 +33,7 @@ Start with the CLI only to understand command behavior:
 
 Then move into the core pipeline:
 
-- `src/parsers/openapi.ts` handles local file validation, parser integration, and stable Toolsmith errors.
+- `src/parsers/openapi.ts` handles local file validation, parser integration, and stable ToolSafe errors.
 - `src/core/normalize.ts` converts OpenAPI paths and operations into `NormalizedTool[]`.
 - `src/rules/index.ts` runs the default rule set against normalized tools.
 - `src/core/risk.ts` classifies each tool using deterministic method and keyword heuristics.

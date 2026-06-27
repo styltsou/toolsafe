@@ -1,10 +1,10 @@
-import pc from "picocolors";
-import type { AnalysisResult, Finding, FindingSeverity, RiskLevel } from "@/core/types";
+import pc from 'picocolors';
+import type { AnalysisResult, Finding, FindingSeverity, RiskLevel } from '@/core/types';
 
 const FINDING_GROUPS: { severity: FindingSeverity; title: string }[] = [
-  { severity: "error", title: "Errors" },
-  { severity: "warning", title: "Warnings" },
-  { severity: "info", title: "Info" },
+  { severity: 'error', title: 'Errors' },
+  { severity: 'warning', title: 'Warnings' },
+  { severity: 'info', title: 'Info' },
 ];
 
 /**
@@ -16,12 +16,12 @@ const FINDING_GROUPS: { severity: FindingSeverity; title: string }[] = [
 export function renderTerminalReport(result: AnalysisResult): string {
   const lines: string[] = [];
 
-  lines.push(pc.bold("Toolsmith Agent-Readiness Report"));
-  lines.push("");
+  lines.push(pc.bold('ToolSafe Agent-Readiness Report'));
+  lines.push('');
   lines.push(`Input: ${result.input.filePath}`);
 
   if (result.input.title || result.input.version) {
-    lines.push(`API: ${[result.input.title, result.input.version].filter(Boolean).join(" ")}`);
+    lines.push(`API: ${[result.input.title, result.input.version].filter(Boolean).join(' ')}`);
   }
 
   lines.push(`Operations analyzed: ${result.summary.totalTools}`);
@@ -31,12 +31,12 @@ export function renderTerminalReport(result: AnalysisResult): string {
   );
 
   const highRiskTools = result.tools.filter(
-    (tool) => tool.risk === "high" || tool.risk === "critical",
+    (tool) => tool.risk === 'high' || tool.risk === 'critical',
   );
 
   if (highRiskTools.length > 0) {
-    lines.push("");
-    lines.push(pc.bold("High-risk operations"));
+    lines.push('');
+    lines.push(pc.bold('High-risk operations'));
 
     for (const tool of highRiskTools) {
       lines.push(`  ${formatRisk(tool.risk)} ${tool.method} ${tool.path} (${tool.toolName})`);
@@ -54,7 +54,7 @@ export function renderTerminalReport(result: AnalysisResult): string {
       continue;
     }
 
-    lines.push("");
+    lines.push('');
     lines.push(pc.bold(group.title));
 
     for (const finding of findings) {
@@ -69,11 +69,11 @@ export function renderTerminalReport(result: AnalysisResult): string {
   }
 
   if (result.findings.length === 0) {
-    lines.push("");
-    lines.push(pc.green("No findings."));
+    lines.push('');
+    lines.push(pc.green('No findings.'));
   }
 
-  return `${lines.join("\n")}\n`;
+  return `${lines.join('\n')}\n`;
 }
 
 function formatFinding(finding: Finding): string {
@@ -82,25 +82,25 @@ function formatFinding(finding: Finding): string {
 
 function formatSeverity(severity: FindingSeverity): string {
   switch (severity) {
-    case "error":
-      return pc.red("ERROR");
-    case "warning":
-      return pc.yellow("WARN ");
-    case "info":
-      return pc.blue("INFO ");
+    case 'error':
+      return pc.red('ERROR');
+    case 'warning':
+      return pc.yellow('WARN ');
+    case 'info':
+      return pc.blue('INFO ');
   }
 }
 
 function formatRisk(risk: RiskLevel): string {
   switch (risk) {
-    case "critical":
-      return pc.red("CRITICAL");
-    case "high":
-      return pc.red("HIGH");
-    case "medium":
-      return pc.yellow("MEDIUM");
-    case "low":
-      return pc.green("LOW");
+    case 'critical':
+      return pc.red('CRITICAL');
+    case 'high':
+      return pc.red('HIGH');
+    case 'medium':
+      return pc.yellow('MEDIUM');
+    case 'low':
+      return pc.green('LOW');
   }
 }
 

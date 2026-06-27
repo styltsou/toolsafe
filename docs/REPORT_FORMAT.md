@@ -1,10 +1,10 @@
 # Report Format
 
-Toolsmith reports are generated from `AnalysisResult`, the shared output of `analyzeOpenApi`.
+ToolSafe reports are generated from `AnalysisResult`, the shared output of `analyzeOpenApi`.
 
 ## JSON Report
 
-The JSON report is the complete machine-readable representation currently exposed by Toolsmith.
+The JSON report is the complete machine-readable representation currently exposed by ToolSafe.
 
 Top-level fields:
 
@@ -23,7 +23,7 @@ bun run src/cli/index.ts report examples/risky-openapi.yaml --format json
 Write JSON:
 
 ```bash
-bun run src/cli/index.ts report examples/risky-openapi.yaml --format json --out toolsmith-report.json
+bun run src/cli/index.ts report examples/risky-openapi.yaml --format json --out toolsafe-report.json
 ```
 
 ## Markdown Report

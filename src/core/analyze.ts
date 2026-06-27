@@ -1,12 +1,12 @@
-import { parseOpenApi } from "@/parsers/openapi";
-import { runRules } from "@/rules";
-import { normalizeOpenApi } from "@/core/normalize";
-import { classifyToolRisks } from "@/core/risk";
-import { calculateScores } from "@/core/scoring";
-import type { AnalysisResult, Finding, NormalizedTool, ToolRiskSummary } from "@/core/types";
+import { parseOpenApi } from '@/parsers/openapi';
+import { runRules } from '@/rules';
+import { normalizeOpenApi } from '@/core/normalize';
+import { classifyToolRisks } from '@/core/risk';
+import { calculateScores } from '@/core/scoring';
+import type { AnalysisResult, Finding, NormalizedTool, ToolRiskSummary } from '@/core/types';
 
 /**
- * Runs Toolsmith's complete deterministic analysis pipeline for one local file.
+ * Runs ToolSafe's complete deterministic analysis pipeline for one local file.
  *
  * This function is the core boundary that CLI commands and report generators
  * should call. Keeping parsing, normalization, rules, risk, and scoring here
@@ -35,23 +35,23 @@ function buildSummary(
   tools: NormalizedTool[],
   findings: Finding[],
   toolRisks: ToolRiskSummary[],
-): AnalysisResult["summary"] {
+): AnalysisResult['summary'] {
   return {
     totalTools: tools.length,
     readOnlyTools: tools.filter((tool) => isReadOnlyMethod(tool.method)).length,
     mutatingTools: tools.filter((tool) => !isReadOnlyMethod(tool.method)).length,
-    destructiveTools: tools.filter((tool) => tool.method === "DELETE").length,
+    destructiveTools: tools.filter((tool) => tool.method === 'DELETE').length,
     highRiskTools: toolRisks.filter(
-      (toolRisk) => toolRisk.risk === "high" || toolRisk.risk === "critical",
+      (toolRisk) => toolRisk.risk === 'high' || toolRisk.risk === 'critical',
     ).length,
     findingCounts: {
-      info: findings.filter((finding) => finding.severity === "info").length,
-      warning: findings.filter((finding) => finding.severity === "warning").length,
-      error: findings.filter((finding) => finding.severity === "error").length,
+      info: findings.filter((finding) => finding.severity === 'info').length,
+      warning: findings.filter((finding) => finding.severity === 'warning').length,
+      error: findings.filter((finding) => finding.severity === 'error').length,
     },
   };
 }
 
-function isReadOnlyMethod(method: NormalizedTool["method"]): boolean {
-  return method === "GET" || method === "HEAD" || method === "OPTIONS";
+function isReadOnlyMethod(method: NormalizedTool['method']): boolean {
+  return method === 'GET' || method === 'HEAD' || method === 'OPTIONS';
 }

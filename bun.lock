@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "toolsmith",
+      "name": "toolsafe",
       "dependencies": {
         "@scalar/openapi-parser": "^0.28.8",
         "commander": "^15.0.0",

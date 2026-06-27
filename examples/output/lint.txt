@@ -1,4 +1,4 @@
-Toolsmith Agent-Readiness Report
+ToolSafe Agent-Readiness Report
 
 Input: examples/risky-openapi.yaml
 API: Risky Example API 1.0.0

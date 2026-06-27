@@ -1,5 +1,5 @@
-import type { Rule } from "@/core/types";
-import { createFinding } from "@/rules/findings";
+import type { Rule } from '@/core/types';
+import { createFinding } from '@/rules/findings';
 
 /**
  * Flags operations that do not describe structured 4xx/5xx response bodies.
@@ -8,11 +8,11 @@ import { createFinding } from "@/rules/findings";
  * fields such as error codes and messages.
  */
 export const missingErrorSchemaRule: Rule = {
-  id: "errors/missing-error-schema",
-  name: "Missing structured error schema",
-  description: "Flags operations without any 4xx or 5xx response schema.",
-  category: "errors",
-  defaultSeverity: "warning",
+  id: 'errors/missing-error-schema',
+  name: 'Missing structured error schema',
+  description: 'Flags operations without any 4xx or 5xx response schema.',
+  category: 'errors',
+  defaultSeverity: 'warning',
   check: ({ tool }) => {
     const hasStructuredErrorResponse = tool.responses.some(
       (response) => isErrorStatus(response.statusCode) && response.schema !== undefined,
@@ -24,10 +24,10 @@ export const missingErrorSchemaRule: Rule = {
 
     return [
       createFinding(missingErrorSchemaRule, tool, {
-        message: "Operation does not define a structured 4xx or 5xx error response schema.",
+        message: 'Operation does not define a structured 4xx or 5xx error response schema.',
         recommendation:
-          "Define structured error responses with stable error codes and messages so agents can recover safely.",
-        evidence: ["No 4xx/5xx response with schema"],
+          'Define structured error responses with stable error codes and messages so agents can recover safely.',
+        evidence: ['No 4xx/5xx response with schema'],
       }),
     ];
   },

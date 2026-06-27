@@ -1,1 +1,1 @@
-export const TOOLSMITH_PACKAGE_NAME = "toolsmith";
+export const TOOLSAFE_PACKAGE_NAME = 'toolsafe';

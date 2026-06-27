@@ -1,4 +1,4 @@
-# Toolsmith Docs
+# ToolSafe Docs
 
 These notes explain the codebase as it exists through milestone 10. They are meant for engineers who need to understand where the pieces fit before changing behavior.
 

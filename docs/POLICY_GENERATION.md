@@ -1,6 +1,6 @@
 # Policy Generation
 
-Toolsmith can generate an advisory guard policy draft from the same `AnalysisResult` used by lint and reports.
+ToolSafe can generate an advisory guard policy draft from the same `AnalysisResult` used by lint and reports.
 
 The policy output is intentionally not an enforcement mechanism. It is a structured recommendation file that a future runtime guard, proxy, generated server, or MCP layer could choose to enforce.
 

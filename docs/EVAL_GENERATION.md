@@ -1,6 +1,6 @@
 # Eval Generation
 
-Toolsmith can generate deterministic eval case ideas from the same `AnalysisResult` used by lint, reports, and policy drafts.
+ToolSafe can generate deterministic eval case ideas from the same `AnalysisResult` used by lint, reports, and policy drafts.
 
 The output is advisory. It is not an executable test suite until a project adapts it to a concrete runtime, authentication model, fixtures, and expected error format.
 
@@ -15,7 +15,7 @@ bun run src/cli/index.ts evals examples/risky-openapi.yaml
 Write YAML to disk:
 
 ```bash
-bun run src/cli/index.ts evals examples/risky-openapi.yaml --out toolsmith.evals.yaml
+bun run src/cli/index.ts evals examples/risky-openapi.yaml --out toolsafe.evals.yaml
 ```
 
 ## Source Of Truth
@@ -52,7 +52,7 @@ Cases are recommended checks, not claims about actual backend behavior. For exam
 - A list pagination finding becomes a result-limit eval idea.
 - A sensitive-response finding becomes a redaction eval idea.
 
-Inputs use placeholders where Toolsmith cannot know real IDs, auth, request fixtures, or expected error codes from static OpenAPI analysis alone.
+Inputs use placeholders where ToolSafe cannot know real IDs, auth, request fixtures, or expected error codes from static OpenAPI analysis alone.
 
 ## Extending
 

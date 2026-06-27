@@ -1,6 +1,6 @@
 # Architecture
 
-Toolsmith is organized around one central idea: every output should come from the same deterministic `AnalysisResult`.
+ToolSafe is organized around one central idea: every output should come from the same deterministic `AnalysisResult`.
 
 The code should feel closer to a static analyzer than an application server. Data flows in one direction from a local OpenAPI file to normalized operations, findings, risk summaries, scores, reports, and advisory generated artifacts.
 
@@ -30,7 +30,7 @@ It should not own parsing, normalization, scoring, rule logic, or policy logic. 
 
 The parser layer turns a local file path into a parsed OpenAPI document plus metadata.
 
-It wraps expected user-facing failures in `ToolsmithError` so CLI commands can display stable messages and return exit code 2 for input problems.
+It wraps expected user-facing failures in `ToolSafeError` so CLI commands can display stable messages and return exit code 2 for input problems.
 
 ### `src/core`
 
@@ -41,7 +41,7 @@ The core layer contains the shared domain model and the main pipeline.
 - `risk.ts` classifies operation risk with explainable heuristics.
 - `scoring.ts` calculates deterministic scores from findings.
 - `analyze.ts` is the shared orchestration point.
-- `errors.ts` defines stable Toolsmith error codes.
+- `errors.ts` defines stable ToolSafe error codes.
 
 When adding a new output, prefer consuming `AnalysisResult` instead of building a separate pipeline.
 

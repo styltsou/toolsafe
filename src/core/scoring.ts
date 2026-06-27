@@ -1,12 +1,12 @@
-import type { Finding, FindingCategory, FindingSeverity } from "@/core/types";
+import type { Finding, FindingCategory, FindingSeverity } from '@/core/types';
 
 const CATEGORY_SCORE_KEYS = [
-  "safety",
-  "schema",
-  "docs",
-  "errors",
-  "agent_usability",
-  "auth",
+  'safety',
+  'schema',
+  'docs',
+  'errors',
+  'agent_usability',
+  'auth',
 ] as const satisfies readonly FindingCategory[];
 
 const SCORE_PENALTIES: Record<FindingSeverity, number> = {
@@ -34,12 +34,12 @@ export type ScoreSummary = {
 export function calculateScores(findings: Finding[]): ScoreSummary {
   return {
     overall: calculateScore(findings),
-    safety: calculateScoreForCategory(findings, "safety"),
-    schema: calculateScoreForCategory(findings, "schema"),
-    docs: calculateScoreForCategory(findings, "docs"),
-    errors: calculateScoreForCategory(findings, "errors"),
-    agentUsability: calculateScoreForCategory(findings, "agent_usability"),
-    auth: calculateScoreForCategory(findings, "auth"),
+    safety: calculateScoreForCategory(findings, 'safety'),
+    schema: calculateScoreForCategory(findings, 'schema'),
+    docs: calculateScoreForCategory(findings, 'docs'),
+    errors: calculateScoreForCategory(findings, 'errors'),
+    agentUsability: calculateScoreForCategory(findings, 'agent_usability'),
+    auth: calculateScoreForCategory(findings, 'auth'),
   };
 }
 

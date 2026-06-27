@@ -1,5 +1,5 @@
-import { stringify as stringifyYaml } from "yaml";
-import type { AnalysisResult, Finding } from "@/core/types";
+import { stringify as stringifyYaml } from 'yaml';
+import type { AnalysisResult, Finding } from '@/core/types';
 
 export type GeneratedSource = {
   filePath: string;

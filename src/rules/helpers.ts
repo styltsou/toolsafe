@@ -1,10 +1,10 @@
-import type { NormalizedTool } from "@/core/types";
-import { isObject } from "@/core/objects";
+import type { NormalizedTool } from '@/core/types';
+import { isObject } from '@/core/objects';
 
 /**
  * Returns lowercased searchable text for heuristic rules.
  *
- * Toolsmith v0 deliberately uses shallow, explainable matching instead of
+ * ToolSafe v0 deliberately uses shallow, explainable matching instead of
  * trying to infer full API semantics.
  */
 export function getOperationSearchText(tool: NormalizedTool): string {
@@ -18,8 +18,8 @@ export function getOperationSearchText(tool: NormalizedTool): string {
     tool.description,
     ...tool.tags,
   ]
-    .filter((value): value is string => typeof value === "string")
-    .join(" ")
+    .filter((value): value is string => typeof value === 'string')
+    .join(' ')
     .toLowerCase();
 }
 

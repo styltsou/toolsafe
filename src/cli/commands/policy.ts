@@ -1,7 +1,7 @@
-import type { Command } from "commander";
-import { renderCommandError, writeOutputFile } from "@/cli/helpers";
-import { analyzeOpenApi } from "@/core/analyze";
-import { generatePolicyDraft, renderPolicyYaml } from "@/generators/policy";
+import type { Command } from 'commander';
+import { renderCommandError, writeOutputFile } from '@/cli/helpers';
+import { analyzeOpenApi } from '@/core/analyze';
+import { generatePolicyDraft, renderPolicyYaml } from '@/generators/policy';
 
 type PolicyOptions = {
   out?: string;
@@ -9,10 +9,10 @@ type PolicyOptions = {
 
 export function registerPolicyCommand(program: Command): void {
   program
-    .command("policy")
-    .description("Generate an advisory guard policy draft")
-    .argument("<file>", "OpenAPI YAML or JSON file")
-    .option("--out <path>", "Write policy to a file instead of stdout")
+    .command('policy')
+    .description('Generate an advisory guard policy draft')
+    .argument('<file>', 'OpenAPI YAML or JSON file')
+    .option('--out <path>', 'Write policy to a file instead of stdout')
     .action(async (filePath: string, options: PolicyOptions) => {
       try {
         const result = await analyzeOpenApi(filePath);

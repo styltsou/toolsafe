@@ -4,11 +4,11 @@ import type {
   NormalizedResponse,
   NormalizedTool,
   ParameterLocation,
-} from "@/core/types";
-import { asString, isObject, omitUndefined } from "@/core/objects";
-import { normalizeIdentifier } from "@/core/strings";
+} from '@/core/types';
+import { asString, isObject, omitUndefined } from '@/core/objects';
+import { normalizeIdentifier } from '@/core/strings';
 
-const HTTP_METHODS: HttpMethod[] = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
+const HTTP_METHODS: HttpMethod[] = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
 
 const METHOD_SORT_ORDER = new Map(HTTP_METHODS.map((method, index) => [method, index]));
 
@@ -56,7 +56,7 @@ type MediaTypeLike = {
 };
 
 /**
- * Converts an OpenAPI document into Toolsmith's stable operation model.
+ * Converts an OpenAPI document into ToolSafe's stable operation model.
  *
  * Normalization is intentionally conservative in v0: it extracts common
  * operation fields and common JSON schemas, then preserves the raw operation
@@ -195,7 +195,7 @@ function extractContentSchema(content: unknown): unknown {
     return undefined;
   }
 
-  const preferredSchema = extractMediaTypeSchema(content["application/json"]);
+  const preferredSchema = extractMediaTypeSchema(content['application/json']);
 
   if (preferredSchema !== undefined) {
     return preferredSchema;
@@ -225,7 +225,7 @@ function normalizeTags(value: unknown): string[] {
     return [];
   }
 
-  return value.filter((item): item is string => typeof item === "string");
+  return value.filter((item): item is string => typeof item === 'string');
 }
 
 function normalizeSecurity(value: unknown): unknown[] | undefined {
@@ -237,7 +237,7 @@ function normalizeSecurity(value: unknown): unknown[] | undefined {
 }
 
 function normalizeParameterLocation(value: unknown): ParameterLocation | undefined {
-  if (value === "path" || value === "query" || value === "header" || value === "cookie") {
+  if (value === 'path' || value === 'query' || value === 'header' || value === 'cookie') {
     return value;
   }
 
@@ -246,15 +246,15 @@ function normalizeParameterLocation(value: unknown): ParameterLocation | undefin
 
 function createFallbackOperationName(method: HttpMethod, path: string): string {
   const pathParts = path
-    .split("/")
+    .split('/')
     .filter(Boolean)
     .map((part) => {
       const match = part.match(/^\{(.+)\}$/);
       return match?.[1] ? `by_${match[1]}` : part;
     })
-    .join("_");
+    .join('_');
 
-  return normalizeIdentifier(`${method.toLowerCase()}_${pathParts || "root"}`);
+  return normalizeIdentifier(`${method.toLowerCase()}_${pathParts || 'root'}`);
 }
 
 function compareTools(a: NormalizedTool, b: NormalizedTool): number {

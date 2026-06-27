@@ -5,14 +5,14 @@ export type CliResult = {
 };
 
 export async function runCli(args: string[]): Promise<CliResult> {
-  const proc = Bun.spawn([process.execPath, "run", "src/cli/index.ts", ...args], {
+  const proc = Bun.spawn([process.execPath, 'run', 'src/cli/index.ts', ...args], {
     cwd: process.cwd(),
     env: {
       ...process.env,
-      NO_COLOR: "1",
+      NO_COLOR: '1',
     },
-    stdout: "pipe",
-    stderr: "pipe",
+    stdout: 'pipe',
+    stderr: 'pipe',
   });
 
   const [stdout, stderr, exitCode] = await Promise.all([

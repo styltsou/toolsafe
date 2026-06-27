@@ -1,15 +1,15 @@
-import { validate } from "@scalar/openapi-parser";
-import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
-import { extname } from "node:path";
-import { parse as parseYaml } from "yaml";
-import { ToolsmithError } from "@/core/errors";
-import { isObject } from "@/core/objects";
+import { validate } from '@scalar/openapi-parser';
+import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import { extname } from 'node:path';
+import { parse as parseYaml } from 'yaml';
+import { ToolSafeError } from '@/core/errors';
+import { isObject } from '@/core/objects';
 
-const SUPPORTED_EXTENSIONS = new Set([".yaml", ".yml", ".json"]);
+const SUPPORTED_EXTENSIONS = new Set(['.yaml', '.yml', '.json']);
 
 /**
- * Metadata Toolsmith needs before operation normalization.
+ * Metadata ToolSafe needs before operation normalization.
  *
  * The full OpenAPI document stays separate so parser consumers can choose how
  * deeply they want to inspect the spec.
@@ -21,7 +21,7 @@ export type OpenApiMetadata = {
 };
 
 /**
- * Parsed OpenAPI input plus stable metadata extracted by Toolsmith.
+ * Parsed OpenAPI input plus stable metadata extracted by ToolSafe.
  */
 export type ParsedOpenApi = {
   filePath: string;
@@ -40,15 +40,15 @@ type OpenApiLike = {
 
 function assertSupportedLocalFile(filePath: string): void {
   if (!existsSync(filePath)) {
-    throw new ToolsmithError("FILE_NOT_FOUND", `File not found: ${filePath}`, filePath);
+    throw new ToolSafeError('FILE_NOT_FOUND', `File not found: ${filePath}`, filePath);
   }
 
   const extension = extname(filePath).toLowerCase();
 
   if (!SUPPORTED_EXTENSIONS.has(extension)) {
-    throw new ToolsmithError(
-      "UNSUPPORTED_FILE_TYPE",
-      "Toolsmith only supports local .yaml, .yml, and .json files in v0.",
+    throw new ToolSafeError(
+      'UNSUPPORTED_FILE_TYPE',
+      'ToolSafe only supports local .yaml, .yml, and .json files in v0.',
       filePath,
     );
   }
@@ -56,32 +56,28 @@ function assertSupportedLocalFile(filePath: string): void {
 
 function extractMetadata(document: unknown, filePath: string): OpenApiMetadata {
   if (!isObject(document)) {
-    throw new ToolsmithError(
-      "OPENAPI_PARSE_ERROR",
-      "OpenAPI document must be an object.",
-      filePath,
-    );
+    throw new ToolSafeError('OPENAPI_PARSE_ERROR', 'OpenAPI document must be an object.', filePath);
   }
 
   const candidate = document as OpenApiLike;
-  const openapiVersion = typeof candidate.openapi === "string" ? candidate.openapi : undefined;
-  const swaggerVersion = typeof candidate.swagger === "string" ? candidate.swagger : undefined;
+  const openapiVersion = typeof candidate.openapi === 'string' ? candidate.openapi : undefined;
+  const swaggerVersion = typeof candidate.swagger === 'string' ? candidate.swagger : undefined;
 
   if (!openapiVersion) {
     if (swaggerVersion) {
-      throw new ToolsmithError(
-        "OPENAPI_UNSUPPORTED_VERSION",
+      throw new ToolSafeError(
+        'OPENAPI_UNSUPPORTED_VERSION',
         `Only OpenAPI 3.x is supported in v0. Received Swagger: ${swaggerVersion}`,
         filePath,
       );
     }
 
-    throw new ToolsmithError("OPENAPI_PARSE_ERROR", "Missing required openapi field.", filePath);
+    throw new ToolSafeError('OPENAPI_PARSE_ERROR', 'Missing required openapi field.', filePath);
   }
 
-  if (!openapiVersion.startsWith("3.")) {
-    throw new ToolsmithError(
-      "OPENAPI_UNSUPPORTED_VERSION",
+  if (!openapiVersion.startsWith('3.')) {
+    throw new ToolSafeError(
+      'OPENAPI_UNSUPPORTED_VERSION',
       `Only OpenAPI 3.x is supported in v0. Received: ${openapiVersion}`,
       filePath,
     );
@@ -89,22 +85,22 @@ function extractMetadata(document: unknown, filePath: string): OpenApiMetadata {
 
   return {
     openapiVersion,
-    title: typeof candidate.info?.title === "string" ? candidate.info.title : undefined,
-    version: typeof candidate.info?.version === "string" ? candidate.info.version : undefined,
+    title: typeof candidate.info?.title === 'string' ? candidate.info.title : undefined,
+    version: typeof candidate.info?.version === 'string' ? candidate.info.version : undefined,
   };
 }
 
 /**
  * Parses and validates a local OpenAPI 3.x YAML/JSON file.
  *
- * The parser wraps expected user-facing failures in `ToolsmithError` so CLI
+ * The parser wraps expected user-facing failures in `ToolSafeError` so CLI
  * commands can print clean messages without depending on Scalar parser error
  * internals.
  */
 export async function parseOpenApi(filePath: string): Promise<ParsedOpenApi> {
   assertSupportedLocalFile(filePath);
 
-  const source = await readFile(filePath, "utf8");
+  const source = await readFile(filePath, 'utf8');
   await validateOpenApiSource(source, filePath);
   const document = parseOpenApiSource(source, filePath);
   const metadata = extractMetadata(document, filePath);
@@ -121,17 +117,17 @@ async function validateOpenApiSource(source: string, filePath: string) {
     const result = await validate(source);
 
     if (!result.valid) {
-      throw new ToolsmithError("OPENAPI_PARSE_ERROR", formatScalarErrors(result.errors), filePath);
+      throw new ToolSafeError('OPENAPI_PARSE_ERROR', formatScalarErrors(result.errors), filePath);
     }
 
     return result;
   } catch (error) {
-    if (error instanceof ToolsmithError) {
+    if (error instanceof ToolSafeError) {
       throw error;
     }
 
-    const message = error instanceof Error ? error.message : "Could not parse OpenAPI file.";
-    throw new ToolsmithError("OPENAPI_PARSE_ERROR", message, filePath);
+    const message = error instanceof Error ? error.message : 'Could not parse OpenAPI file.';
+    throw new ToolSafeError('OPENAPI_PARSE_ERROR', message, filePath);
   }
 }
 
@@ -139,16 +135,16 @@ function parseOpenApiSource(source: string, filePath: string): unknown {
   try {
     return parseYaml(source);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Could not parse OpenAPI file.";
-    throw new ToolsmithError("OPENAPI_PARSE_ERROR", message, filePath);
+    const message = error instanceof Error ? error.message : 'Could not parse OpenAPI file.';
+    throw new ToolSafeError('OPENAPI_PARSE_ERROR', message, filePath);
   }
 }
 
 function formatScalarErrors(errors: { message: string; path?: string[] }[]): string {
   return errors
     .map((error) => {
-      const path = error.path?.length ? `${error.path.join(".")}: ` : "";
+      const path = error.path?.length ? `${error.path.join('.')}: ` : '';
       return `${path}${error.message}`;
     })
-    .join("; ");
+    .join('; ');
 }

@@ -1,8 +1,8 @@
 {
-  "name": "toolsmith",
+  "name": "toolsafe",
   "private": true,
   "bin": {
-    "toolsmith": "./src/cli/index.ts"
+    "toolsafe": "./src/cli/index.ts"
   },
   "type": "module",
   "module": "index.ts",

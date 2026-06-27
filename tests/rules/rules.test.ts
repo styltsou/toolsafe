@@ -1,7 +1,7 @@
-import { describe, expect, test } from "bun:test";
-import type { NormalizedTool } from "@/core/types";
-import { normalizeOpenApi } from "@/core/normalize";
-import { parseOpenApi } from "@/parsers/openapi";
+import { describe, expect, test } from 'bun:test';
+import type { NormalizedTool } from '@/core/types';
+import { normalizeOpenApi } from '@/core/normalize';
+import { parseOpenApi } from '@/parsers/openapi';
 import {
   destructiveRequiresGuardRule,
   externalCommunicationRequiresGuardRule,
@@ -14,41 +14,41 @@ import {
   sensitiveResponseFieldsRule,
   stringShouldBeEnumRule,
   vagueBooleanRule,
-} from "@/rules";
+} from '@/rules';
 
-describe("default rule engine", () => {
-  test("returns stable findings for the risky example", async () => {
-    const parsed = await parseOpenApi("examples/risky-openapi.yaml");
+describe('default rule engine', () => {
+  test('returns stable findings for the risky example', async () => {
+    const parsed = await parseOpenApi('examples/risky-openapi.yaml');
     const tools = normalizeOpenApi(parsed.document);
     const findings = runRules(tools);
 
     expect(findings.map((finding) => finding.ruleId)).toEqual([
-      "safety/destructive-requires-guard",
-      "errors/missing-error-schema",
-      "safety/external-communication-requires-guard",
-      "safety/mutating-requires-dry-run",
-      "errors/missing-error-schema",
-      "safety/financial-requires-idempotency",
-      "safety/mutating-requires-dry-run",
-      "errors/missing-error-schema",
-      "schema/list-requires-pagination",
-      "errors/missing-error-schema",
-      "safety/mutating-requires-dry-run",
-      "schema/string-should-be-enum",
-      "schema/vague-boolean",
-      "errors/missing-error-schema",
-      "safety/mutating-requires-dry-run",
+      'safety/destructive-requires-guard',
+      'errors/missing-error-schema',
+      'safety/external-communication-requires-guard',
+      'safety/mutating-requires-dry-run',
+      'errors/missing-error-schema',
+      'safety/financial-requires-idempotency',
+      'safety/mutating-requires-dry-run',
+      'errors/missing-error-schema',
+      'schema/list-requires-pagination',
+      'errors/missing-error-schema',
+      'safety/mutating-requires-dry-run',
+      'schema/string-should-be-enum',
+      'schema/vague-boolean',
+      'errors/missing-error-schema',
+      'safety/mutating-requires-dry-run',
     ]);
   });
 });
 
-describe("safety/financial-requires-idempotency", () => {
-  test("flags financial mutating operations without idempotency inputs", () => {
+describe('safety/financial-requires-idempotency', () => {
+  test('flags financial mutating operations without idempotency inputs', () => {
     const tool = makeTool({
-      method: "POST",
-      path: "/payments/charge",
-      name: "chargePayment",
-      summary: "Charge payment",
+      method: 'POST',
+      path: '/payments/charge',
+      name: 'chargePayment',
+      summary: 'Charge payment',
     });
 
     const findings = financialRequiresIdempotencyRule.check({
@@ -59,15 +59,15 @@ describe("safety/financial-requires-idempotency", () => {
     expect(findings).toHaveLength(1);
   });
 
-  test("does not flag financial operations with an idempotency key", () => {
+  test('does not flag financial operations with an idempotency key', () => {
     const tool = makeTool({
-      method: "POST",
-      path: "/payments/charge",
-      name: "chargePayment",
+      method: 'POST',
+      path: '/payments/charge',
+      name: 'chargePayment',
       parameters: [
         {
-          name: "Idempotency-Key",
-          in: "header",
+          name: 'Idempotency-Key',
+          in: 'header',
           required: true,
         },
       ],
@@ -82,13 +82,13 @@ describe("safety/financial-requires-idempotency", () => {
   });
 });
 
-describe("safety/external-communication-requires-guard", () => {
-  test("flags external communication operations without guard signals", () => {
+describe('safety/external-communication-requires-guard', () => {
+  test('flags external communication operations without guard signals', () => {
     const tool = makeTool({
-      method: "POST",
-      path: "/emails/send",
-      name: "sendEmail",
-      summary: "Send email",
+      method: 'POST',
+      path: '/emails/send',
+      name: 'sendEmail',
+      summary: 'Send email',
     });
 
     const findings = externalCommunicationRequiresGuardRule.check({
@@ -99,14 +99,14 @@ describe("safety/external-communication-requires-guard", () => {
     expect(findings).toHaveLength(1);
   });
 
-  test("does not flag external communication operations with guard metadata", () => {
+  test('does not flag external communication operations with guard metadata', () => {
     const tool = makeTool({
-      method: "POST",
-      path: "/emails/send",
-      name: "sendEmail",
+      method: 'POST',
+      path: '/emails/send',
+      name: 'sendEmail',
       rawOperation: {
-        "x-agent-guard": {
-          mode: "require_confirmation",
+        'x-agent-guard': {
+          mode: 'require_confirmation',
         },
       },
     });
@@ -120,12 +120,12 @@ describe("safety/external-communication-requires-guard", () => {
   });
 });
 
-describe("safety/destructive-requires-guard", () => {
-  test("flags DELETE operations without guard fields or guard extensions", () => {
+describe('safety/destructive-requires-guard', () => {
+  test('flags DELETE operations without guard fields or guard extensions', () => {
     const tool = makeTool({
-      method: "DELETE",
-      path: "/users/{id}",
-      name: "deleteUser",
+      method: 'DELETE',
+      path: '/users/{id}',
+      name: 'deleteUser',
     });
 
     const findings = destructiveRequiresGuardRule.check({
@@ -134,17 +134,17 @@ describe("safety/destructive-requires-guard", () => {
     });
 
     expect(findings).toHaveLength(1);
-    expect(findings[0]?.severity).toBe("error");
+    expect(findings[0]?.severity).toBe('error');
   });
 
-  test("does not flag DELETE operations with x-agent-guard metadata", () => {
+  test('does not flag DELETE operations with x-agent-guard metadata', () => {
     const tool = makeTool({
-      method: "DELETE",
-      path: "/users/{id}",
-      name: "deleteUser",
+      method: 'DELETE',
+      path: '/users/{id}',
+      name: 'deleteUser',
       rawOperation: {
-        "x-agent-guard": {
-          mode: "require_confirmation",
+        'x-agent-guard': {
+          mode: 'require_confirmation',
         },
       },
     });
@@ -158,12 +158,12 @@ describe("safety/destructive-requires-guard", () => {
   });
 });
 
-describe("safety/mutating-requires-dry-run", () => {
-  test("flags mutating operations without dry-run style inputs", () => {
+describe('safety/mutating-requires-dry-run', () => {
+  test('flags mutating operations without dry-run style inputs', () => {
     const tool = makeTool({
-      method: "POST",
-      path: "/users",
-      name: "createUser",
+      method: 'POST',
+      path: '/users',
+      name: 'createUser',
     });
 
     const findings = mutatingRequiresDryRunRule.check({
@@ -172,19 +172,19 @@ describe("safety/mutating-requires-dry-run", () => {
     });
 
     expect(findings).toHaveLength(1);
-    expect(findings[0]?.severity).toBe("warning");
+    expect(findings[0]?.severity).toBe('warning');
   });
 
-  test("does not flag mutating operations with dryRun input", () => {
+  test('does not flag mutating operations with dryRun input', () => {
     const tool = makeTool({
-      method: "POST",
-      path: "/users",
-      name: "createUser",
+      method: 'POST',
+      path: '/users',
+      name: 'createUser',
       requestBodySchema: {
-        type: "object",
+        type: 'object',
         properties: {
           dryRun: {
-            type: "boolean",
+            type: 'boolean',
           },
         },
       },
@@ -199,13 +199,13 @@ describe("safety/mutating-requires-dry-run", () => {
   });
 });
 
-describe("schema/list-requires-pagination", () => {
-  test("flags likely list GET operations without pagination query parameters", () => {
+describe('schema/list-requires-pagination', () => {
+  test('flags likely list GET operations without pagination query parameters', () => {
     const tool = makeTool({
-      method: "GET",
-      path: "/customers",
-      name: "listCustomers",
-      summary: "List customers",
+      method: 'GET',
+      path: '/customers',
+      name: 'listCustomers',
+      summary: 'List customers',
     });
 
     const findings = listRequiresPaginationRule.check({
@@ -216,16 +216,16 @@ describe("schema/list-requires-pagination", () => {
     expect(findings).toHaveLength(1);
   });
 
-  test("does not flag likely list GET operations with a limit query parameter", () => {
+  test('does not flag likely list GET operations with a limit query parameter', () => {
     const tool = makeTool({
-      method: "GET",
-      path: "/customers",
-      name: "listCustomers",
-      summary: "List customers",
+      method: 'GET',
+      path: '/customers',
+      name: 'listCustomers',
+      summary: 'List customers',
       parameters: [
         {
-          name: "limit",
-          in: "query",
+          name: 'limit',
+          in: 'query',
           required: false,
         },
       ],
@@ -240,17 +240,17 @@ describe("schema/list-requires-pagination", () => {
   });
 });
 
-describe("schema/vague-boolean", () => {
-  test("flags vague boolean inputs", () => {
+describe('schema/vague-boolean', () => {
+  test('flags vague boolean inputs', () => {
     const tool = makeTool({
-      method: "POST",
-      path: "/users",
-      name: "createUser",
+      method: 'POST',
+      path: '/users',
+      name: 'createUser',
       requestBodySchema: {
-        type: "object",
+        type: 'object',
         properties: {
           force: {
-            type: "boolean",
+            type: 'boolean',
           },
         },
       },
@@ -264,16 +264,16 @@ describe("schema/vague-boolean", () => {
     expect(findings).toHaveLength(1);
   });
 
-  test("does not flag explicit boolean inputs", () => {
+  test('does not flag explicit boolean inputs', () => {
     const tool = makeTool({
-      method: "POST",
-      path: "/emails/send",
-      name: "sendEmail",
+      method: 'POST',
+      path: '/emails/send',
+      name: 'sendEmail',
       requestBodySchema: {
-        type: "object",
+        type: 'object',
         properties: {
           recipientConfirmed: {
-            type: "boolean",
+            type: 'boolean',
           },
         },
       },
@@ -288,17 +288,17 @@ describe("schema/vague-boolean", () => {
   });
 });
 
-describe("schema/string-should-be-enum", () => {
-  test("flags likely constrained strings without enum values", () => {
+describe('schema/string-should-be-enum', () => {
+  test('flags likely constrained strings without enum values', () => {
     const tool = makeTool({
-      method: "POST",
-      path: "/users",
-      name: "createUser",
+      method: 'POST',
+      path: '/users',
+      name: 'createUser',
       requestBodySchema: {
-        type: "object",
+        type: 'object',
         properties: {
           role: {
-            type: "string",
+            type: 'string',
           },
         },
       },
@@ -312,17 +312,17 @@ describe("schema/string-should-be-enum", () => {
     expect(findings).toHaveLength(1);
   });
 
-  test("does not flag likely constrained strings with enum values", () => {
+  test('does not flag likely constrained strings with enum values', () => {
     const tool = makeTool({
-      method: "POST",
-      path: "/users",
-      name: "createUser",
+      method: 'POST',
+      path: '/users',
+      name: 'createUser',
       requestBodySchema: {
-        type: "object",
+        type: 'object',
         properties: {
           role: {
-            type: "string",
-            enum: ["admin", "member"],
+            type: 'string',
+            enum: ['admin', 'member'],
           },
         },
       },
@@ -337,20 +337,20 @@ describe("schema/string-should-be-enum", () => {
   });
 });
 
-describe("schema/sensitive-response-fields", () => {
-  test("flags sensitive response fields", () => {
+describe('schema/sensitive-response-fields', () => {
+  test('flags sensitive response fields', () => {
     const tool = makeTool({
-      method: "GET",
-      path: "/sessions/current",
-      name: "getCurrentSession",
+      method: 'GET',
+      path: '/sessions/current',
+      name: 'getCurrentSession',
       responses: [
         {
-          statusCode: "200",
+          statusCode: '200',
           schema: {
-            type: "object",
+            type: 'object',
             properties: {
               accessToken: {
-                type: "string",
+                type: 'string',
               },
             },
           },
@@ -366,19 +366,19 @@ describe("schema/sensitive-response-fields", () => {
     expect(findings).toHaveLength(1);
   });
 
-  test("does not flag ordinary response fields", () => {
+  test('does not flag ordinary response fields', () => {
     const tool = makeTool({
-      method: "GET",
-      path: "/users/current",
-      name: "getCurrentUser",
+      method: 'GET',
+      path: '/users/current',
+      name: 'getCurrentUser',
       responses: [
         {
-          statusCode: "200",
+          statusCode: '200',
           schema: {
-            type: "object",
+            type: 'object',
             properties: {
               email: {
-                type: "string",
+                type: 'string',
               },
             },
           },
@@ -395,12 +395,12 @@ describe("schema/sensitive-response-fields", () => {
   });
 });
 
-describe("docs/missing-description", () => {
-  test("flags operations with no summary or description", () => {
+describe('docs/missing-description', () => {
+  test('flags operations with no summary or description', () => {
     const tool = makeTool({
-      method: "GET",
-      path: "/health",
-      name: "getHealth",
+      method: 'GET',
+      path: '/health',
+      name: 'getHealth',
     });
 
     const findings = missingDescriptionRule.check({
@@ -412,16 +412,16 @@ describe("docs/missing-description", () => {
   });
 });
 
-describe("errors/missing-error-schema", () => {
-  test("flags operations without a structured 4xx or 5xx response schema", () => {
+describe('errors/missing-error-schema', () => {
+  test('flags operations without a structured 4xx or 5xx response schema', () => {
     const tool = makeTool({
-      method: "GET",
-      path: "/health",
-      name: "getHealth",
+      method: 'GET',
+      path: '/health',
+      name: 'getHealth',
       responses: [
         {
-          statusCode: "200",
-          description: "OK",
+          statusCode: '200',
+          description: 'OK',
         },
       ],
     });
@@ -434,17 +434,17 @@ describe("errors/missing-error-schema", () => {
     expect(findings).toHaveLength(1);
   });
 
-  test("does not flag operations with a structured 4xx response schema", () => {
+  test('does not flag operations with a structured 4xx response schema', () => {
     const tool = makeTool({
-      method: "POST",
-      path: "/customers",
-      name: "createCustomer",
+      method: 'POST',
+      path: '/customers',
+      name: 'createCustomer',
       responses: [
         {
-          statusCode: "400",
-          description: "Bad request",
+          statusCode: '400',
+          description: 'Bad request',
           schema: {
-            type: "object",
+            type: 'object',
           },
         },
       ],
@@ -461,10 +461,10 @@ describe("errors/missing-error-schema", () => {
 
 function makeTool(overrides: Partial<NormalizedTool>): NormalizedTool {
   return {
-    id: overrides.name ?? "testTool",
-    name: overrides.name ?? "testTool",
-    method: "GET",
-    path: "/test",
+    id: overrides.name ?? 'testTool',
+    name: overrides.name ?? 'testTool',
+    method: 'GET',
+    path: '/test',
     tags: [],
     parameters: [],
     responses: [],

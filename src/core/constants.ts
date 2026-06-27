@@ -1,1 +1,1 @@
-export const TOOLSMITH_VERSION = "0.0.0";
+export const TOOLSAFE_VERSION = '0.0.0';

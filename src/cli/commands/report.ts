@@ -1,25 +1,25 @@
-import type { Command } from "commander";
-import { parseChoiceOption, renderCommandError, writeOutputFile } from "@/cli/helpers";
-import { analyzeOpenApi } from "@/core/analyze";
-import type { AnalysisResult } from "@/core/types";
-import { renderJsonReport, renderMarkdownReport } from "@/reporters";
+import type { Command } from 'commander';
+import { parseChoiceOption, renderCommandError, writeOutputFile } from '@/cli/helpers';
+import { analyzeOpenApi } from '@/core/analyze';
+import type { AnalysisResult } from '@/core/types';
+import { renderJsonReport, renderMarkdownReport } from '@/reporters';
 
-type ReportFormat = "json" | "markdown";
+type ReportFormat = 'json' | 'markdown';
 
 type ReportOptions = {
   format?: string;
   out?: string;
 };
 
-const REPORT_FORMATS = ["json", "markdown"] as const satisfies readonly ReportFormat[];
+const REPORT_FORMATS = ['json', 'markdown'] as const satisfies readonly ReportFormat[];
 
 export function registerReportCommand(program: Command): void {
   program
-    .command("report")
-    .description("Generate a JSON or Markdown Toolsmith report")
-    .argument("<file>", "OpenAPI YAML or JSON file")
-    .option("--format <format>", "Output format: json or markdown", "markdown")
-    .option("--out <path>", "Write report to a file instead of stdout")
+    .command('report')
+    .description('Generate a JSON or Markdown ToolSafe report')
+    .argument('<file>', 'OpenAPI YAML or JSON file')
+    .option('--format <format>', 'Output format: json or markdown', 'markdown')
+    .option('--out <path>', 'Write report to a file instead of stdout')
     .action(async (filePath: string, options: ReportOptions) => {
       const format = parseReportFormat(options.format);
 
@@ -46,11 +46,11 @@ export function registerReportCommand(program: Command): void {
 }
 
 function parseReportFormat(value: string | undefined): ReportFormat | undefined {
-  return parseChoiceOption(value, REPORT_FORMATS, { optionName: "--format" });
+  return parseChoiceOption(value, REPORT_FORMATS, { optionName: '--format' });
 }
 
 function renderReport(result: AnalysisResult, format: ReportFormat): string {
-  if (format === "json") {
+  if (format === 'json') {
     return renderJsonReport(result);
   }
 

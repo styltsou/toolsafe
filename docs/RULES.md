@@ -1,6 +1,6 @@
 # Rules
 
-Toolsmith currently runs 10 default rules. Rules are deterministic and operate on normalized OpenAPI operations.
+ToolSafe currently runs 10 default rules. Rules are deterministic and operate on normalized OpenAPI operations.
 
 ## Default Rules
 

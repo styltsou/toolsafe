@@ -1,6 +1,6 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
-import { ToolsmithError } from "@/core/errors";
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname } from 'node:path';
+import { ToolSafeError } from '@/core/errors';
 
 export function parseChoiceOption<T extends string>(
   value: string | undefined,
@@ -21,18 +21,18 @@ export function parseChoiceOption<T extends string>(
 
 export async function writeOutputFile(filePath: string, output: string): Promise<void> {
   await mkdir(dirname(filePath), { recursive: true });
-  await writeFile(filePath, output, "utf8");
+  await writeFile(filePath, output, 'utf8');
 }
 
 export function renderCommandError(error: unknown): string {
-  if (error instanceof ToolsmithError) {
-    return `Toolsmith ${error.code}: ${error.message}\n`;
+  if (error instanceof ToolSafeError) {
+    return `ToolSafe ${error.code}: ${error.message}\n`;
   }
 
-  const message = error instanceof Error ? error.message : "Unexpected Toolsmith failure.";
-  return `Toolsmith ERROR: ${message}\n`;
+  const message = error instanceof Error ? error.message : 'Unexpected ToolSafe failure.';
+  return `ToolSafe ERROR: ${message}\n`;
 }
 
 function formatChoices(choices: readonly string[]): string {
-  return choices.join(" or ");
+  return choices.join(' or ');
 }

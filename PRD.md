@@ -1,12 +1,12 @@
-# Toolsmith PRD — Agent-Readiness Linter for OpenAPI Tools
+# ToolSafe PRD — Agent-Readiness Linter for OpenAPI Tools
 
 ## 1. Product Summary
 
-Toolsmith is a deterministic, offline-first developer tool that analyzes OpenAPI specifications and scores how safe, usable, and reliable their API operations are as tools for AI agents.
+ToolSafe is a deterministic, offline-first developer tool that analyzes OpenAPI specifications and scores how safe, usable, and reliable their API operations are as tools for AI agents.
 
-The goal is not to build an AI agent and not to depend on an LLM API. Toolsmith works like ESLint, Semgrep, or a static analyzer: it parses an OpenAPI file, normalizes operations into a tool-like internal model, runs deterministic lint rules, and outputs structured findings, risk reports, generated eval cases, and optional guard policies.
+The goal is not to build an AI agent and not to depend on an LLM API. ToolSafe works like ESLint, Semgrep, or a static analyzer: it parses an OpenAPI file, normalizes operations into a tool-like internal model, runs deterministic lint rules, and outputs structured findings, risk reports, generated eval cases, and optional guard policies.
 
-Toolsmith answers questions like:
+ToolSafe answers questions like:
 
 - Which API operations are safe for agents to call autonomously?
 - Which operations mutate state?
@@ -22,15 +22,15 @@ The initial version should focus on OpenAPI 3.x input and CLI output. No LLM is 
 
 ### One-line positioning
 
-Toolsmith is an agent-readiness linter for OpenAPI APIs.
+ToolSafe is an agent-readiness linter for OpenAPI APIs.
 
 ### Longer positioning
 
 As more applications expose APIs as tools for AI agents through MCP, function calling, OpenAPI tool importers, and custom agent frameworks, the hard problem is no longer only “can an agent call this API?” The harder problem is “should an agent call this API, and under what constraints?”
 
-Toolsmith provides a deterministic analysis layer that helps developers inspect an API before turning it into agent tools. It detects risky operations, missing safety affordances, weak schemas, ambiguous parameters, poor error contracts, and unbounded outputs.
+ToolSafe provides a deterministic analysis layer that helps developers inspect an API before turning it into agent tools. It detects risky operations, missing safety affordances, weak schemas, ambiguous parameters, poor error contracts, and unbounded outputs.
 
-### What Toolsmith is
+### What ToolSafe is
 
 - A CLI-first TypeScript/Bun tool.
 - A static analyzer for OpenAPI specs.
@@ -39,7 +39,7 @@ Toolsmith provides a deterministic analysis layer that helps developers inspect 
 - A deterministic eval generator.
 - A future foundation for MCP guard policy generation.
 
-### What Toolsmith is not
+### What ToolSafe is not
 
 - It is not an AI agent.
 - It does not need an LLM API.
@@ -68,13 +68,13 @@ Example users:
 User runs:
 
 ```bash
-toolsmith lint ./openapi.yaml
+toolsafe lint ./openapi.yaml
 ```
 
-Toolsmith prints human-readable findings:
+ToolSafe prints human-readable findings:
 
 ```txt
-Toolsmith Agent-Readiness Report
+ToolSafe Agent-Readiness Report
 
 Input: ./openapi.yaml
 Operations analyzed: 42
@@ -103,7 +103,7 @@ Warnings:
 User runs:
 
 ```bash
-toolsmith report ./openapi.yaml --format json --out toolsmith-report.json
+toolsafe report ./openapi.yaml --format json --out toolsafe-report.json
 ```
 
 Output contains summary, operation-level risks, findings, category scores, and recommendations.
@@ -113,7 +113,7 @@ Output contains summary, operation-level risks, findings, category scores, and r
 User runs:
 
 ```bash
-toolsmith report ./openapi.yaml --format markdown --out TOOLSMITH_REPORT.md
+toolsafe report ./openapi.yaml --format markdown --out TOOLSAFE_REPORT.md
 ```
 
 This creates a portfolio-friendly and PR-friendly report.
@@ -123,10 +123,10 @@ This creates a portfolio-friendly and PR-friendly report.
 User runs:
 
 ```bash
-toolsmith evals ./openapi.yaml --out toolsmith.evals.yaml
+toolsafe evals ./openapi.yaml --out toolsafe.evals.yaml
 ```
 
-Toolsmith generates test cases based on schemas and risk rules, such as:
+ToolSafe generates test cases based on schemas and risk rules, such as:
 
 - Missing required field tests.
 - Invalid enum tests.
@@ -140,10 +140,10 @@ Toolsmith generates test cases based on schemas and risk rules, such as:
 User runs:
 
 ```bash
-toolsmith policy ./openapi.yaml --out guard-policy.yaml
+toolsafe policy ./openapi.yaml --out guard-policy.yaml
 ```
 
-Toolsmith generates a suggested policy file that could later be used by an MCP proxy or tool-execution guard.
+ToolSafe generates a suggested policy file that could later be used by an MCP proxy or tool-execution guard.
 
 Example:
 
@@ -191,12 +191,12 @@ Do not support remote URLs in v0 unless trivial.
 Implement these commands:
 
 ```bash
-toolsmith lint <file>
-toolsmith report <file> --format json|markdown --out <path>
-toolsmith evals <file> --out <path>
-toolsmith policy <file> --out <path>
-toolsmith rules
-toolsmith version
+toolsafe lint <file>
+toolsafe report <file> --format json|markdown --out <path>
+toolsafe evals <file> --out <path>
+toolsafe policy <file> --out <path>
+toolsafe rules
+toolsafe version
 ```
 
 ### Optional nice-to-have commands
@@ -204,9 +204,9 @@ toolsmith version
 These can be added after MVP:
 
 ```bash
-toolsmith inspect <file>
-toolsmith score <file>
-toolsmith explain-rule <rule-id>
+toolsafe inspect <file>
+toolsafe score <file>
+toolsafe explain-rule <rule-id>
 ```
 
 ### MVP outputs
@@ -239,11 +239,11 @@ The strongest v0 product is the linter. Reports, eval suggestions, and guard pol
 
 Important scope corrections:
 
-- Generated evals are recommended test ideas, not executable conformance tests. They become executable only after a project maps Toolsmith operation IDs and expected errors to a real test runner or guard runtime.
+- Generated evals are recommended test ideas, not executable conformance tests. They become executable only after a project maps ToolSafe operation IDs and expected errors to a real test runner or guard runtime.
 - Generated policies are advisory policy drafts. They should include enough metadata to help a future MCP proxy or OpenAPI-to-MCP generator, but v0 should not claim that the policy is enforceable by itself.
-- Confirmation is not usually a native OpenAPI concept. Toolsmith can only detect explicit confirmation or guard signals in the spec, such as a `confirm` field, a custom `x-agent-guard` extension, or a generated policy rule. It should not claim to know whether the real backend has an out-of-band approval flow.
-- Risk classification is heuristic. Every operation-level risk should carry evidence and, where useful, a confidence value so users can understand why Toolsmith flagged it.
-- OpenAPI 3.1 support can be accepted by the parser in v0, but deep JSON Schema 2020-12 behavior should be explicitly out of scope. Toolsmith should traverse common object, array, enum, required, and response-schema shapes first.
+- Confirmation is not usually a native OpenAPI concept. ToolSafe can only detect explicit confirmation or guard signals in the spec, such as a `confirm` field, a custom `x-agent-guard` extension, or a generated policy rule. It should not claim to know whether the real backend has an out-of-band approval flow.
+- Risk classification is heuristic. Every operation-level risk should carry evidence and, where useful, a confidence value so users can understand why ToolSafe flagged it.
+- OpenAPI 3.1 support can be accepted by the parser in v0, but deep JSON Schema 2020-12 behavior should be explicitly out of scope. ToolSafe should traverse common object, array, enum, required, and response-schema shapes first.
 - Rule output quality matters more than rule count. Five reliable rules with good evidence are more useful than fifteen noisy rules.
 - A config file is useful, but should not block the first alpha. Default deterministic behavior should work without configuration.
 - The terminal report should be concise. Detailed data belongs in JSON and Markdown reports.
@@ -285,7 +285,7 @@ Start with a single package repository, not a monorepo.
 Recommended structure:
 
 ```txt
-toolsmith/
+toolsafe/
   README.md
   package.json
   tsconfig.json
@@ -371,7 +371,7 @@ packages/mcp       MCP server/proxy
 packages/rules     reusable rule pack
 ```
 
-But Toolsmith v0 has one main deliverable: a CLI. The core can still be organized internally under `src/core`. Later, if the project grows, the internal `src/core` folder can become `packages/core`.
+But ToolSafe v0 has one main deliverable: a CLI. The core can still be organized internally under `src/core`. Later, if the project grows, the internal `src/core` folder can become `packages/core`.
 
 Starting with a monorepo too early has downsides:
 
@@ -398,24 +398,24 @@ The most important design decision is to normalize OpenAPI operations into a sim
 ### NormalizedTool
 
 ```ts
-export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS';
 
-export type RiskLevel = "low" | "medium" | "high" | "critical";
+export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 
 export type SideEffectType =
-  | "read"
-  | "create"
-  | "update"
-  | "delete"
-  | "external_communication"
-  | "financial"
-  | "permission_change"
-  | "execution"
-  | "unknown";
+  | 'read'
+  | 'create'
+  | 'update'
+  | 'delete'
+  | 'external_communication'
+  | 'financial'
+  | 'permission_change'
+  | 'execution'
+  | 'unknown';
 
 export type NormalizedParameter = {
   name: string;
-  in: "path" | "query" | "header" | "cookie" | "body";
+  in: 'path' | 'query' | 'header' | 'cookie' | 'body';
   required: boolean;
   schema?: unknown;
   description?: string;
@@ -447,9 +447,9 @@ export type NormalizedTool = {
 ### Finding
 
 ```ts
-export type FindingSeverity = "info" | "warning" | "error";
+export type FindingSeverity = 'info' | 'warning' | 'error';
 
-export type FindingCategory = "safety" | "schema" | "docs" | "errors" | "agent_usability" | "auth";
+export type FindingCategory = 'safety' | 'schema' | 'docs' | 'errors' | 'agent_usability' | 'auth';
 
 export type Finding = {
   ruleId: string;
@@ -682,7 +682,7 @@ mass
 - Low: likely read-only and bounded.
 - Medium: mutating or ambiguous.
 - High: destructive, external side effects, permissions, financial, execution, or missing important guardrails.
-- Critical: high-risk operation with multiple missing explicit controls in the API contract or Toolsmith policy metadata, especially destructive/financial/execution operations that also lack idempotency, structured errors, limits, or guard annotations. Do not mark a DELETE operation critical solely because OpenAPI does not reveal an out-of-band human approval workflow.
+- Critical: high-risk operation with multiple missing explicit controls in the API contract or ToolSafe policy metadata, especially destructive/financial/execution operations that also lack idempotency, structured errors, limits, or guard annotations. Do not mark a DELETE operation critical solely because OpenAPI does not reveal an out-of-band human approval workflow.
 
 ## 12. MVP Rules
 
@@ -718,12 +718,12 @@ Custom OpenAPI extensions:
 
 ```txt
 x-agent-guard
-x-toolsmith-guard
+x-toolsafe-guard
 x-requires-confirmation
 x-confirmation-required
 ```
 
-Security or policy metadata generated by Toolsmith can also satisfy this later, but plain OpenAPI usually cannot represent a separate human approval workflow unless the API authors model it explicitly.
+Security or policy metadata generated by ToolSafe can also satisfy this later, but plain OpenAPI usually cannot represent a separate human approval workflow unless the API authors model it explicitly.
 
 Finding:
 
@@ -750,7 +750,7 @@ This rule does not prove the backend lacks a human approval flow. It only says t
 
 #### Representing guard intent in OpenAPI
 
-OpenAPI does not have a standard `requiresConfirmation` field. For agent-readiness analysis, Toolsmith should look for explicit machine-readable signals that API authors can choose to expose.
+OpenAPI does not have a standard `requiresConfirmation` field. For agent-readiness analysis, ToolSafe should look for explicit machine-readable signals that API authors can choose to expose.
 
 Option 1: model confirmation as an actual request field.
 
@@ -794,7 +794,7 @@ delete:
 
 This is useful for a future OpenAPI-to-MCP generator because the generated MCP tool can carry the guard policy forward even if the HTTP API itself does not have a confirmation parameter.
 
-Option 3: leave the OpenAPI unchanged and let Toolsmith generate an advisory policy.
+Option 3: leave the OpenAPI unchanged and let ToolSafe generate an advisory policy.
 
 ```yaml
 operations:
@@ -1326,7 +1326,7 @@ Example:
 Sections:
 
 ```md
-# Toolsmith Agent-Readiness Report
+# ToolSafe Agent-Readiness Report
 
 ## Summary
 
@@ -1347,14 +1347,14 @@ Keep it readable and useful in GitHub PRs.
 
 ## 15. Eval Generation
 
-Toolsmith should generate deterministic eval cases from rules and schemas.
+ToolSafe should generate deterministic eval cases from rules and schemas.
 
 The eval generator does not execute tests. It outputs a YAML file that describes recommended test cases.
 
 Command:
 
 ```bash
-toolsmith evals ./openapi.yaml --out toolsmith.evals.yaml
+toolsafe evals ./openapi.yaml --out toolsafe.evals.yaml
 ```
 
 Example output:
@@ -1370,7 +1370,7 @@ cases:
     path: /users/{id}
     type: guard
     input:
-      id: "test_id"
+      id: 'test_id'
     expect:
       blocked: true
       errorCode: CONFIRMATION_REQUIRED
@@ -1445,14 +1445,14 @@ The generated evals are recommendations. Make that clear in the file header.
 Command:
 
 ```bash
-toolsmith policy ./openapi.yaml --out guard-policy.yaml
+toolsafe policy ./openapi.yaml --out guard-policy.yaml
 ```
 
 Example:
 
 ```yaml
 version: 1
-generatedBy: toolsmith
+generatedBy: toolsafe
 defaultMode: allow
 operations:
   deleteUser:
@@ -1507,12 +1507,12 @@ Default mapping:
 
 ## 17. CLI UX
 
-### `toolsmith lint`
+### `toolsafe lint`
 
 Usage:
 
 ```bash
-toolsmith lint <file> [--format pretty|json] [--fail-on warning|error]
+toolsafe lint <file> [--format pretty|json] [--fail-on warning|error]
 ```
 
 Default: pretty terminal output.
@@ -1527,38 +1527,38 @@ Exit codes:
 
 Default fail threshold should be `error`.
 
-### `toolsmith report`
+### `toolsafe report`
 
 Usage:
 
 ```bash
-toolsmith report <file> --format json|markdown --out <path>
+toolsafe report <file> --format json|markdown --out <path>
 ```
 
 If `--out` omitted, print to stdout.
 
-### `toolsmith evals`
+### `toolsafe evals`
 
 Usage:
 
 ```bash
-toolsmith evals <file> --out <path>
+toolsafe evals <file> --out <path>
 ```
 
-### `toolsmith policy`
+### `toolsafe policy`
 
 Usage:
 
 ```bash
-toolsmith policy <file> --out <path>
+toolsafe policy <file> --out <path>
 ```
 
-### `toolsmith rules`
+### `toolsafe rules`
 
 Usage:
 
 ```bash
-toolsmith rules
+toolsafe rules
 ```
 
 Print all rule IDs, categories, severities, and descriptions.
@@ -1570,7 +1570,7 @@ All CLI errors should be clean and actionable.
 Example:
 
 ```txt
-Toolsmith could not parse the OpenAPI file.
+ToolSafe could not parse the OpenAPI file.
 
 File: ./openapi.yaml
 Reason: Missing required "openapi" field.
@@ -1632,7 +1632,7 @@ Bin config:
 ```json
 {
   "bin": {
-    "toolsmith": "./src/cli/index.ts"
+    "toolsafe": "./src/cli/index.ts"
   }
 }
 ```
@@ -1759,12 +1759,12 @@ Each rule should have focused fixtures.
 Example:
 
 ```ts
-test("DELETE operation without an explicit guard signal creates finding", () => {
+test('DELETE operation without an explicit guard signal creates finding', () => {
   const tool = makeTool({
-    method: "DELETE",
-    path: "/users/{id}",
-    name: "deleteUser",
-    parameters: [{ name: "id", in: "path", required: true }],
+    method: 'DELETE',
+    path: '/users/{id}',
+    name: 'deleteUser',
+    parameters: [{ name: 'id', in: 'path', required: true }],
   });
 
   const findings = destructiveRequiresConfirmation.check({
@@ -1773,7 +1773,7 @@ test("DELETE operation without an explicit guard signal creates finding", () => 
   });
 
   expect(findings).toHaveLength(1);
-  expect(findings[0].severity).toBe("error");
+  expect(findings[0].severity).toBe('error');
 });
 ```
 
@@ -1800,7 +1800,7 @@ paths:
       operationId: listUsers
       summary: List users
       responses:
-        "200":
+        '200':
           description: OK
     post:
       operationId: createUser
@@ -1821,7 +1821,7 @@ paths:
                 force:
                   type: boolean
       responses:
-        "200":
+        '200':
           description: OK
   /users/{id}:
     delete:
@@ -1834,7 +1834,7 @@ paths:
           schema:
             type: string
       responses:
-        "204":
+        '204':
           description: Deleted
   /payments/charge:
     post:
@@ -1855,7 +1855,7 @@ paths:
                 amount:
                   type: number
       responses:
-        "200":
+        '200':
           description: OK
   /emails/send:
     post:
@@ -1879,7 +1879,7 @@ paths:
                 body:
                   type: string
       responses:
-        "200":
+        '200':
           description: OK
 ```
 
@@ -1889,7 +1889,7 @@ This fixture should trigger many findings and make the demo obvious.
 
 The README should explain:
 
-1. What Toolsmith is.
+1. What ToolSafe is.
 2. Why agent-readiness matters.
 3. Why it does not require an LLM.
 4. Installation.
@@ -1903,17 +1903,17 @@ The README should explain:
 Suggested README headline:
 
 ```md
-# Toolsmith
+# ToolSafe
 
 Agent-readiness linting for OpenAPI tools.
 
-Toolsmith analyzes OpenAPI specs and detects API design issues that make tools risky, ambiguous, or hard for AI agents to use safely.
+ToolSafe analyzes OpenAPI specs and detects API design issues that make tools risky, ambiguous, or hard for AI agents to use safely.
 ```
 
 Suggested README pitch:
 
 ```md
-Most APIs were designed for humans and backend services, not autonomous agents. Toolsmith helps identify the missing safety and usability contracts before those APIs become agent-callable tools.
+Most APIs were designed for humans and backend services, not autonomous agents. ToolSafe helps identify the missing safety and usability contracts before those APIs become agent-callable tools.
 ```
 
 ## 23. Future Roadmap
@@ -1924,7 +1924,7 @@ After MVP, possible features:
 
 - MCP tool definition input.
 - SARIF output for CI/code scanning.
-- Config file `.toolsmithrc`.
+- Config file `.toolsafe.rc`.
 - Rule enable/disable.
 - Severity overrides.
 - Better JSON Schema traversal.
@@ -1972,9 +1972,9 @@ The core must remain useful without an LLM.
 MVP is done when:
 
 - User can install/run with Bun.
-- User can run `toolsmith lint examples/risky-openapi.yaml`.
-- Toolsmith parses OpenAPI YAML and JSON.
-- Toolsmith normalizes operations.
+- User can run `toolsafe lint examples/risky-openapi.yaml`.
+- ToolSafe parses OpenAPI YAML and JSON.
+- ToolSafe normalizes operations.
 - At least 10 rules are implemented.
 - Findings include severity, category, message, recommendation, operation, and evidence.
 - Terminal output is readable.
@@ -2037,7 +2037,7 @@ bun run src/cli/index.ts lint examples/risky-openapi.yaml
 Output:
 
 ```txt
-Toolsmith Agent-Readiness Report
+ToolSafe Agent-Readiness Report
 
 Risky Example API v1.0.0
 Operations analyzed: 5

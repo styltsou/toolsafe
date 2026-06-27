@@ -1,32 +1,36 @@
 # Next Steps
 
-Toolsmith is now in a good MVP state: local OpenAPI parsing, normalization, deterministic rules, scoring, reports, advisory policy drafts, advisory eval ideas, docs, examples, and CI are in place.
+ToolSafe is now in a good MVP state: local OpenAPI parsing, normalization, deterministic rules, scoring, reports, advisory policy drafts, advisory eval ideas, docs, examples, and CI are in place (64 tests, typecheck clean, 10 rules).
 
-The next work should focus on making Toolsmith easier to adopt in real repositories and easier to integrate into CI/security workflows.
+The next work should focus on making ToolSafe easier to adopt in real repositories and easier to integrate into CI/security workflows.
 
-## 1. Config Support
+## High Priority
 
-Config support should let teams tune Toolsmith without changing source code or forking the rule set.
+### Finish remaining rules from PRD
 
-### Goals
+| Rule                                              | Status          |
+| ------------------------------------------------- | --------------- |
+| `docs/weak-description`                           | Not implemented |
+| `docs/mutating-description-mentions-side-effects` | Not implemented |
+| `safety/batch-operation-requires-limit`           | Not implemented |
+| `auth/dangerous-auth-scope`                       | Not implemented |
+| `schema/unconstrained-file-upload`                | Not implemented |
 
-- Let users enable or disable rules.
-- Let users override rule severities.
-- Let users configure lint failure thresholds.
-- Let users set output defaults for reports, policy drafts, or eval ideas.
-- Keep default behavior unchanged when no config file exists.
+### Add missing CLI commands
 
-### Possible Config File Names
+- `toolsafe rules` — print all rule IDs, categories, severities, and descriptions
+- `toolsafe version` — print version
 
-Support one obvious project-local config first:
+### Config support
 
-- `toolsmith.config.json`
+Config support should let teams tune ToolSafe without changing source code or forking the rule set.
 
-YAML or TypeScript config can wait until JSON proves insufficient.
+Goals:
 
-### Suggested Shape
+- Let users enable or disable rules, override severities, configure lint failure thresholds, and set output defaults
+- Keep default behavior unchanged when no config file exists
 
-The first version can stay small:
+Start with `toolsafe.config.json` (JSON only for v1):
 
 ```json
 {
@@ -40,72 +44,36 @@ The first version can stay small:
 }
 ```
 
-Rule values could be:
+Implementation notes:
 
-- `off`
-- `info`
-- `warning`
-- `error`
+- Add `src/config/`, parse once, validate with Zod
+- Apply rule filtering and severity overrides before scoring/reporting/policy/eval generation
+- Keep config loading deterministic and local-file only
+- --config flag can come later
 
-### Implementation Notes
+### SARIF output
 
-- Add `src/config/`.
-- Parse config once in CLI commands that run analysis.
-- Keep config loading deterministic and local-file only.
-- Validate config with Zod.
-- Apply rule filtering and severity overrides before scoring, reporting, policy generation, and eval generation.
-- Make config path explicit later with `--config`; start with auto-discovery only if it stays simple.
+SARIF would let ToolSafe findings appear in GitHub code scanning and other static-analysis workflows.
 
-### Tests
+Add `--format sarif` to `toolsafe report` (or a dedicated `toolsafe sarif` command).
 
-- No config preserves current snapshots.
-- Disabled rule removes findings.
-- Severity override changes finding severity and scores.
-- `lint.failOn` changes exit behavior.
-- Invalid config returns exit code `2` with a clean Toolsmith error.
+Mapping sketch:
 
-## 2. SARIF Output
-
-SARIF would let Toolsmith findings appear in GitHub code scanning and other static-analysis workflows.
-
-### Goals
-
-- Add machine-readable SARIF output for lint/report workflows.
-- Map Toolsmith findings to SARIF `result` entries.
-- Preserve rule IDs, severity, recommendations, and evidence.
-- Point findings at the analyzed OpenAPI file.
-
-### CLI Options
-
-Two reasonable paths:
-
-- Add `--format sarif` to `toolsmith report`.
-- Or add a dedicated `toolsmith sarif <file>` command.
-
-Prefer `report --format sarif` if the output stays another report format.
-
-### Mapping Sketch
-
-- SARIF `tool.driver.name`: `Toolsmith`
-- SARIF rule ID: Toolsmith rule ID
-- SARIF result level:
-  - `error` -> `error`
-  - `warning` -> `warning`
-  - `info` -> `note`
+- `tool.driver.name`: `ToolSafe`
+- SARIF result level: `error` → `error`, `warning` → `warning`, `info` → `note`
 - SARIF message: finding message plus recommendation
 - SARIF location: source OpenAPI file
 
-OpenAPI operation-level paths are not line-aware yet. Initial SARIF can point to the file as a whole and include method/path in the message. Later, parser source-map support could improve locations.
+## Medium Priority
 
-### Tests
+- Polish terminal output with picocolors (better use of colors, grouping, formatting)
+- Improve README with CLI examples, screenshots, rule list
+- Add `examples/guard-policy.yaml` and `examples/toolsafe-report.md` to showcase output
+- Keep examples current: add an `examples:check` script that regenerates outputs into a temp dir and compares against committed examples
+- JSON schema traversal improvements for deeper rule analysis
 
-- Snapshot SARIF for `examples/risky-openapi.yaml`.
-- Validate basic SARIF shape.
-- Ensure all findings produce SARIF results.
-- Ensure SARIF output is stable and deterministic.
+## Future (post-MVP)
 
-## 3. Keep Examples Current
-
-`examples/output/` is generated from `examples/risky-openapi.yaml`.
-
-Add an `examples:check` script that regenerates outputs into a temp directory and compares them against committed examples. Once that exists, add it to CI so docs and sample outputs cannot drift silently.
+- MCP tool definition input support
+- OpenAPI-to-MCP safe generator
+- Optional LLM mode for description improvements

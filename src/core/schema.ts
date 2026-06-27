@@ -1,6 +1,6 @@
-import type { NormalizedTool } from "@/core/types";
-import { isObject } from "@/core/objects";
-import { matchesNormalizedName } from "@/core/strings";
+import type { NormalizedTool } from '@/core/types';
+import { isObject } from '@/core/objects';
+import { matchesNormalizedName } from '@/core/strings';
 
 type ObjectSchemaLike = {
   type?: unknown;
@@ -28,7 +28,7 @@ export function hasAnyInputField(tool: NormalizedTool, names: readonly string[])
 
 export function hasAnyQueryParameter(tool: NormalizedTool, names: readonly string[]): boolean {
   return tool.parameters.some(
-    (parameter) => parameter.in === "query" && matchesNormalizedName(parameter.name, names),
+    (parameter) => parameter.in === 'query' && matchesNormalizedName(parameter.name, names),
   );
 }
 
@@ -72,11 +72,11 @@ export function getInputSchemaProperties(tool: NormalizedTool): SchemaProperty[]
 }
 
 export function isBooleanSchema(schema: unknown): boolean {
-  return getSchemaType(schema) === "boolean";
+  return getSchemaType(schema) === 'boolean';
 }
 
 export function isStringSchema(schema: unknown): boolean {
-  return getSchemaType(schema) === "string";
+  return getSchemaType(schema) === 'string';
 }
 
 export function hasEnum(schema: unknown): boolean {
@@ -90,7 +90,7 @@ function getSchemaType(schema: unknown): string | undefined {
 
   const type = (schema as ObjectSchemaLike).type;
 
-  return typeof type === "string" ? type : undefined;
+  return typeof type === 'string' ? type : undefined;
 }
 
 function unwrapArraySchema(schema: unknown): unknown {
@@ -100,7 +100,7 @@ function unwrapArraySchema(schema: unknown): unknown {
 
   const schemaLike = schema as ObjectSchemaLike;
 
-  if (schemaLike.type === "array" && schemaLike.items !== undefined) {
+  if (schemaLike.type === 'array' && schemaLike.items !== undefined) {
     return schemaLike.items;
   }
 

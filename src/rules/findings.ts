@@ -1,4 +1,4 @@
-import type { Finding, FindingCategory, FindingSeverity, NormalizedTool, Rule } from "@/core/types";
+import type { Finding, FindingCategory, FindingSeverity, NormalizedTool, Rule } from '@/core/types';
 
 const SEVERITY_ORDER: Record<FindingSeverity, number> = {
   error: 0,

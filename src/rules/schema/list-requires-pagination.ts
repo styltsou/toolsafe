@@ -1,32 +1,32 @@
-import type { Rule } from "@/core/types";
-import { hasAnyQueryParameter } from "@/core/schema";
-import { includesAny } from "@/core/strings";
-import { createFinding } from "@/rules/findings";
-import { getOperationSearchText } from "@/rules/helpers";
+import type { Rule } from '@/core/types';
+import { hasAnyQueryParameter } from '@/core/schema';
+import { includesAny } from '@/core/strings';
+import { createFinding } from '@/rules/findings';
+import { getOperationSearchText } from '@/rules/helpers';
 
 const LIST_KEYWORDS = [
-  "list",
-  "search",
-  "query",
-  "all",
-  "records",
-  "customers",
-  "users",
-  "items",
-  "events",
+  'list',
+  'search',
+  'query',
+  'all',
+  'records',
+  'customers',
+  'users',
+  'items',
+  'events',
 ];
 
 const PAGINATION_PARAMETERS = [
-  "limit",
-  "page",
-  "pageSize",
-  "page_size",
-  "perPage",
-  "per_page",
-  "cursor",
-  "offset",
-  "next",
-  "nextCursor",
+  'limit',
+  'page',
+  'pageSize',
+  'page_size',
+  'perPage',
+  'per_page',
+  'cursor',
+  'offset',
+  'next',
+  'nextCursor',
 ];
 
 /**
@@ -36,14 +36,14 @@ const PAGINATION_PARAMETERS = [
  * exposure stay predictable.
  */
 export const listRequiresPaginationRule: Rule = {
-  id: "schema/list-requires-pagination",
-  name: "List/search requires pagination or limit",
-  description: "Flags likely list/search GET operations that lack pagination or limit parameters.",
-  category: "agent_usability",
-  defaultSeverity: "warning",
+  id: 'schema/list-requires-pagination',
+  name: 'List/search requires pagination or limit',
+  description: 'Flags likely list/search GET operations that lack pagination or limit parameters.',
+  category: 'agent_usability',
+  defaultSeverity: 'warning',
   check: ({ tool }) => {
     const isLikelyList =
-      tool.method === "GET" && includesAny(getOperationSearchText(tool), LIST_KEYWORDS);
+      tool.method === 'GET' && includesAny(getOperationSearchText(tool), LIST_KEYWORDS);
 
     if (!isLikelyList || hasAnyQueryParameter(tool, PAGINATION_PARAMETERS)) {
       return [];
@@ -51,10 +51,10 @@ export const listRequiresPaginationRule: Rule = {
 
     return [
       createFinding(listRequiresPaginationRule, tool, {
-        message: "List/search operation has no pagination or limit query parameter.",
+        message: 'List/search operation has no pagination or limit query parameter.',
         recommendation:
-          "Expose limit, page, pageSize, cursor, or offset parameters to prevent unbounded agent outputs.",
-        evidence: ["GET operation appears to return a collection"],
+          'Expose limit, page, pageSize, cursor, or offset parameters to prevent unbounded agent outputs.',
+        evidence: ['GET operation appears to return a collection'],
       }),
     ];
   },

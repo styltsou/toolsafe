@@ -1,12 +1,12 @@
 # Publishing Notes
 
-Toolsmith has a working CLI entrypoint, but the package is still marked private. Do not publish until the project owner explicitly decides the first public release scope.
+ToolSafe has a working CLI entrypoint, but the package is still marked private. Do not publish until the project owner explicitly decides the first public release scope.
 
 ## Current Package Shape
 
-- Package name: `toolsmith`
+- Package name: `toolsafe`
 - Runtime: Bun
-- CLI bin: `toolsmith -> ./src/cli/index.ts`
+- CLI bin: `toolsafe -> ./src/cli/index.ts`
 - Package is currently private.
 
 ## Before Publishing
@@ -24,4 +24,4 @@ Complete this checklist before removing `private: true`:
 
 ## Release Notes
 
-Initial release notes should clearly say Toolsmith is a static analyzer. Policy and eval outputs are advisory drafts and require runtime integration before they can enforce behavior or execute tests.
+Initial release notes should clearly say ToolSafe is a static analyzer. Policy and eval outputs are advisory drafts and require runtime integration before they can enforce behavior or execute tests.

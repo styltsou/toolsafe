@@ -1,4 +1,4 @@
-import type { AnalysisResult } from "@/core/types";
+import type { AnalysisResult } from '@/core/types';
 
 /**
  * Stable pretty JSON reporter used by CLI output and later report generation.

@@ -1,22 +1,22 @@
-export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS';
 
-export type RiskLevel = "low" | "medium" | "high" | "critical";
+export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 
 export type SideEffectType =
-  | "read"
-  | "create"
-  | "update"
-  | "delete"
-  | "external_communication"
-  | "financial"
-  | "permission_change"
-  | "execution"
-  | "unknown";
+  | 'read'
+  | 'create'
+  | 'update'
+  | 'delete'
+  | 'external_communication'
+  | 'financial'
+  | 'permission_change'
+  | 'execution'
+  | 'unknown';
 
-export type ParameterLocation = "path" | "query" | "header" | "cookie" | "body";
+export type ParameterLocation = 'path' | 'query' | 'header' | 'cookie' | 'body';
 
 /**
- * Toolsmith's flattened view of an OpenAPI parameter or simple body field.
+ * ToolSafe's flattened view of an OpenAPI parameter or simple body field.
  *
  * The `body` location is reserved for later schema expansion; Milestone 2 only
  * emits OpenAPI path/query/header/cookie parameters.
@@ -64,9 +64,9 @@ export type NormalizedTool = {
   rawOperation: unknown;
 };
 
-export type FindingSeverity = "info" | "warning" | "error";
+export type FindingSeverity = 'info' | 'warning' | 'error';
 
-export type FindingCategory = "safety" | "schema" | "docs" | "errors" | "agent_usability" | "auth";
+export type FindingCategory = 'safety' | 'schema' | 'docs' | 'errors' | 'agent_usability' | 'auth';
 
 /**
  * A single actionable rule result.
