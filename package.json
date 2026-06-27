@@ -1,16 +1,20 @@
 {
   "name": "toolsafe",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Deterministic agent-readiness linter for OpenAPI APIs",
   "keywords": [
     "agent",
     "ai",
     "api",
+    "api-safety",
     "lint",
+    "linter",
     "llm",
+    "mcp",
     "openapi",
     "safety",
-    "security"
+    "security",
+    "static-analysis"
   ],
   "license": "MIT",
   "repository": {
