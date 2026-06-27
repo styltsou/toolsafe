@@ -1,4 +1,5 @@
 import type { Command } from 'commander';
+import { loadConfig } from '@/config/loader';
 import { parseChoiceOption, renderCommandError, writeOutputFile } from '@/cli/helpers';
 import { analyzeOpenApi } from '@/core/analyze';
 import type { AnalysisResult } from '@/core/types';
@@ -9,6 +10,7 @@ type ReportFormat = 'json' | 'markdown' | 'sarif';
 type ReportOptions = {
   format?: string;
   out?: string;
+  config?: string;
 };
 
 const REPORT_FORMATS = ['json', 'markdown', 'sarif'] as const satisfies readonly ReportFormat[];
@@ -20,6 +22,7 @@ export function registerReportCommand(program: Command): void {
     .argument('<file>', 'OpenAPI YAML or JSON file')
     .option('--format <format>', 'Output format: json, markdown, or sarif', 'markdown')
     .option('--out <path>', 'Write report to a file instead of stdout')
+    .option('--config <path>', 'Path to toolsafe.config.json')
     .action(async (filePath: string, options: ReportOptions) => {
       const format = parseReportFormat(options.format);
 
@@ -29,7 +32,8 @@ export function registerReportCommand(program: Command): void {
       }
 
       try {
-        const result = await analyzeOpenApi(filePath);
+        const config = loadConfig(options.config);
+        const result = await analyzeOpenApi(filePath, config ?? undefined);
         const output = renderReport(result, format);
 
         if (options.out) {

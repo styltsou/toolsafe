@@ -20,11 +20,15 @@ The code should feel closer to a static analyzer than an application server. Dat
 
 The codebase uses the `@/*` path alias for source imports. `@/core/types` maps to `src/core/types.ts`, and tests use the same alias when importing source modules.
 
+### `src/config`
+
+Config loading, schema validation, and type definitions for `toolsafe.config.json`. The loader auto-detects the file in CWD or loads from an explicit `--config` path. Config applies rule-level filtering and severity overrides to the analysis pipeline.
+
 ### `src/cli`
 
 The CLI layer owns command registration, command-specific options, stdout/stderr output, and process exit codes.
 
-It should not own parsing, normalization, scoring, rule logic, or policy logic. Commands call `analyzeOpenApi` and then choose a reporter or generator.
+It should not own parsing, normalization, scoring, rule logic, or policy logic. Commands call `analyzeOpenApi` and then choose a reporter or generator. Commands load config before calling the analysis pipeline.
 
 ### `src/parsers`
 
@@ -92,6 +96,6 @@ The lint command currently uses three exit states:
 - `1`: analysis completed and at least one finding met the configured failure threshold.
 - `2`: the input could not be parsed, options were invalid, or another input-level error occurred.
 
-The default threshold is `error`. With `--fail-on warning`, warnings and errors both produce exit code 1.
+The default threshold is `error`. The resolved threshold follows this precedence: `--fail-on` CLI flag > config `lint.failOn` > built-in default (`error`).
 
 The `report`, `policy`, and `evals` commands return `0` when generation succeeds and `2` for input or parse errors.

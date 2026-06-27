@@ -59,11 +59,13 @@ Analyze an OpenAPI file and print findings to the terminal.
 |--------|-------------|---------|
 | `--format <pretty\|json>` | Output format | `pretty` |
 | `--fail-on <warning\|error>` | Exit with code 1 at this severity | `error` |
+| `--config <path>` | Path to config file | Auto-detect `toolsafe.config.json` |
 
 ```bash
 toolsafe lint api.yaml
 toolsafe lint api.yaml --format json
 toolsafe lint api.yaml --fail-on warning
+toolsafe lint api.yaml --config toolsafe.config.json
 ```
 
 **Exit codes:** `0` if no findings at threshold, `1` if findings meet threshold, `2` on error.
@@ -76,11 +78,13 @@ Generate a detailed report in JSON, Markdown, or SARIF.
 |--------|-------------|---------|
 | `--format <json\|markdown\|sarif>` | Output format | `markdown` |
 | `--out <path>` | Write to file instead of stdout | — |
+| `--config <path>` | Path to config file | Auto-detect `toolsafe.config.json` |
 
 ```bash
 toolsafe report api.yaml --format markdown --out report.md
 toolsafe report api.yaml --format json > report.json
 toolsafe report api.yaml --format sarif --out results.sarif
+toolsafe report api.yaml --config toolsafe.config.json --format json
 ```
 
 ### `toolsafe policy <file>`
@@ -90,10 +94,12 @@ Generate an advisory guard policy YAML draft. The policy describes which operati
 | Option | Description | Default |
 |--------|-------------|---------|
 | `--out <path>` | Write to file instead of stdout | — |
+| `--config <path>` | Path to config file | Auto-detect `toolsafe.config.json` |
 
 ```bash
 toolsafe policy api.yaml
 toolsafe policy api.yaml --out guard-policy.yaml
+toolsafe policy api.yaml --config toolsafe.config.json
 ```
 
 ### `toolsafe evals <file>`
@@ -103,10 +109,12 @@ Generate advisory eval case ideas in YAML. Each eval case describes a scenario a
 | Option | Description | Default |
 |--------|-------------|---------|
 | `--out <path>` | Write to file instead of stdout | — |
+| `--config <path>` | Path to config file | Auto-detect `toolsafe.config.json` |
 
 ```bash
 toolsafe evals api.yaml
 toolsafe evals api.yaml --out toolsafe.evals.yaml
+toolsafe evals api.yaml --config toolsafe.config.json
 ```
 
 ### `toolsafe rules`
@@ -116,6 +124,39 @@ List all available rules with their ID, severity, category, and description.
 ```bash
 toolsafe rules
 ```
+
+## Configuration
+
+ToolSafe auto-detects `toolsafe.config.json` in the current directory. You can also pass an explicit path with `--config`.
+
+```json
+{
+  "rules": {
+    "safety/destructive-requires-guard": "off",
+    "errors/missing-error-schema": "error"
+  },
+  "lint": {
+    "failOn": "warning"
+  }
+}
+```
+
+### Rules
+
+Each rule ID maps to one of:
+
+| Value | Behavior |
+|-------|----------|
+| `"off"` | Rule is disabled |
+| `"info"` / `"warning"` / `"error"` | Override the rule's severity |
+
+### Lint
+
+| Field | Description | Default |
+|-------|-------------|---------|
+| `failOn` | Minimum severity to exit with code 1 | `"error"` |
+
+**Precedence:** CLI `--fail-on` > config `lint.failOn` > default (`"error"`).
 
 ## Output Formats
 

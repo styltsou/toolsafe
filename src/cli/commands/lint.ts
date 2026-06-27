@@ -1,4 +1,5 @@
 import type { Command } from 'commander';
+import { loadConfig } from '@/config/loader';
 import { parseChoiceOption, renderCommandError } from '@/cli/helpers';
 import { analyzeOpenApi } from '@/core/analyze';
 import type { AnalysisResult, FindingSeverity } from '@/core/types';
@@ -10,6 +11,7 @@ type FailOn = 'warning' | 'error';
 type LintOptions = {
   format?: string;
   failOn?: string;
+  config?: string;
 };
 
 const FORMATS = ['pretty', 'json'] as const satisfies readonly LintFormat[];
@@ -21,18 +23,26 @@ export function registerLintCommand(program: Command): void {
     .description('Analyze a local OpenAPI file for agent-readiness issues')
     .argument('<file>', 'OpenAPI YAML or JSON file')
     .option('--format <format>', 'Output format: pretty or json', 'pretty')
-    .option('--fail-on <severity>', 'Exit with code 1 on warning or error', 'error')
+    .option('--fail-on <severity>', 'Exit with code 1 on warning or error')
+    .option('--config <path>', 'Path to toolsafe.config.json')
     .action(async (filePath: string, options: LintOptions) => {
       const format = parseFormat(options.format);
-      const failOn = parseFailOn(options.failOn);
 
-      if (!format || !failOn) {
+      if (!format) {
         process.exitCode = 2;
         return;
       }
 
       try {
-        const result = await analyzeOpenApi(filePath);
+        const config = loadConfig(options.config);
+        const failOn = resolveFailOn(options.failOn, config);
+
+        if (!failOn) {
+          process.exitCode = 2;
+          return;
+        }
+
+        const result = await analyzeOpenApi(filePath, config ?? undefined);
         process.stdout.write(renderLintResult(result, format));
 
         if (hasThresholdFindings(result, failOn)) {
@@ -49,8 +59,19 @@ function parseFormat(value: string | undefined): LintFormat | undefined {
   return parseChoiceOption(value, FORMATS, { optionName: '--format' });
 }
 
-function parseFailOn(value: string | undefined): FailOn | undefined {
-  return parseChoiceOption(value, FAIL_ON_VALUES, { optionName: '--fail-on' });
+function resolveFailOn(
+  cliValue: string | undefined,
+  config?: import('@/config/types').ToolSafeConfig | null,
+): FailOn | undefined {
+  if (cliValue) {
+    return parseChoiceOption(cliValue, FAIL_ON_VALUES, { optionName: '--fail-on' });
+  }
+
+  if (config?.lint?.failOn) {
+    return config.lint.failOn;
+  }
+
+  return 'error';
 }
 
 function renderLintResult(result: AnalysisResult, format: LintFormat): string {

@@ -1,5 +1,7 @@
+import type { ToolSafeConfig } from '@/config/types';
 import { parseOpenApi } from '@/parsers/openapi';
-import { runRules } from '@/rules';
+import { defaultRules, runRules } from '@/rules';
+import type { Rule } from '@/core/types';
 import { normalizeOpenApi } from '@/core/normalize';
 import { classifyToolRisks } from '@/core/risk';
 import { calculateScores } from '@/core/scoring';
@@ -12,10 +14,15 @@ import type { AnalysisResult, Finding, NormalizedTool, ToolRiskSummary } from '@
  * should call. Keeping parsing, normalization, rules, risk, and scoring here
  * prevents later outputs from each assembling slightly different results.
  */
-export async function analyzeOpenApi(filePath: string): Promise<AnalysisResult> {
+export async function analyzeOpenApi(
+  filePath: string,
+  config?: ToolSafeConfig,
+): Promise<AnalysisResult> {
   const parsed = await parseOpenApi(filePath);
   const tools = normalizeOpenApi(parsed.document);
-  const findings = runRules(tools);
+  const activeRules = filterRules(defaultRules, config);
+  let findings = runRules(tools, activeRules);
+  findings = overrideSeverities(findings, config);
   const toolRisks = classifyToolRisks(tools);
 
   return {
@@ -54,4 +61,28 @@ function buildSummary(
 
 function isReadOnlyMethod(method: NormalizedTool['method']): boolean {
   return method === 'GET' || method === 'HEAD' || method === 'OPTIONS';
+}
+
+function filterRules(rules: Rule[], config?: ToolSafeConfig): Rule[] {
+  if (!config?.rules) {
+    return rules;
+  }
+
+  return rules.filter((rule) => config.rules![rule.id] !== 'off');
+}
+
+function overrideSeverities(findings: Finding[], config?: ToolSafeConfig): Finding[] {
+  if (!config?.rules) {
+    return findings;
+  }
+
+  return findings.map((finding) => {
+    const override = config.rules![finding.ruleId];
+
+    if (override && override !== 'off') {
+      return { ...finding, severity: override };
+    }
+
+    return finding;
+  });
 }

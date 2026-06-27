@@ -145,11 +145,20 @@ Five more rules from the PRD were added, bringing the default set to 15:
 - Terminal output now shows a per-category score breakdown and dims evidence/recommendation text for easier scanning.
 - `bun run examples:check` regenerates examples into a temp dir and diffs against committed files, keeping sample outputs current.
 
+### Milestone 15: Config Support
+
+ToolSafe now supports `toolsafe.config.json` for tuning without changing source:
+
+- `src/config/` module with Zod-validated config schema.
+- Auto-detection of `toolsafe.config.json` in CWD, plus explicit `--config` flag.
+- Rule disabling (`"off"`) and severity overrides (`"info"` / `"warning"` / `"error"`).
+- `lint.failOn` support with config-to-CLI precedence chain.
+- Wired into all four CLI commands (lint, report, policy, evals).
+
 ## Not Implemented Yet
 
 The following are planned or mentioned in product docs but are not complete at this point:
 
-- Config files and severity overrides.
 - Remote URL input.
 - Runtime API execution or proxy behavior.
 - MCP server generation.

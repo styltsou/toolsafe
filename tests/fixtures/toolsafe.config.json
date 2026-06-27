@@ -1,0 +1,9 @@
+{
+  "rules": {
+    "safety/destructive-requires-guard": "off",
+    "errors/missing-error-schema": "error"
+  },
+  "lint": {
+    "failOn": "warning"
+  }
+}
