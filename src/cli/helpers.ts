@@ -41,7 +41,9 @@ function formatChoices(choices: readonly string[]): string {
   return choices.join(' or ');
 }
 
-export function parseHeaderOption(values: string[] | undefined): Record<string, string> | undefined {
+export function parseHeaderOption(
+  values: string[] | undefined,
+): Record<string, string> | undefined {
   if (!values || values.length === 0) return undefined;
 
   const headers: Record<string, string> = {};

@@ -20,11 +20,7 @@ async function loadTemplate(...parts: string[]): Promise<string> {
   return readFile(join(TEMPLATES_DIR, ...parts), 'utf8');
 }
 
-async function writeFileIfOk(
-  filePath: string,
-  content: string,
-  label: string,
-): Promise<void> {
+async function writeFileIfOk(filePath: string, content: string, label: string): Promise<void> {
   if (existsSync(filePath)) {
     if (process.stdin.isTTY) {
       const rl = createInterface({ input: process.stdin, output: process.stdout });
@@ -87,10 +83,7 @@ async function discoverOpenApiFiles(root: string): Promise<string[]> {
   for await (const match of glob.scan({ cwd: root })) {
     const absPath = join(root, match);
 
-    if (
-      match === 'toolsafe.config.json' ||
-      IGNORE_DIRS.has(match.split(/[/\\]/)[0]!)
-    ) {
+    if (match === 'toolsafe.config.json' || IGNORE_DIRS.has(match.split(/[/\\]/)[0]!)) {
       continue;
     }
 
@@ -102,9 +95,7 @@ async function discoverOpenApiFiles(root: string): Promise<string[]> {
   }
 
   const sniffed = (
-    await Promise.all(
-      candidates.map(async (f) => ((await sniffOpenApiFile(f)) ? f : null)),
-    )
+    await Promise.all(candidates.map(async (f) => ((await sniffOpenApiFile(f)) ? f : null)))
   ).filter((f): f is string => f !== null);
 
   return [...byNaming, ...sniffed].toSorted();
@@ -116,13 +107,17 @@ function formatFindingCount(result: {
   const parts: string[] = [`${result.summary.totalTools} operations`];
 
   if (result.summary.findingCounts.error > 0) {
-    parts.push(`${picocolors.red(`${result.summary.findingCounts.error} error${result.summary.findingCounts.error !== 1 ? 's' : ''}`)}`);
+    parts.push(
+      `${picocolors.red(`${result.summary.findingCounts.error} error${result.summary.findingCounts.error !== 1 ? 's' : ''}`)}`,
+    );
   } else {
     parts.push(`0 errors`);
   }
 
   if (result.summary.findingCounts.warning > 0) {
-    parts.push(`${picocolors.yellow(`${result.summary.findingCounts.warning} warning${result.summary.findingCounts.warning !== 1 ? 's' : ''}`)}`);
+    parts.push(
+      `${picocolors.yellow(`${result.summary.findingCounts.warning} warning${result.summary.findingCounts.warning !== 1 ? 's' : ''}`)}`,
+    );
   } else {
     parts.push(`0 warnings`);
   }
@@ -158,7 +153,9 @@ async function analyzeProject(root: string, config: ToolSafeConfig | undefined):
       const relPath = relative(root, file);
       try {
         const result = await analyzeOpenApi(file, config);
-        process.stdout.write(`  ${picocolors.green('✓')} ${relPath}  (${formatFindingCount(result)})\n`);
+        process.stdout.write(
+          `  ${picocolors.green('✓')} ${relPath}  (${formatFindingCount(result)})\n`,
+        );
         return { kind: 'success' as const, file, result };
       } catch (error) {
         const reason = renderSkipReason(error);
@@ -168,16 +165,24 @@ async function analyzeProject(root: string, config: ToolSafeConfig | undefined):
     }),
   );
 
-  const results = entries.filter((e): e is { kind: 'success'; file: string; result: AnalysisResult } => e.kind === 'success');
-  const skipped = entries.filter((e): e is { kind: 'skipped'; file: string; reason: string } => e.kind === 'skipped');
+  const results = entries.filter(
+    (e): e is { kind: 'success'; file: string; result: AnalysisResult } => e.kind === 'success',
+  );
+  const skipped = entries.filter(
+    (e): e is { kind: 'skipped'; file: string; reason: string } => e.kind === 'skipped',
+  );
 
   const totalErrors = results.reduce((sum, r) => sum + r.result.summary.findingCounts.error, 0);
   const totalWarnings = results.reduce((sum, r) => sum + r.result.summary.findingCounts.warning, 0);
   const totalInfos = results.reduce((sum, r) => sum + r.result.summary.findingCounts.info, 0);
   const totalOperations = results.reduce((sum, r) => sum + r.result.summary.totalTools, 0);
 
-  process.stdout.write(`\n${picocolors.bold('Summary:')} ${results.length} spec${results.length !== 1 ? 's' : ''} analyzed, ${skipped.length} skipped\n`);
-  process.stdout.write(`Total: ${totalErrors > 0 ? picocolors.red(String(totalErrors)) : totalErrors} error${totalErrors !== 1 ? 's' : ''}, ${totalWarnings > 0 ? picocolors.yellow(String(totalWarnings)) : totalWarnings} warning${totalWarnings !== 1 ? 's' : ''}, ${picocolors.dim(String(totalInfos))} info${totalInfos !== 1 ? '' : ''} across ${totalOperations} operations\n`);
+  process.stdout.write(
+    `\n${picocolors.bold('Summary:')} ${results.length} spec${results.length !== 1 ? 's' : ''} analyzed, ${skipped.length} skipped\n`,
+  );
+  process.stdout.write(
+    `Total: ${totalErrors > 0 ? picocolors.red(String(totalErrors)) : totalErrors} error${totalErrors !== 1 ? 's' : ''}, ${totalWarnings > 0 ? picocolors.yellow(String(totalWarnings)) : totalWarnings} warning${totalWarnings !== 1 ? 's' : ''}, ${picocolors.dim(String(totalInfos))} info${totalInfos !== 1 ? '' : ''} across ${totalOperations} operations\n`,
+  );
 
   if (totalErrors > 0) {
     process.exitCode = 1;

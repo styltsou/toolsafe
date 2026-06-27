@@ -1,5 +1,10 @@
 import type { Command } from 'commander';
-import { parseChoiceOption, parseHeaderOption, renderCommandError, writeOutputFile } from '@/cli/helpers';
+import {
+  parseChoiceOption,
+  parseHeaderOption,
+  renderCommandError,
+  writeOutputFile,
+} from '@/cli/helpers';
 import { loadConfig } from '@/config/loader';
 import type { ToolSafeConfig } from '@/config/types';
 import { resolveConfig, withAnalysis } from '@/cli/analysis';

@@ -14,13 +14,7 @@ async function runInitInDir(
   stderr: string;
 }> {
   const proc = Bun.spawn(
-    [
-      process.execPath,
-      'run',
-      join(PROJECT_ROOT, 'src/cli/index.ts'),
-      'init',
-      ...args,
-    ],
+    [process.execPath, 'run', join(PROJECT_ROOT, 'src/cli/index.ts'), 'init', ...args],
     {
       cwd,
       env: {
@@ -57,10 +51,7 @@ describe('toolsafe init', () => {
 
     expect(result.exitCode).toBe(0);
 
-    const configContent = await readFile(
-      join(tmpDir, 'toolsafe.config.json'),
-      'utf8',
-    );
+    const configContent = await readFile(join(tmpDir, 'toolsafe.config.json'), 'utf8');
     expect(configContent).toContain('"rules"');
     expect(configContent).toContain('"lint"');
     expect(configContent).toContain('"failOn": "error"');
@@ -80,10 +71,7 @@ describe('toolsafe init', () => {
     await mkdir(join(tmpDir, '.github', 'workflows'), { recursive: true });
 
     await writeFile(join(tmpDir, 'toolsafe.config.json'), 'original config');
-    await writeFile(
-      join(tmpDir, '.github', 'workflows', 'toolsafe.yml'),
-      'original workflow',
-    );
+    await writeFile(join(tmpDir, '.github', 'workflows', 'toolsafe.yml'), 'original workflow');
 
     const result = await runInitInDir(tmpDir);
 
@@ -91,10 +79,7 @@ describe('toolsafe init', () => {
     expect(result.stdout).toContain('Skipping');
     expect(result.stdout).toContain('non-TTY');
 
-    const configContent = await readFile(
-      join(tmpDir, 'toolsafe.config.json'),
-      'utf8',
-    );
+    const configContent = await readFile(join(tmpDir, 'toolsafe.config.json'), 'utf8');
     expect(configContent).toBe('original config');
 
     const workflowContent = await readFile(
@@ -125,10 +110,7 @@ describe('toolsafe init', () => {
     await rm(tmpDir, { recursive: true, force: true });
     await mkdir(join(tmpDir, '.github', 'workflows'), { recursive: true });
 
-    await cp(
-      join(PROJECT_ROOT, 'examples/risky-openapi.yaml'),
-      join(tmpDir, 'risky-openapi.yaml'),
-    );
+    await cp(join(PROJECT_ROOT, 'examples/risky-openapi.yaml'), join(tmpDir, 'risky-openapi.yaml'));
     await cp(
       join(PROJECT_ROOT, 'tests/fixtures/simple-openapi.json'),
       join(tmpDir, 'openapi.json'),
@@ -211,7 +193,8 @@ describe('toolsafe init', () => {
     await rm(tmpDir, { recursive: true, force: true });
     await mkdir(join(tmpDir, '.github', 'workflows'), { recursive: true });
 
-    const yamlContent = 'openapi: "3.1.0"\ninfo:\n  title: Sniffed API\n  version: "1.0.0"\npaths: {}\n';
+    const yamlContent =
+      'openapi: "3.1.0"\ninfo:\n  title: Sniffed API\n  version: "1.0.0"\npaths: {}\n';
     await writeFile(join(tmpDir, 'my-api.yaml'), yamlContent);
 
     const result = await runInitInDir(tmpDir, ['--analyze']);

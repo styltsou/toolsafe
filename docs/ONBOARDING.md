@@ -13,12 +13,12 @@ It does not call the target API, use an LLM, enforce runtime policy, or generate
 1. Run `bun test` to make sure the local environment matches the repo.
 2. Run `bun run src/cli/index.ts init --analyze` to scaffold config and discover OpenAPI specs in the project.
 3. Run `bun run src/cli/index.ts lint examples/risky-openapi.yaml` and look at the grouped terminal output.
-3. Run the same command with `--format json` and compare the output to the `AnalysisResult` type in `src/core/types.ts`.
-4. Run `bun run src/cli/index.ts policy examples/risky-openapi.yaml` and note the advisory language at the top.
-5. Run `bun run src/cli/index.ts evals examples/risky-openapi.yaml` and note the placeholder inputs.
-6. Inspect `examples/output/` to see generated sample files.
-7. Open `src/core/analyze.ts` and follow the pipeline calls in order.
-8. Open `tests/core/analyze.test.ts` to see the expected shape of the complete analysis result.
+4. Run the same command with `--format json` and compare the output to the `AnalysisResult` type in `src/core/types.ts`.
+5. Run `bun run src/cli/index.ts policy examples/risky-openapi.yaml` and note the advisory language at the top.
+6. Run `bun run src/cli/index.ts evals examples/risky-openapi.yaml` and note the placeholder inputs.
+7. Inspect `examples/output/` to see generated sample files.
+8. Open `src/core/analyze.ts` and follow the pipeline calls in order.
+9. Open `tests/core/analyze.test.ts` to see the expected shape of the complete analysis result.
 
 ## How To Navigate The Source
 

@@ -64,9 +64,9 @@ toolsafe generate --kind policy path/to/openapi.yaml
 
 Bootstrap ToolSafe configuration for a new repo. Creates `toolsafe.config.json` and `.github/workflows/toolsafe.yml` in the current directory.
 
-| Option                   | Description                                        |
-| ------------------------ | -------------------------------------------------- |
-| `-a, --analyze`          | Discover and lint all OpenAPI specs in the project |
+| Option          | Description                                        |
+| --------------- | -------------------------------------------------- |
+| `-a, --analyze` | Discover and lint all OpenAPI specs in the project |
 
 If either output file already exists, you are prompted before overwriting (interactive TTY) or the file is silently skipped (non-TTY, e.g. CI).
 
@@ -76,6 +76,7 @@ toolsafe init --analyze
 ```
 
 When `--analyze` is used, ToolSafe discovers OpenAPI specs by:
+
 1. **Naming conventions** — files named `openapi.*`, `swagger.*`, `spec.*`, or inside `openapi/` / `swagger/` directories
 2. **Content sniffing** — other `.yaml`/`.yml`/`.json` files are checked for an `openapi` root key before analysis
 

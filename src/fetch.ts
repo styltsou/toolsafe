@@ -33,7 +33,10 @@ function resolveProxy(proxy: string | undefined, targetUrl: URL): string | undef
 }
 
 function isNoProxy(hostname: string, noProxy: string): boolean {
-  const patterns = noProxy.split(',').map((p) => p.trim()).filter(Boolean);
+  const patterns = noProxy
+    .split(',')
+    .map((p) => p.trim())
+    .filter(Boolean);
 
   return patterns.some((pattern) => {
     if (pattern === '*') return true;
@@ -106,7 +109,9 @@ function fetchHttpsViaProxy(
     const targetPort = parseInt(targetUrl.port, 10) || 443;
 
     const socket = netConnect(parseInt(proxyUrl.port, 10) || 8080, proxyUrl.hostname, () => {
-      socket.write(`CONNECT ${targetUrl.hostname}:${targetPort} HTTP/1.1\r\nHost: ${targetUrl.hostname}\r\n\r\n`);
+      socket.write(
+        `CONNECT ${targetUrl.hostname}:${targetPort} HTTP/1.1\r\nHost: ${targetUrl.hostname}\r\n\r\n`,
+      );
     });
 
     socket.setTimeout(PROXY_TIMEOUT, () => {
