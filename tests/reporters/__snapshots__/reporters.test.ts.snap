@@ -422,3 +422,591 @@ API: Risky Example API 1.0.0
   - Evidence: HTTP method DELETE
 "
 `;
+
+exports[`reporters SARIF output matches snapshot 1`] = `
+"{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "ToolSafe",
+          "version": "0.0.0",
+          "informationUri": "https://github.com/styltsou/toolsafe",
+          "rules": [
+            {
+              "id": "safety/destructive-requires-guard",
+              "name": "Destructive operation should declare an explicit guard signal",
+              "shortDescription": {
+                "text": "Flags DELETE/destructive operations that do not expose confirmation fields or guard metadata."
+              },
+              "fullDescription": {
+                "text": "Flags DELETE/destructive operations that do not expose confirmation fields or guard metadata."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "safety/financial-requires-idempotency",
+              "name": "Financial mutation should require idempotency",
+              "shortDescription": {
+                "text": "Flags financial mutating operations that do not expose an idempotency key or request ID."
+              },
+              "fullDescription": {
+                "text": "Flags financial mutating operations that do not expose an idempotency key or request ID."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "safety/external-communication-requires-guard",
+              "name": "External communication should require guard signal",
+              "shortDescription": {
+                "text": "Flags mutating email, SMS, notification, invite, webhook, or broadcast operations without confirmation or guard metadata."
+              },
+              "fullDescription": {
+                "text": "Flags mutating email, SMS, notification, invite, webhook, or broadcast operations without confirmation or guard metadata."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "safety/mutating-requires-dry-run",
+              "name": "Mutating operation should support dry-run or preview",
+              "shortDescription": {
+                "text": "Flags mutating operations that do not expose dryRun, preview, validateOnly, or planOnly inputs."
+              },
+              "fullDescription": {
+                "text": "Flags mutating operations that do not expose dryRun, preview, validateOnly, or planOnly inputs."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "schema/list-requires-pagination",
+              "name": "List/search requires pagination or limit",
+              "shortDescription": {
+                "text": "Flags likely list/search GET operations that lack pagination or limit parameters."
+              },
+              "fullDescription": {
+                "text": "Flags likely list/search GET operations that lack pagination or limit parameters."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "schema/vague-boolean",
+              "name": "Boolean inputs should be explicit",
+              "shortDescription": {
+                "text": "Flags boolean parameters or body fields with vague names such as force or flag."
+              },
+              "fullDescription": {
+                "text": "Flags boolean parameters or body fields with vague names such as force or flag."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "schema/string-should-be-enum",
+              "name": "Constrained strings should use enums",
+              "shortDescription": {
+                "text": "Flags likely constrained string inputs such as role, status, or mode without enum values."
+              },
+              "fullDescription": {
+                "text": "Flags likely constrained string inputs such as role, status, or mode without enum values."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "schema/sensitive-response-fields",
+              "name": "Sensitive response fields should be reviewed",
+              "shortDescription": {
+                "text": "Flags response schemas with sensitive top-level fields such as tokens, secrets, credentials, or payment identifiers."
+              },
+              "fullDescription": {
+                "text": "Flags response schemas with sensitive top-level fields such as tokens, secrets, credentials, or payment identifiers."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "docs/missing-description",
+              "name": "Missing operation description",
+              "shortDescription": {
+                "text": "Flags operations with neither summary nor description."
+              },
+              "fullDescription": {
+                "text": "Flags operations with neither summary nor description."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "errors/missing-error-schema",
+              "name": "Missing structured error schema",
+              "shortDescription": {
+                "text": "Flags operations without any 4xx or 5xx response schema."
+              },
+              "fullDescription": {
+                "text": "Flags operations without any 4xx or 5xx response schema."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "safety/destructive-requires-guard",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {
+            "text": "Destructive operation does not declare an explicit agent guard or confirmation signal in the API contract.\\n\\nRecommendation: Add a confirmation field, a vendor extension such as x-agent-guard, or a generated guard policy before exposing this operation to autonomous agents.\\n\\nEvidence:\\n  - HTTP method DELETE"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "DELETE /users/{id}"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "safety",
+            "toolId": "deleteUser",
+            "toolName": "deleteUser",
+            "method": "DELETE",
+            "path": "/users/{id}"
+          }
+        },
+        {
+          "ruleId": "errors/missing-error-schema",
+          "ruleIndex": 9,
+          "level": "warning",
+          "message": {
+            "text": "Operation does not define a structured 4xx or 5xx error response schema.\\n\\nRecommendation: Define structured error responses with stable error codes and messages so agents can recover safely.\\n\\nEvidence:\\n  - No 4xx/5xx response with schema"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "POST /emails/send"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "errors",
+            "toolId": "sendEmail",
+            "toolName": "sendEmail",
+            "method": "POST",
+            "path": "/emails/send"
+          }
+        },
+        {
+          "ruleId": "safety/external-communication-requires-guard",
+          "ruleIndex": 2,
+          "level": "warning",
+          "message": {
+            "text": "External communication operation does not declare a confirmation or guard signal.\\n\\nRecommendation: Add confirmation input or guard metadata before exposing this operation to autonomous agents.\\n\\nEvidence:\\n  - HTTP method POST\\n  - External communication keyword"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "POST /emails/send"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "safety",
+            "toolId": "sendEmail",
+            "toolName": "sendEmail",
+            "method": "POST",
+            "path": "/emails/send"
+          }
+        },
+        {
+          "ruleId": "safety/mutating-requires-dry-run",
+          "ruleIndex": 3,
+          "level": "warning",
+          "message": {
+            "text": "Mutating operation does not expose dry-run, preview, or validate-only mode.\\n\\nRecommendation: Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.\\n\\nEvidence:\\n  - HTTP method POST"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "POST /emails/send"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "safety",
+            "toolId": "sendEmail",
+            "toolName": "sendEmail",
+            "method": "POST",
+            "path": "/emails/send"
+          }
+        },
+        {
+          "ruleId": "errors/missing-error-schema",
+          "ruleIndex": 9,
+          "level": "warning",
+          "message": {
+            "text": "Operation does not define a structured 4xx or 5xx error response schema.\\n\\nRecommendation: Define structured error responses with stable error codes and messages so agents can recover safely.\\n\\nEvidence:\\n  - No 4xx/5xx response with schema"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "POST /payments/charge"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "errors",
+            "toolId": "chargePayment",
+            "toolName": "chargePayment",
+            "method": "POST",
+            "path": "/payments/charge"
+          }
+        },
+        {
+          "ruleId": "safety/financial-requires-idempotency",
+          "ruleIndex": 1,
+          "level": "warning",
+          "message": {
+            "text": "Financial mutating operation does not expose an idempotency key.\\n\\nRecommendation: Add an idempotency key, request ID, or equivalent deduplication field before exposing this operation to agents.\\n\\nEvidence:\\n  - HTTP method POST\\n  - Financial operation keyword"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "POST /payments/charge"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "safety",
+            "toolId": "chargePayment",
+            "toolName": "chargePayment",
+            "method": "POST",
+            "path": "/payments/charge"
+          }
+        },
+        {
+          "ruleId": "safety/mutating-requires-dry-run",
+          "ruleIndex": 3,
+          "level": "warning",
+          "message": {
+            "text": "Mutating operation does not expose dry-run, preview, or validate-only mode.\\n\\nRecommendation: Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.\\n\\nEvidence:\\n  - HTTP method POST"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "POST /payments/charge"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "safety",
+            "toolId": "chargePayment",
+            "toolName": "chargePayment",
+            "method": "POST",
+            "path": "/payments/charge"
+          }
+        },
+        {
+          "ruleId": "errors/missing-error-schema",
+          "ruleIndex": 9,
+          "level": "warning",
+          "message": {
+            "text": "Operation does not define a structured 4xx or 5xx error response schema.\\n\\nRecommendation: Define structured error responses with stable error codes and messages so agents can recover safely.\\n\\nEvidence:\\n  - No 4xx/5xx response with schema"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "GET /users"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "errors",
+            "toolId": "listUsers",
+            "toolName": "listUsers",
+            "method": "GET",
+            "path": "/users"
+          }
+        },
+        {
+          "ruleId": "schema/list-requires-pagination",
+          "ruleIndex": 4,
+          "level": "warning",
+          "message": {
+            "text": "List/search operation has no pagination or limit query parameter.\\n\\nRecommendation: Expose limit, page, pageSize, cursor, or offset parameters to prevent unbounded agent outputs.\\n\\nEvidence:\\n  - GET operation appears to return a collection"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "GET /users"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "agent_usability",
+            "toolId": "listUsers",
+            "toolName": "listUsers",
+            "method": "GET",
+            "path": "/users"
+          }
+        },
+        {
+          "ruleId": "errors/missing-error-schema",
+          "ruleIndex": 9,
+          "level": "warning",
+          "message": {
+            "text": "Operation does not define a structured 4xx or 5xx error response schema.\\n\\nRecommendation: Define structured error responses with stable error codes and messages so agents can recover safely.\\n\\nEvidence:\\n  - No 4xx/5xx response with schema"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "POST /users"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "errors",
+            "toolId": "createUser",
+            "toolName": "createUser",
+            "method": "POST",
+            "path": "/users"
+          }
+        },
+        {
+          "ruleId": "safety/mutating-requires-dry-run",
+          "ruleIndex": 3,
+          "level": "warning",
+          "message": {
+            "text": "Mutating operation does not expose dry-run, preview, or validate-only mode.\\n\\nRecommendation: Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.\\n\\nEvidence:\\n  - HTTP method POST"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "POST /users"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "safety",
+            "toolId": "createUser",
+            "toolName": "createUser",
+            "method": "POST",
+            "path": "/users"
+          }
+        },
+        {
+          "ruleId": "schema/string-should-be-enum",
+          "ruleIndex": 6,
+          "level": "warning",
+          "message": {
+            "text": "String input 'role' appears constrained but has no enum.\\n\\nRecommendation: Add enum values so agents can choose valid inputs without guessing API-specific strings.\\n\\nEvidence:\\n  - String input: role"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "POST /users"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "schema",
+            "toolId": "createUser",
+            "toolName": "createUser",
+            "method": "POST",
+            "path": "/users"
+          }
+        },
+        {
+          "ruleId": "schema/vague-boolean",
+          "ruleIndex": 5,
+          "level": "warning",
+          "message": {
+            "text": "Boolean input 'force' is too vague for reliable agent use.\\n\\nRecommendation: Rename vague booleans to describe the exact behavior they enable, or replace them with a constrained enum.\\n\\nEvidence:\\n  - Boolean input: force"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "POST /users"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "schema",
+            "toolId": "createUser",
+            "toolName": "createUser",
+            "method": "POST",
+            "path": "/users"
+          }
+        },
+        {
+          "ruleId": "errors/missing-error-schema",
+          "ruleIndex": 9,
+          "level": "warning",
+          "message": {
+            "text": "Operation does not define a structured 4xx or 5xx error response schema.\\n\\nRecommendation: Define structured error responses with stable error codes and messages so agents can recover safely.\\n\\nEvidence:\\n  - No 4xx/5xx response with schema"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "DELETE /users/{id}"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "errors",
+            "toolId": "deleteUser",
+            "toolName": "deleteUser",
+            "method": "DELETE",
+            "path": "/users/{id}"
+          }
+        },
+        {
+          "ruleId": "safety/mutating-requires-dry-run",
+          "ruleIndex": 3,
+          "level": "warning",
+          "message": {
+            "text": "Mutating operation does not expose dry-run, preview, or validate-only mode.\\n\\nRecommendation: Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.\\n\\nEvidence:\\n  - HTTP method DELETE"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/risky-openapi.yaml"
+                },
+                "region": {
+                  "snippet": {
+                    "text": "DELETE /users/{id}"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "category": "safety",
+            "toolId": "deleteUser",
+            "toolName": "deleteUser",
+            "method": "DELETE",
+            "path": "/users/{id}"
+          }
+        }
+      ]
+    }
+  ]
+}
+"
+`;

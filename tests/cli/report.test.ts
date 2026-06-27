@@ -25,6 +25,17 @@ describe('toolsafe report CLI', () => {
     expect(result.stderr).toBe('');
   });
 
+  test('prints SARIF to stdout when requested', async () => {
+    const result = await runCli(['report', 'examples/risky-openapi.yaml', '--format', 'sarif']);
+    const parsed = JSON.parse(result.stdout);
+
+    expect(result.exitCode).toBe(0);
+    expect(parsed.version).toBe('2.1.0');
+    expect(parsed.runs[0].tool.driver.name).toBe('ToolSafe');
+    expect(parsed.runs[0].results.length).toBeGreaterThan(0);
+    expect(result.stderr).toBe('');
+  });
+
   test('writes Markdown to disk when --out is provided', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'toolsafe-report-'));
     const outputPath = join(directory, 'reports', 'toolsafe-report.md');

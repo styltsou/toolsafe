@@ -2,23 +2,23 @@ import type { Command } from 'commander';
 import { parseChoiceOption, renderCommandError, writeOutputFile } from '@/cli/helpers';
 import { analyzeOpenApi } from '@/core/analyze';
 import type { AnalysisResult } from '@/core/types';
-import { renderJsonReport, renderMarkdownReport } from '@/reporters';
+import { renderJsonReport, renderMarkdownReport, renderSarifReport } from '@/reporters';
 
-type ReportFormat = 'json' | 'markdown';
+type ReportFormat = 'json' | 'markdown' | 'sarif';
 
 type ReportOptions = {
   format?: string;
   out?: string;
 };
 
-const REPORT_FORMATS = ['json', 'markdown'] as const satisfies readonly ReportFormat[];
+const REPORT_FORMATS = ['json', 'markdown', 'sarif'] as const satisfies readonly ReportFormat[];
 
 export function registerReportCommand(program: Command): void {
   program
     .command('report')
-    .description('Generate a JSON or Markdown ToolSafe report')
+    .description('Generate a JSON, Markdown, or SARIF ToolSafe report')
     .argument('<file>', 'OpenAPI YAML or JSON file')
-    .option('--format <format>', 'Output format: json or markdown', 'markdown')
+    .option('--format <format>', 'Output format: json, markdown, or sarif', 'markdown')
     .option('--out <path>', 'Write report to a file instead of stdout')
     .action(async (filePath: string, options: ReportOptions) => {
       const format = parseReportFormat(options.format);
@@ -52,6 +52,10 @@ function parseReportFormat(value: string | undefined): ReportFormat | undefined 
 function renderReport(result: AnalysisResult, format: ReportFormat): string {
   if (format === 'json') {
     return renderJsonReport(result);
+  }
+
+  if (format === 'sarif') {
+    return renderSarifReport(result);
   }
 
   return renderMarkdownReport(result);
