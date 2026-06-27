@@ -432,7 +432,7 @@ exports[`reporters SARIF output matches snapshot 1`] = `
       "tool": {
         "driver": {
           "name": "ToolSafe",
-          "version": "0.0.0",
+          "version": "0.1.0",
           "informationUri": "https://github.com/styltsou/toolsafe",
           "rules": [
             {

@@ -1,11 +1,26 @@
 {
   "name": "toolsafe",
-  "private": true,
+  "version": "0.1.0",
+  "description": "Deterministic agent-readiness linter for OpenAPI APIs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/styltsou/toolsafe.git"
+  },
+  "keywords": [
+    "openapi",
+    "lint",
+    "agent",
+    "ai",
+    "llm",
+    "api",
+    "safety",
+    "security"
+  ],
   "bin": {
     "toolsafe": "./src/cli/index.ts"
   },
   "type": "module",
-  "module": "index.ts",
   "scripts": {
     "dev": "bun run src/cli/index.ts",
     "cli": "bun run src/cli/index.ts",
@@ -32,5 +47,8 @@
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "engines": {
+    "bun": ">=1.2"
   }
 }

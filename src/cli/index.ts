@@ -5,15 +5,15 @@ import { registerEvalsCommand } from '@/cli/commands/evals';
 import { registerLintCommand } from '@/cli/commands/lint';
 import { registerPolicyCommand } from '@/cli/commands/policy';
 import { registerReportCommand } from '@/cli/commands/report';
-import { TOOLSAFE_VERSION } from '@/core/constants';
 import { defaultRules } from '@/rules';
+import pkg from '../../package.json' with { type: 'json' };
 
 const program = new Command();
 
 program
   .name('toolsafe')
   .description('Agent-readiness linting for OpenAPI tools')
-  .version(TOOLSAFE_VERSION);
+  .version(pkg.version);
 
 registerLintCommand(program);
 registerReportCommand(program);

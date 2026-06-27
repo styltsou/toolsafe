@@ -2,73 +2,184 @@
 
 ToolSafe is a deterministic, offline-first agent-readiness linter for OpenAPI APIs.
 
-It parses local OpenAPI 3.x YAML or JSON files, normalizes operations into tool-like records, runs static rules, scores the API, and generates reports, advisory guard policies, and advisory eval ideas. It does not call the target API and does not use an LLM.
+It parses local OpenAPI 3.x YAML or JSON files, normalizes operations into tool-like records, runs static rules, scores the API, and generates reports, advisory guard policies, and advisory eval ideas.
+
+**Key properties:**
+
+- **Deterministic** — same input always produces the same output
+- **Offline-first** — parses the spec file locally, never calls the API
+- **No LLM** — all rules are static and explainable
+- **CI-ready** — exit codes, JSON output, SARIF for GitHub code scanning
 
 ## Install
 
+### Via npm (recommended)
+
 ```bash
+npm install -g toolsafe
+```
+
+Requires [Bun](https://bun.sh) (v1.2+) as the runtime.
+
+### Via bun
+
+```bash
+bun install -g toolsafe
+```
+
+### From source
+
+```bash
+git clone https://github.com/styltsou/toolsafe.git
+cd toolsafe
 bun install
+bun run build
 ```
 
-## CLI
-
-Show commands:
+## Quick Start
 
 ```bash
-bun run src/cli/index.ts --help
+# Lint an OpenAPI file
+toolsafe lint path/to/openapi.yaml
+
+# Generate a SARIF report (for GitHub code scanning)
+toolsafe report path/to/openapi.yaml --format sarif
+
+# Generate a guard policy draft
+toolsafe policy path/to/openapi.yaml
 ```
 
-Lint an OpenAPI file:
+## CLI Reference
+
+### `toolsafe lint <file>`
+
+Analyze an OpenAPI file and print findings to the terminal.
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--format <pretty\|json>` | Output format | `pretty` |
+| `--fail-on <warning\|error>` | Exit with code 1 at this severity | `error` |
 
 ```bash
-bun run src/cli/index.ts lint examples/risky-openapi.yaml
+toolsafe lint api.yaml
+toolsafe lint api.yaml --format json
+toolsafe lint api.yaml --fail-on warning
 ```
 
-Generate reports:
+**Exit codes:** `0` if no findings at threshold, `1` if findings meet threshold, `2` on error.
+
+### `toolsafe report <file>`
+
+Generate a detailed report in JSON, Markdown, or SARIF.
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--format <json\|markdown\|sarif>` | Output format | `markdown` |
+| `--out <path>` | Write to file instead of stdout | — |
 
 ```bash
-bun run src/cli/index.ts report examples/risky-openapi.yaml --format markdown
-bun run src/cli/index.ts report examples/risky-openapi.yaml --format json
+toolsafe report api.yaml --format markdown --out report.md
+toolsafe report api.yaml --format json > report.json
+toolsafe report api.yaml --format sarif --out results.sarif
 ```
 
-Generate advisory artifacts:
+### `toolsafe policy <file>`
+
+Generate an advisory guard policy YAML draft. The policy describes which operations need confirmation, dry-run support, idempotency keys, or other failure-domain guards before an agent calls them.
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--out <path>` | Write to file instead of stdout | — |
 
 ```bash
-bun run src/cli/index.ts policy examples/risky-openapi.yaml
-bun run src/cli/index.ts evals examples/risky-openapi.yaml
+toolsafe policy api.yaml
+toolsafe policy api.yaml --out guard-policy.yaml
 ```
 
-Write generated output to disk:
+### `toolsafe evals <file>`
+
+Generate advisory eval case ideas in YAML. Each eval case describes a scenario and expected behaviour that can be used to test an agent integration against the API.
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--out <path>` | Write to file instead of stdout | — |
 
 ```bash
-bun run src/cli/index.ts report examples/risky-openapi.yaml --format markdown --out TOOLSMITH_REPORT.md
-bun run src/cli/index.ts policy examples/risky-openapi.yaml --out guard-policy.yaml
-bun run src/cli/index.ts evals examples/risky-openapi.yaml --out toolsafe.evals.yaml
+toolsafe evals api.yaml
+toolsafe evals api.yaml --out toolsafe.evals.yaml
 ```
 
-## Current Commands
+### `toolsafe rules`
 
-- `lint <file>`: prints terminal or JSON findings and exits based on `--fail-on`.
-- `report <file>`: prints or writes JSON/Markdown reports.
-- `policy <file>`: prints or writes an advisory guard-policy YAML draft.
-- `evals <file>`: prints or writes advisory eval-case YAML ideas.
-- `rules`: lists the default rules.
+List all available rules with their ID, severity, category, and description.
+
+```bash
+toolsafe rules
+```
+
+## Output Formats
+
+### Pretty (terminal)
+
+Coloured human-readable output with scores, high-risk operations, and findings grouped by severity.
+
+### JSON
+
+Full structured output including scores, per-tool risk, and all findings with evidence and recommendations.
+
+### Markdown
+
+PR-and-documentation-friendly report with summary table, scores, operation risk table, and findings.
+
+### SARIF (2.1.0)
+
+Static Analysis Results Interchange Format — compatible with GitHub code scanning, GitLab SAST, and other SARIF consumers.
+
+**Level mapping:** `error` → `error`, `warning` → `warning`, `info` → `note`
+
+```bash
+toolsafe report api.yaml --format sarif --out results.sarif
+```
+
+Upload to GitHub:
+
+```yaml
+# .github/workflows/toolsafe.yml
+name: ToolSafe
+on: [push, pull_request]
+jobs:
+  toolsafe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install -g toolsafe && toolsafe report openapi.yaml --format sarif --out results.sarif
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
+```
+
+## Rules
+
+Rules are grouped into categories:
+
+| Category | Focus | Example rule |
+|----------|-------|-------------|
+| `safety` | Destructive, financial, external-communication guards | `safety/destructive-requires-guard` |
+| `schema` | Boolean clarity, enums, sensitive fields | `schema/vague-boolean` |
+| `docs` | Missing or weak descriptions | `docs/missing-description` |
+| `errors` | Structured error response schemas | `errors/missing-error-schema` |
+| `agent_usability` | Pagination, limits | `schema/list-requires-pagination` |
+
+Run `toolsafe rules` to see the full list.
 
 ## Exit Codes
 
-- `0`: command succeeded and, for lint, no finding met the configured failure threshold.
-- `1`: lint succeeded but findings met the configured threshold.
-- `2`: input, parse, option, or unexpected command error.
-
-## Sample Outputs
-
-See `examples/output/` for generated outputs from `examples/risky-openapi.yaml`:
-
-- `lint.txt`
-- `toolsafe-report.json`
-- `TOOLSMITH_REPORT.md`
-- `guard-policy.yaml`
-- `toolsafe.evals.yaml`
+| Code | Meaning |
+|------|---------|
+| `0` | Success (lint: no finding met the fail-on threshold) |
+| `1` | Lint succeeded but findings met the threshold |
+| `2` | Input, parse, option, or unexpected error |
 
 ## Development
 
@@ -79,7 +190,7 @@ bun run format:check
 bun test
 ```
 
-Or run the non-test checks together:
+Or run all non-test checks together:
 
 ```bash
 bun run check
@@ -93,4 +204,4 @@ bun run examples:generate
 
 ## Documentation
 
-Start with [`docs/README.md`](./docs/README.md) for architecture notes, onboarding, rule details, report formats, and generated artifacts.
+See [`docs/README.md`](./docs/README.md) for architecture notes, rule authoring, and report format details.

@@ -1,5 +1,5 @@
-import { TOOLSAFE_VERSION } from '@/core/constants';
 import type { AnalysisResult, FindingSeverity, Rule } from '@/core/types';
+import pkg from '../../package.json' with { type: 'json' };
 import { defaultRules } from '@/rules';
 
 type SarifLog = {
@@ -139,7 +139,7 @@ export function renderSarifReport(result: AnalysisResult): string {
         tool: {
           driver: {
             name: 'ToolSafe',
-            version: TOOLSAFE_VERSION,
+            version: pkg.version,
             informationUri: 'https://github.com/styltsou/toolsafe',
             rules: sarifRules,
           },
