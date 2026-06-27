@@ -1,3 +1,4 @@
+import type { FetchOptions } from '@/fetch';
 import type { ToolSafeConfig } from '@/config/types';
 import { parseOpenApi } from '@/parsers/openapi';
 import { defaultRules, runRules } from '@/rules';
@@ -17,8 +18,9 @@ import type { AnalysisResult, Finding, NormalizedTool, ToolRiskSummary } from '@
 export async function analyzeOpenApi(
   filePath: string,
   config?: ToolSafeConfig,
+  fetchOptions?: FetchOptions,
 ): Promise<AnalysisResult> {
-  const parsed = await parseOpenApi(filePath);
+  const parsed = await parseOpenApi(filePath, fetchOptions);
   const tools = normalizeOpenApi(parsed.document);
   const activeRules = filterRules(defaultRules, config);
   let findings = runRules(tools, activeRules);

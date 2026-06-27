@@ -28,9 +28,7 @@ export function loadConfig(configPath?: string): ToolSafeConfig | undefined {
 function resolveConfigPath(configPath?: string): string | null {
   if (configPath) {
     if (!existsSync(configPath)) {
-      throw new Error(
-        `Config file not found at the specified --config path: ${configPath}`,
-      );
+      throw new Error(`Config file not found at the specified --config path: ${configPath}`);
     }
     return configPath;
   }

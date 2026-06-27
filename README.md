@@ -58,11 +58,11 @@ toolsafe generate --kind policy path/to/openapi.yaml
 
 Analyze an OpenAPI file and print findings to the terminal.
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--format <pretty\|json>` | Output format | `pretty` |
-| `--fail-on <warning\|error>` | Exit with code 1 at this severity | `error` |
-| `--config <path>` | Path to config file | Auto-detect `toolsafe.config.json` |
+| Option                       | Description                       | Default                            |
+| ---------------------------- | --------------------------------- | ---------------------------------- |
+| `--format <pretty\|json>`    | Output format                     | `pretty`                           |
+| `--fail-on <warning\|error>` | Exit with code 1 at this severity | `error`                            |
+| `--config <path>`            | Path to config file               | Auto-detect `toolsafe.config.json` |
 
 ```bash
 toolsafe lint api.yaml
@@ -79,11 +79,11 @@ Lint supports local files and remote URLs (`https://...`).
 
 Generate a detailed report in JSON, Markdown, or SARIF. Supports local files and remote URLs.
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--format <json\|markdown\|sarif>` | Output format | `markdown` |
-| `--out <path>` | Write to file instead of stdout | — |
-| `--config <path>` | Path to config file | Auto-detect `toolsafe.config.json` |
+| Option                             | Description                     | Default                            |
+| ---------------------------------- | ------------------------------- | ---------------------------------- |
+| `--format <json\|markdown\|sarif>` | Output format                   | `markdown`                         |
+| `--out <path>`                     | Write to file instead of stdout | —                                  |
+| `--config <path>`                  | Path to config file             | Auto-detect `toolsafe.config.json` |
 
 ```bash
 toolsafe report api.yaml --format markdown --out report.md
@@ -96,11 +96,11 @@ toolsafe report api.yaml --config toolsafe.config.json --format json
 
 Generate an advisory guard policy draft or eval case ideas in YAML.
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--kind <policy\|evals>` | Output kind | `policy` |
-| `--out <path>` | Write to file instead of stdout | — |
-| `--config <path>` | Path to config file | Auto-detect `toolsafe.config.json` |
+| Option                   | Description                     | Default                            |
+| ------------------------ | ------------------------------- | ---------------------------------- |
+| `--kind <policy\|evals>` | Output kind                     | `policy`                           |
+| `--out <path>`           | Write to file instead of stdout | —                                  |
+| `--config <path>`        | Path to config file             | Auto-detect `toolsafe.config.json` |
 
 ```bash
 toolsafe generate --kind policy api.yaml
@@ -142,25 +142,25 @@ ToolSafe auto-detects `toolsafe.config.json` in the current directory. You can a
 
 Each rule ID maps to one of:
 
-| Value | Behavior |
-|-------|----------|
-| `"off"` | Rule is disabled |
+| Value                              | Behavior                     |
+| ---------------------------------- | ---------------------------- |
+| `"off"`                            | Rule is disabled             |
 | `"info"` / `"warning"` / `"error"` | Override the rule's severity |
 
 ### Lint
 
-| Field | Description | Default |
-|-------|-------------|---------|
+| Field    | Description                          | Default   |
+| -------- | ------------------------------------ | --------- |
 | `failOn` | Minimum severity to exit with code 1 | `"error"` |
 
 **Precedence:** CLI `--fail-on` > config `lint.failOn` > default (`"error"`).
 
 ### Report
 
-| Field | Description | Default |
-|-------|-------------|---------|
+| Field    | Description                  | Default      |
+| -------- | ---------------------------- | ------------ |
 | `format` | Default report output format | `"markdown"` |
-| `out` | Default output file path | stdout |
+| `out`    | Default output file path     | stdout       |
 
 **Precedence:** CLI `--format`/`--out` > config `report.*` > built-in defaults.
 
@@ -210,23 +210,23 @@ jobs:
 
 Rules are grouped into categories:
 
-| Category | Focus | Example rule |
-|----------|-------|-------------|
-| `safety` | Destructive, financial, external-communication guards | `safety/destructive-requires-guard` |
-| `schema` | Boolean clarity, enums, sensitive fields | `schema/vague-boolean` |
-| `docs` | Missing or weak descriptions | `docs/missing-description` |
-| `errors` | Structured error response schemas | `errors/missing-error-schema` |
-| `agent_usability` | Pagination, limits | `schema/list-requires-pagination` |
+| Category          | Focus                                                 | Example rule                        |
+| ----------------- | ----------------------------------------------------- | ----------------------------------- |
+| `safety`          | Destructive, financial, external-communication guards | `safety/destructive-requires-guard` |
+| `schema`          | Boolean clarity, enums, sensitive fields              | `schema/vague-boolean`              |
+| `docs`            | Missing or weak descriptions                          | `docs/missing-description`          |
+| `errors`          | Structured error response schemas                     | `errors/missing-error-schema`       |
+| `agent_usability` | Pagination, limits                                    | `schema/list-requires-pagination`   |
 
 Run `toolsafe rules` to see the full list.
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | Success (lint: no finding met the fail-on threshold) |
-| `1` | Lint succeeded but findings met the threshold |
-| `2` | Input, parse, option, or unexpected error |
+| Code | Meaning                                              |
+| ---- | ---------------------------------------------------- |
+| `0`  | Success (lint: no finding met the fail-on threshold) |
+| `1`  | Lint succeeded but findings met the threshold        |
+| `2`  | Input, parse, option, or unexpected error            |
 
 ## Development
 

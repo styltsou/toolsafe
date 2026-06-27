@@ -18,7 +18,7 @@ operations:
     mode: require_confirmation
     reasons:
       - HTTP method POST can mutate state
-      - "Risk keyword: email"
+      - 'Risk keyword: email'
       - External communication operation does not declare a confirmation or
         guard signal.
       - Mutating operation does not expose dry-run, preview, or validate-only
@@ -40,7 +40,7 @@ operations:
     mode: require_confirmation
     reasons:
       - HTTP method POST can mutate state
-      - "Risk keyword: payment"
+      - 'Risk keyword: payment'
       - Financial mutating operation does not expose an idempotency key.
       - Mutating operation does not expose dry-run, preview, or validate-only
         mode.

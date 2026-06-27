@@ -7,6 +7,11 @@ const RuleConfigSchema = z.union([
   z.literal('error'),
 ]);
 
+const FetchConfigSchema = z.object({
+  proxy: z.string().optional(),
+  headers: z.record(z.string(), z.string()).optional(),
+});
+
 export const ToolSafeConfigSchema = z.object({
   rules: z.record(z.string(), RuleConfigSchema).optional(),
   lint: z
@@ -20,6 +25,7 @@ export const ToolSafeConfigSchema = z.object({
       out: z.string().optional(),
     })
     .optional(),
+  fetch: FetchConfigSchema.optional(),
 });
 
 export type ToolSafeConfig = z.infer<typeof ToolSafeConfigSchema>;

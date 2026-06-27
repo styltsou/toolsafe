@@ -1,5 +1,5 @@
 import type { Command } from 'commander';
-import { parseChoiceOption, writeOutputFile } from '@/cli/helpers';
+import { parseChoiceOption, parseHeaderOption, writeOutputFile } from '@/cli/helpers';
 import { withAnalysis } from '@/cli/analysis';
 import { generatePolicyDraft, renderPolicyYaml } from '@/generators/policy';
 import { generateEvalIdeas, renderEvalIdeasYaml } from '@/generators/evals';
@@ -11,6 +11,8 @@ type GenerateOptions = {
   kind?: string;
   out?: string;
   config?: string;
+  proxy?: string;
+  header?: string[];
 };
 
 const GENERATE_KINDS = ['policy', 'evals'] as const satisfies readonly GenerateKind[];
@@ -28,6 +30,8 @@ export function registerGenerateCommand(program: Command): void {
     .option('--kind <kind>', 'Output kind: policy or evals', 'policy')
     .option('--out <path>', 'Write output to a file instead of stdout')
     .option('--config <path>', 'Path to toolsafe.config.json')
+    .option('--proxy <url>', 'HTTP proxy URL for remote spec fetching')
+    .option('--header <value...>', 'Custom headers for remote spec fetching (Key: Value)')
     .action(async (filePath: string, options: GenerateOptions) => {
       const kind = parseGenerateKind(options.kind);
 
@@ -36,16 +40,27 @@ export function registerGenerateCommand(program: Command): void {
         return;
       }
 
-      await withAnalysis(filePath, options.config, async (result) => {
-        const output = GENERATORS[kind](result);
+      const headers = parseHeaderOption(options.header);
+      await withAnalysis(
+        filePath,
+        options.config,
+        async (result) => {
+          const output = GENERATORS[kind](result);
 
-        if (options.out) {
-          await writeOutputFile(options.out, output);
-          return;
-        }
+          if (options.out) {
+            await writeOutputFile(options.out, output);
+            return;
+          }
 
-        process.stdout.write(output);
-      });
+          process.stdout.write(output);
+        },
+        {
+          fetch: {
+            ...(options.proxy ? { proxy: options.proxy } : {}),
+            ...(headers ? { headers } : {}),
+          },
+        },
+      );
     });
 }
 

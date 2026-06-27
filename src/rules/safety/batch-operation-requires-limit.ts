@@ -24,8 +24,7 @@ const LIMIT_FIELDS = [
 export const batchOperationRequiresLimitRule: Rule = {
   id: 'safety/batch-operation-requires-limit',
   name: 'Batch operation requires limit',
-  description:
-    'Flags batch or bulk operations that do not expose a limit or max items parameter.',
+  description: 'Flags batch or bulk operations that do not expose a limit or max items parameter.',
   category: 'safety',
   defaultSeverity: 'warning',
   check: ({ tool }) => {

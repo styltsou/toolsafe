@@ -101,6 +101,22 @@ describe('parseOpenApi', () => {
     expect(result.filePath).toBe(`${serverUrl}/openapi.json`);
   });
 
+  test('passes custom headers to remote fetch', async () => {
+    const result = await parseOpenApi(`${serverUrl}/openapi.json`, {
+      headers: { Authorization: 'Bearer test123' },
+    });
+
+    expect(result.metadata.title).toBe('Simple API');
+  });
+
+  test('passes proxy and headers together', async () => {
+    const result = await parseOpenApi(`${serverUrl}/openapi.json`, {
+      headers: { 'X-Custom': 'value' },
+    });
+
+    expect(result.metadata.title).toBe('Simple API');
+  });
+
   test('throws FETCH_ERROR for a non-200 remote URL', async () => {
     await expect(parseOpenApi(`${serverUrl}/not-found.json`)).rejects.toMatchObject({
       code: 'FETCH_ERROR',

@@ -27,6 +27,40 @@ describe('config loader', () => {
   });
 });
 
+describe('parseHeaderOption', () => {
+  test('returns undefined for undefined input', async () => {
+    const { parseHeaderOption } = await import('@/cli/helpers');
+    expect(parseHeaderOption(undefined)).toBeUndefined();
+  });
+
+  test('returns undefined for empty array', async () => {
+    const { parseHeaderOption } = await import('@/cli/helpers');
+    expect(parseHeaderOption([])).toBeUndefined();
+  });
+
+  test('parses single header', async () => {
+    const { parseHeaderOption } = await import('@/cli/helpers');
+    expect(parseHeaderOption(['Authorization: Bearer token123'])).toEqual({
+      Authorization: 'Bearer token123',
+    });
+  });
+
+  test('parses multiple headers', async () => {
+    const { parseHeaderOption } = await import('@/cli/helpers');
+    expect(parseHeaderOption(['X-API-Key: abc', 'X-Trace-Id: 123'])).toEqual({
+      'X-API-Key': 'abc',
+      'X-Trace-Id': '123',
+    });
+  });
+
+  test('trims whitespace around key and value', async () => {
+    const { parseHeaderOption } = await import('@/cli/helpers');
+    expect(parseHeaderOption(['  Authorization :  Bearer x  '])).toEqual({
+      Authorization: 'Bearer x',
+    });
+  });
+});
+
 describe('config schema validation', () => {
   test('accepts a valid config', () => {
     const result = ToolSafeConfigSchema.safeParse({
@@ -96,6 +130,40 @@ describe('config schema validation', () => {
 
     expect(result.success).toBe(false);
   });
+
+  test('accepts fetch config with proxy', () => {
+    const result = ToolSafeConfigSchema.safeParse({
+      fetch: {
+        proxy: 'http://proxy.corp:8080',
+      },
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  test('accepts fetch config with headers', () => {
+    const result = ToolSafeConfigSchema.safeParse({
+      fetch: {
+        headers: {
+          Authorization: 'Bearer token',
+          'X-Custom': 'value',
+        },
+      },
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  test('accepts fetch config with proxy and headers', () => {
+    const result = ToolSafeConfigSchema.safeParse({
+      fetch: {
+        proxy: 'http://proxy.corp:8080',
+        headers: { Authorization: 'Bearer token' },
+      },
+    });
+
+    expect(result.success).toBe(true);
+  });
 });
 
 describe('config disables rules', () => {
@@ -108,7 +176,9 @@ describe('config disables rules', () => {
 
     const result = await analyzeOpenApi('examples/risky-openapi.yaml', config);
 
-    const errorFindings = result.findings.filter((f) => f.ruleId === 'safety/destructive-requires-guard');
+    const errorFindings = result.findings.filter(
+      (f) => f.ruleId === 'safety/destructive-requires-guard',
+    );
     expect(errorFindings).toHaveLength(0);
   });
 
@@ -169,7 +239,9 @@ describe('config overrides severity', () => {
 
     const result = await analyzeOpenApi('examples/risky-openapi.yaml', config);
 
-    const promotedFindings = result.findings.filter((f) => f.ruleId === 'safety/mutating-requires-dry-run');
+    const promotedFindings = result.findings.filter(
+      (f) => f.ruleId === 'safety/mutating-requires-dry-run',
+    );
     expect(promotedFindings.length).toBeGreaterThan(0);
     for (const finding of promotedFindings) {
       expect(finding.severity).toBe('error');
@@ -187,10 +259,16 @@ describe('config overrides severity', () => {
 
     const result = await analyzeOpenApi('examples/risky-openapi.yaml', config);
 
-    expect(result.findings.filter((f) => f.ruleId === 'safety/destructive-requires-guard')).toHaveLength(0);
-    expect(result.findings.filter((f) => f.ruleId === 'docs/mutating-description-mentions-side-effects')).toHaveLength(0);
+    expect(
+      result.findings.filter((f) => f.ruleId === 'safety/destructive-requires-guard'),
+    ).toHaveLength(0);
+    expect(
+      result.findings.filter((f) => f.ruleId === 'docs/mutating-description-mentions-side-effects'),
+    ).toHaveLength(0);
 
-    const promotedFindings = result.findings.filter((f) => f.ruleId === 'errors/missing-error-schema');
+    const promotedFindings = result.findings.filter(
+      (f) => f.ruleId === 'errors/missing-error-schema',
+    );
     expect(promotedFindings.length).toBeGreaterThan(0);
     for (const finding of promotedFindings) {
       expect(finding.severity).toBe('error');

@@ -49,7 +49,7 @@ export const mutatingDescriptionMentionsSideEffectsRule: Rule = {
   category: 'docs',
   defaultSeverity: 'warning',
   check: ({ tool }) => {
-    if (!MUTATING_METHODS.includes(tool.method as typeof MUTATING_METHODS[number])) {
+    if (!MUTATING_METHODS.includes(tool.method as (typeof MUTATING_METHODS)[number])) {
       return [];
     }
 
@@ -61,15 +61,12 @@ export const mutatingDescriptionMentionsSideEffectsRule: Rule = {
 
     return [
       createFinding(mutatingDescriptionMentionsSideEffectsRule, tool, {
-        message:
-          'Mutating operation description does not mention side effects or state changes.',
+        message: 'Mutating operation description does not mention side effects or state changes.',
         recommendation:
           'Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").',
         evidence: [
           `Method: ${tool.method}`,
-          tool.description
-            ? `Description: "${tool.description}"`
-            : 'No description provided',
+          tool.description ? `Description: "${tool.description}"` : 'No description provided',
         ],
       }),
     ];

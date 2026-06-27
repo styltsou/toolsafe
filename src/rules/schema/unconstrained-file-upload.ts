@@ -38,8 +38,9 @@ export const unconstrainedFileUploadRule: Rule = {
   category: 'schema',
   defaultSeverity: 'warning',
   check: ({ tool }) => {
-    const fileInputs: NamedInput[] = getInputSchemaProperties(tool)
-      .filter((property) => isFileSchema(property.schema, property.name));
+    const fileInputs: NamedInput[] = getInputSchemaProperties(tool).filter((property) =>
+      isFileSchema(property.schema, property.name),
+    );
 
     if (fileInputs.length === 0) {
       return [];

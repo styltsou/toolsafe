@@ -1,10 +1,15 @@
 import type { Command } from 'commander';
-import { parseChoiceOption, renderCommandError, writeOutputFile } from '@/cli/helpers';
+import { parseChoiceOption, parseHeaderOption, renderCommandError, writeOutputFile } from '@/cli/helpers';
 import { loadConfig } from '@/config/loader';
 import type { ToolSafeConfig } from '@/config/types';
 import { resolveConfig, withAnalysis } from '@/cli/analysis';
 import type { AnalysisResult } from '@/core/types';
-import { renderHtmlReport, renderJsonReport, renderMarkdownReport, renderSarifReport } from '@/reporters';
+import {
+  renderHtmlReport,
+  renderJsonReport,
+  renderMarkdownReport,
+  renderSarifReport,
+} from '@/reporters';
 
 type ReportFormat = 'html' | 'json' | 'markdown' | 'sarif';
 
@@ -12,9 +17,16 @@ type ReportOptions = {
   format?: string;
   out?: string;
   config?: string;
+  proxy?: string;
+  header?: string[];
 };
 
-const REPORT_FORMATS = ['html', 'json', 'markdown', 'sarif'] as const satisfies readonly ReportFormat[];
+const REPORT_FORMATS = [
+  'html',
+  'json',
+  'markdown',
+  'sarif',
+] as const satisfies readonly ReportFormat[];
 
 export function registerReportCommand(program: Command): void {
   program
@@ -24,6 +36,8 @@ export function registerReportCommand(program: Command): void {
     .option('--format <format>', 'Output format: html, json, markdown, or sarif')
     .option('--out <path>', 'Write report to a file instead of stdout')
     .option('--config <path>', 'Path to toolsafe.config.json')
+    .option('--proxy <url>', 'HTTP proxy URL for remote spec fetching')
+    .option('--header <value...>', 'Custom headers for remote spec fetching (Key: Value)')
     .action(async (filePath: string, options: ReportOptions) => {
       let config: ToolSafeConfig | undefined;
 
@@ -35,9 +49,8 @@ export function registerReportCommand(program: Command): void {
         return;
       }
 
-      const parsedFormat = options.format !== undefined
-        ? parseReportFormat(options.format)
-        : undefined;
+      const parsedFormat =
+        options.format !== undefined ? parseReportFormat(options.format) : undefined;
 
       if (options.format !== undefined && parsedFormat === undefined) {
         process.exitCode = 2;
@@ -52,16 +65,27 @@ export function registerReportCommand(program: Command): void {
 
       const outPath = resolveConfig(options.out, config?.report?.out, undefined);
 
-      await withAnalysis(filePath, config, async (result) => {
-        const output = renderReport(result, format);
+      const headers = parseHeaderOption(options.header);
+      await withAnalysis(
+        filePath,
+        config,
+        async (result) => {
+          const output = renderReport(result, format);
 
-        if (outPath) {
-          await writeOutputFile(outPath, output);
-          return;
-        }
+          if (outPath) {
+            await writeOutputFile(outPath, output);
+            return;
+          }
 
-        process.stdout.write(output);
-      });
+          process.stdout.write(output);
+        },
+        {
+          fetch: {
+            ...(options.proxy ? { proxy: options.proxy } : {}),
+            ...(headers ? { headers } : {}),
+          },
+        },
+      );
     });
 }
 

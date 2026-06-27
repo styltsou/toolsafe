@@ -1,6 +1,6 @@
 import type { Command } from 'commander';
 import { loadConfig } from '@/config/loader';
-import { parseChoiceOption, renderCommandError } from '@/cli/helpers';
+import { parseChoiceOption, parseHeaderOption, renderCommandError } from '@/cli/helpers';
 import { withAnalysis } from '@/cli/analysis';
 import type { ToolSafeConfig } from '@/config/types';
 import type { AnalysisResult, FindingSeverity } from '@/core/types';
@@ -13,6 +13,8 @@ type LintOptions = {
   format?: string;
   failOn?: string;
   config?: string;
+  proxy?: string;
+  header?: string[];
 };
 
 const FORMATS = ['pretty', 'json'] as const satisfies readonly LintFormat[];
@@ -26,6 +28,8 @@ export function registerLintCommand(program: Command): void {
     .option('--format <format>', 'Output format: pretty or json', 'pretty')
     .option('--fail-on <severity>', 'Exit with code 1 on warning or error')
     .option('--config <path>', 'Path to toolsafe.config.json')
+    .option('--proxy <url>', 'HTTP proxy URL for remote spec fetching')
+    .option('--header <value...>', 'Custom headers for remote spec fetching (Key: Value)')
     .action(async (filePath: string, options: LintOptions) => {
       const format = parseFormat(options.format);
 
@@ -51,13 +55,24 @@ export function registerLintCommand(program: Command): void {
         return;
       }
 
-      await withAnalysis(filePath, config, async (result) => {
-        process.stdout.write(renderLintResult(result, format));
+      const headers = parseHeaderOption(options.header);
+      await withAnalysis(
+        filePath,
+        config,
+        async (result) => {
+          process.stdout.write(renderLintResult(result, format));
 
-        if (hasThresholdFindings(result, failOn)) {
-          process.exitCode = 1;
-        }
-      });
+          if (hasThresholdFindings(result, failOn)) {
+            process.exitCode = 1;
+          }
+        },
+        {
+          fetch: {
+            ...(options.proxy ? { proxy: options.proxy } : {}),
+            ...(headers ? { headers } : {}),
+          },
+        },
+      );
     });
 }
 

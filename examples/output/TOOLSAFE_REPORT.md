@@ -6,36 +6,36 @@ API: Risky Example API 1.0.0
 
 ## Summary
 
-| Metric | Value |
-| --- | ---: |
-| Operations analyzed | 5 |
-| Read-only operations | 1 |
-| Mutating operations | 4 |
-| Destructive operations | 1 |
-| High-risk operations | 3 |
-| Errors | 1 |
-| Warnings | 18 |
-| Info | 5 |
+| Metric                 | Value |
+| ---------------------- | ----: |
+| Operations analyzed    |     5 |
+| Read-only operations   |     1 |
+| Mutating operations    |     4 |
+| Destructive operations |     1 |
+| High-risk operations   |     3 |
+| Errors                 |     1 |
+| Warnings               |    18 |
+| Info                   |     5 |
 
 ## Scores
 
-| Category | Score |
-| --- | ---: |
-| Overall | 13/100 |
-| Safety | 66/100 |
-| Schema | 92/100 |
-| Docs | 79/100 |
-| Errors | 80/100 |
-| Agent usability | 96/100 |
-| Auth | 100/100 |
+| Category        |   Score |
+| --------------- | ------: |
+| Overall         |  13/100 |
+| Safety          |  66/100 |
+| Schema          |  92/100 |
+| Docs            |  79/100 |
+| Errors          |  80/100 |
+| Agent usability |  96/100 |
+| Auth            | 100/100 |
 
 ## High-Risk Operations
 
-| Risk | Operation | Reasons |
-| --- | --- | --- |
-| high | `POST /emails/send` (sendEmail) | HTTP method POST can mutate state; Risk keyword: email |
+| Risk | Operation                               | Reasons                                                  |
+| ---- | --------------------------------------- | -------------------------------------------------------- |
+| high | `POST /emails/send` (sendEmail)         | HTTP method POST can mutate state; Risk keyword: email   |
 | high | `POST /payments/charge` (chargePayment) | HTTP method POST can mutate state; Risk keyword: payment |
-| high | `DELETE /users/{id}` (deleteUser) | HTTP method DELETE is destructive |
+| high | `DELETE /users/{id}` (deleteUser)       | HTTP method DELETE is destructive                        |
 
 ## Findings
 

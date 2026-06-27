@@ -4,23 +4,23 @@ ToolSafe currently runs 15 default rules. Rules are deterministic and operate on
 
 ## Default Rules
 
-| Rule ID                                                  | Severity | Category        | Purpose                                                                                                              |
-| -------------------------------------------------------- | -------- | --------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `safety/destructive-requires-guard`                      | error    | safety          | Flags destructive operations without explicit confirmation fields or guard metadata.                                 |
-| `safety/batch-operation-requires-limit`                  | warning  | safety          | Flags batch or bulk operations without a limit or max items parameter.                                               |
-| `auth/dangerous-auth-scope`                              | warning  | auth            | Flags security requirements with overly broad or dangerous scopes.                                                   |
-| `safety/financial-requires-idempotency`                  | warning  | safety          | Flags financial mutations without an idempotency key or request ID.                                                  |
-| `safety/external-communication-requires-guard`           | warning  | safety          | Flags email, SMS, notification, invite, webhook, or broadcast operations without confirmation or guard metadata.     |
-| `safety/mutating-requires-dry-run`                       | warning  | safety          | Flags mutating operations without dry-run, preview, validate-only, or plan-only inputs.                              |
-| `schema/list-requires-pagination`                        | warning  | agent usability | Flags likely list/search operations without pagination or limit parameters.                                          |
-| `schema/unconstrained-file-upload`                       | warning  | schema          | Flags file upload inputs that lack size or content constraints.                                                      |
-| `schema/vague-boolean`                                   | warning  | schema          | Flags vague boolean inputs such as `force` or `flag`.                                                                |
-| `schema/string-should-be-enum`                           | warning  | schema          | Flags likely constrained string inputs such as `role`, `status`, or `mode` without enum values.                      |
-| `schema/sensitive-response-fields`                       | warning  | schema          | Flags response schemas with sensitive top-level fields such as tokens, secrets, credentials, or payment identifiers. |
-| `docs/missing-description`                               | warning  | docs            | Flags operations with neither summary nor description.                                                               |
-| `docs/weak-description`                                  | info     | docs            | Flags descriptions that are too short or contain generic placeholder text.                                            |
-| `docs/mutating-description-mentions-side-effects`         | warning  | docs            | Flags mutating operations whose descriptions lack mention of side effects.                                            |
-| `errors/missing-error-schema`                            | warning  | errors          | Flags operations without any structured 4xx or 5xx response schema.                                                  |
+| Rule ID                                           | Severity | Category        | Purpose                                                                                                              |
+| ------------------------------------------------- | -------- | --------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `safety/destructive-requires-guard`               | error    | safety          | Flags destructive operations without explicit confirmation fields or guard metadata.                                 |
+| `safety/batch-operation-requires-limit`           | warning  | safety          | Flags batch or bulk operations without a limit or max items parameter.                                               |
+| `auth/dangerous-auth-scope`                       | warning  | auth            | Flags security requirements with overly broad or dangerous scopes.                                                   |
+| `safety/financial-requires-idempotency`           | warning  | safety          | Flags financial mutations without an idempotency key or request ID.                                                  |
+| `safety/external-communication-requires-guard`    | warning  | safety          | Flags email, SMS, notification, invite, webhook, or broadcast operations without confirmation or guard metadata.     |
+| `safety/mutating-requires-dry-run`                | warning  | safety          | Flags mutating operations without dry-run, preview, validate-only, or plan-only inputs.                              |
+| `schema/list-requires-pagination`                 | warning  | agent usability | Flags likely list/search operations without pagination or limit parameters.                                          |
+| `schema/unconstrained-file-upload`                | warning  | schema          | Flags file upload inputs that lack size or content constraints.                                                      |
+| `schema/vague-boolean`                            | warning  | schema          | Flags vague boolean inputs such as `force` or `flag`.                                                                |
+| `schema/string-should-be-enum`                    | warning  | schema          | Flags likely constrained string inputs such as `role`, `status`, or `mode` without enum values.                      |
+| `schema/sensitive-response-fields`                | warning  | schema          | Flags response schemas with sensitive top-level fields such as tokens, secrets, credentials, or payment identifiers. |
+| `docs/missing-description`                        | warning  | docs            | Flags operations with neither summary nor description.                                                               |
+| `docs/weak-description`                           | info     | docs            | Flags descriptions that are too short or contain generic placeholder text.                                           |
+| `docs/mutating-description-mentions-side-effects` | warning  | docs            | Flags mutating operations whose descriptions lack mention of side effects.                                           |
+| `errors/missing-error-schema`                     | warning  | errors          | Flags operations without any structured 4xx or 5xx response schema.                                                  |
 
 ## Rule Output
 

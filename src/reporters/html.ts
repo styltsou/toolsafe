@@ -92,7 +92,9 @@ export function renderHtmlReport(result: AnalysisResult): string {
 
   if (highRiskTools.length > 0) {
     sections.push('<h2>High-Risk Operations</h2>');
-    sections.push('<table><thead><tr><th>Risk</th><th>Operation</th><th>Reasons</th></tr></thead><tbody>');
+    sections.push(
+      '<table><thead><tr><th>Risk</th><th>Operation</th><th>Reasons</th></tr></thead><tbody>',
+    );
     for (const tool of highRiskTools) {
       sections.push(
         `<tr><td>${riskBadge(tool.risk)}</td><td><code>${escapeHtml(tool.method)} ${escapeHtml(tool.path)}</code> (${escapeHtml(tool.toolName)})</td><td>${escapeHtml(tool.reasons.join('; '))}</td></tr>`,
@@ -123,15 +125,22 @@ export function renderHtmlReport(result: AnalysisResult): string {
   return sections.join('\n');
 }
 
-function renderFindingHtml(finding: Finding, severityBadge: (s: FindingSeverity) => string): string {
+function renderFindingHtml(
+  finding: Finding,
+  severityBadge: (s: FindingSeverity) => string,
+): string {
   return [
     `<div class="finding finding-${finding.severity}">`,
     `  <div class="finding-title">${severityBadge(finding.severity)} ${escapeHtml(finding.ruleId)}: <code>${escapeHtml(finding.method)} ${escapeHtml(finding.path)}</code></div>`,
     `  <div class="finding-msg">${escapeHtml(finding.message)}</div>`,
     `  <div class="finding-rec">${escapeHtml(finding.recommendation)}</div>`,
-    finding.evidence?.length ? `  <div class="evidence">Evidence: ${escapeHtml(finding.evidence.join('; '))}</div>` : '',
+    finding.evidence?.length
+      ? `  <div class="evidence">Evidence: ${escapeHtml(finding.evidence.join('; '))}</div>`
+      : '',
     '</div>',
-  ].filter(Boolean).join('\n');
+  ]
+    .filter(Boolean)
+    .join('\n');
 }
 
 function row(label: string, value: string): string {
@@ -139,5 +148,9 @@ function row(label: string, value: string): string {
 }
 
 function escapeHtml(value: string): string {
-  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 }

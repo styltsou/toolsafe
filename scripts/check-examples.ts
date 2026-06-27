@@ -44,7 +44,9 @@ const checks = await Promise.all(
       console.log(`✅ ${file.name} matches`);
       return true;
     } catch {
-      console.error(`\n❌ ${file.name} does not exist at ${committedPath}. Run bun run examples:generate first.`);
+      console.error(
+        `\n❌ ${file.name} does not exist at ${committedPath}. Run bun run examples:generate first.`,
+      );
       return false;
     }
   }),
@@ -53,7 +55,9 @@ const checks = await Promise.all(
 hasDiff = checks.some((ok) => !ok);
 
 if (hasDiff) {
-  console.error('\n❌ Some examples differ. Run `bun run examples:generate` to update committed examples.');
+  console.error(
+    '\n❌ Some examples differ. Run `bun run examples:generate` to update committed examples.',
+  );
   process.exit(1);
 } else {
   console.log('\n✅ All examples are up to date.');

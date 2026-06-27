@@ -3,6 +3,8 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { extname } from 'node:path';
 import { parse as parseYaml } from 'yaml';
+import type { FetchOptions } from '@/fetch';
+import { fetchText } from '@/fetch';
 import { ToolSafeError } from '@/core/errors';
 import { isObject } from '@/core/objects';
 
@@ -97,18 +99,16 @@ function extractMetadata(document: unknown, filePath: string): OpenApiMetadata {
   };
 }
 
-async function fetchOpenApiFile(url: URL): Promise<string> {
-  const response = await fetch(url);
-
-  if (!response.ok) {
+async function fetchOpenApiFile(url: URL, fetchOptions?: FetchOptions): Promise<string> {
+  try {
+    return await fetchText(url, fetchOptions);
+  } catch (error) {
     throw new ToolSafeError(
       'FETCH_ERROR',
-      `Failed to fetch ${url.href}: HTTP ${response.status} ${response.statusText}`,
+      `Failed to fetch ${url.href}: ${error instanceof Error ? error.message : 'Unknown error'}`,
       url.href,
     );
   }
-
-  return response.text();
 }
 
 async function parseFromSource(source: string, filePath: string): Promise<ParsedOpenApi> {
@@ -127,13 +127,16 @@ async function parseFromSource(source: string, filePath: string): Promise<Parsed
  * Wraps expected user-facing failures in `ToolSafeError` so CLI commands can
  * print clean messages without depending on Scalar parser error internals.
  */
-export async function parseOpenApi(filePath: string): Promise<ParsedOpenApi> {
+export async function parseOpenApi(
+  filePath: string,
+  fetchOptions?: FetchOptions,
+): Promise<ParsedOpenApi> {
   if (isUrl(filePath)) {
     const url = new URL(filePath);
 
     assertSupportedExtension(url.pathname, 'URLs', url.href);
 
-    const source = await fetchOpenApiFile(url);
+    const source = await fetchOpenApiFile(url, fetchOptions);
 
     return parseFromSource(source, filePath);
   }

@@ -147,12 +147,7 @@ describe('toolsafe --config CLI flag', () => {
   });
 
   test('invalid --config file produces an error', async () => {
-    const result = await runCli([
-      'lint',
-      'examples/risky-openapi.yaml',
-      '--config',
-      'README.md',
-    ]);
+    const result = await runCli(['lint', 'examples/risky-openapi.yaml', '--config', 'README.md']);
 
     expect(result.exitCode).toBe(2);
     expect(result.stderr).toContain('ERROR');

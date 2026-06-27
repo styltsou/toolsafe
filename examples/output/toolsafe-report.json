@@ -32,10 +32,7 @@
       "method": "POST",
       "path": "/emails/send",
       "risk": "high",
-      "reasons": [
-        "HTTP method POST can mutate state",
-        "Risk keyword: email"
-      ]
+      "reasons": ["HTTP method POST can mutate state", "Risk keyword: email"]
     },
     {
       "toolId": "chargePayment",
@@ -43,10 +40,7 @@
       "method": "POST",
       "path": "/payments/charge",
       "risk": "high",
-      "reasons": [
-        "HTTP method POST can mutate state",
-        "Risk keyword: payment"
-      ]
+      "reasons": ["HTTP method POST can mutate state", "Risk keyword: payment"]
     },
     {
       "toolId": "listUsers",
@@ -54,9 +48,7 @@
       "method": "GET",
       "path": "/users",
       "risk": "low",
-      "reasons": [
-        "HTTP method GET is generally read-only"
-      ]
+      "reasons": ["HTTP method GET is generally read-only"]
     },
     {
       "toolId": "createUser",
@@ -64,9 +56,7 @@
       "method": "POST",
       "path": "/users",
       "risk": "medium",
-      "reasons": [
-        "HTTP method POST can mutate state"
-      ]
+      "reasons": ["HTTP method POST can mutate state"]
     },
     {
       "toolId": "deleteUser",
@@ -74,9 +64,7 @@
       "method": "DELETE",
       "path": "/users/{id}",
       "risk": "high",
-      "reasons": [
-        "HTTP method DELETE is destructive"
-      ]
+      "reasons": ["HTTP method DELETE is destructive"]
     }
   ],
   "findings": [
@@ -90,9 +78,7 @@
       "path": "/users/{id}",
       "message": "Destructive operation does not declare an explicit agent guard or confirmation signal in the API contract.",
       "recommendation": "Add a confirmation field, a vendor extension such as x-agent-guard, or a generated guard policy before exposing this operation to autonomous agents.",
-      "evidence": [
-        "HTTP method DELETE"
-      ]
+      "evidence": ["HTTP method DELETE"]
     },
     {
       "ruleId": "docs/mutating-description-mentions-side-effects",
@@ -104,10 +90,7 @@
       "path": "/emails/send",
       "message": "Mutating operation description does not mention side effects or state changes.",
       "recommendation": "Update the description to clearly state what side effects this operation has (e.g., \"Creates a new user account\" rather than just \"Create user\").",
-      "evidence": [
-        "Method: POST",
-        "No description provided"
-      ]
+      "evidence": ["Method: POST", "No description provided"]
     },
     {
       "ruleId": "errors/missing-error-schema",
@@ -119,9 +102,7 @@
       "path": "/emails/send",
       "message": "Operation does not define a structured 4xx or 5xx error response schema.",
       "recommendation": "Define structured error responses with stable error codes and messages so agents can recover safely.",
-      "evidence": [
-        "No 4xx/5xx response with schema"
-      ]
+      "evidence": ["No 4xx/5xx response with schema"]
     },
     {
       "ruleId": "safety/external-communication-requires-guard",
@@ -133,10 +114,7 @@
       "path": "/emails/send",
       "message": "External communication operation does not declare a confirmation or guard signal.",
       "recommendation": "Add confirmation input or guard metadata before exposing this operation to autonomous agents.",
-      "evidence": [
-        "HTTP method POST",
-        "External communication keyword"
-      ]
+      "evidence": ["HTTP method POST", "External communication keyword"]
     },
     {
       "ruleId": "safety/mutating-requires-dry-run",
@@ -148,9 +126,7 @@
       "path": "/emails/send",
       "message": "Mutating operation does not expose dry-run, preview, or validate-only mode.",
       "recommendation": "Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.",
-      "evidence": [
-        "HTTP method POST"
-      ]
+      "evidence": ["HTTP method POST"]
     },
     {
       "ruleId": "docs/mutating-description-mentions-side-effects",
@@ -162,10 +138,7 @@
       "path": "/payments/charge",
       "message": "Mutating operation description does not mention side effects or state changes.",
       "recommendation": "Update the description to clearly state what side effects this operation has (e.g., \"Creates a new user account\" rather than just \"Create user\").",
-      "evidence": [
-        "Method: POST",
-        "No description provided"
-      ]
+      "evidence": ["Method: POST", "No description provided"]
     },
     {
       "ruleId": "errors/missing-error-schema",
@@ -177,9 +150,7 @@
       "path": "/payments/charge",
       "message": "Operation does not define a structured 4xx or 5xx error response schema.",
       "recommendation": "Define structured error responses with stable error codes and messages so agents can recover safely.",
-      "evidence": [
-        "No 4xx/5xx response with schema"
-      ]
+      "evidence": ["No 4xx/5xx response with schema"]
     },
     {
       "ruleId": "safety/financial-requires-idempotency",
@@ -191,10 +162,7 @@
       "path": "/payments/charge",
       "message": "Financial mutating operation does not expose an idempotency key.",
       "recommendation": "Add an idempotency key, request ID, or equivalent deduplication field before exposing this operation to agents.",
-      "evidence": [
-        "HTTP method POST",
-        "Financial operation keyword"
-      ]
+      "evidence": ["HTTP method POST", "Financial operation keyword"]
     },
     {
       "ruleId": "safety/mutating-requires-dry-run",
@@ -206,9 +174,7 @@
       "path": "/payments/charge",
       "message": "Mutating operation does not expose dry-run, preview, or validate-only mode.",
       "recommendation": "Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.",
-      "evidence": [
-        "HTTP method POST"
-      ]
+      "evidence": ["HTTP method POST"]
     },
     {
       "ruleId": "errors/missing-error-schema",
@@ -220,9 +186,7 @@
       "path": "/users",
       "message": "Operation does not define a structured 4xx or 5xx error response schema.",
       "recommendation": "Define structured error responses with stable error codes and messages so agents can recover safely.",
-      "evidence": [
-        "No 4xx/5xx response with schema"
-      ]
+      "evidence": ["No 4xx/5xx response with schema"]
     },
     {
       "ruleId": "schema/list-requires-pagination",
@@ -234,9 +198,7 @@
       "path": "/users",
       "message": "List/search operation has no pagination or limit query parameter.",
       "recommendation": "Expose limit, page, pageSize, cursor, or offset parameters to prevent unbounded agent outputs.",
-      "evidence": [
-        "GET operation appears to return a collection"
-      ]
+      "evidence": ["GET operation appears to return a collection"]
     },
     {
       "ruleId": "docs/mutating-description-mentions-side-effects",
@@ -248,10 +210,7 @@
       "path": "/users",
       "message": "Mutating operation description does not mention side effects or state changes.",
       "recommendation": "Update the description to clearly state what side effects this operation has (e.g., \"Creates a new user account\" rather than just \"Create user\").",
-      "evidence": [
-        "Method: POST",
-        "No description provided"
-      ]
+      "evidence": ["Method: POST", "No description provided"]
     },
     {
       "ruleId": "errors/missing-error-schema",
@@ -263,9 +222,7 @@
       "path": "/users",
       "message": "Operation does not define a structured 4xx or 5xx error response schema.",
       "recommendation": "Define structured error responses with stable error codes and messages so agents can recover safely.",
-      "evidence": [
-        "No 4xx/5xx response with schema"
-      ]
+      "evidence": ["No 4xx/5xx response with schema"]
     },
     {
       "ruleId": "safety/mutating-requires-dry-run",
@@ -277,9 +234,7 @@
       "path": "/users",
       "message": "Mutating operation does not expose dry-run, preview, or validate-only mode.",
       "recommendation": "Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.",
-      "evidence": [
-        "HTTP method POST"
-      ]
+      "evidence": ["HTTP method POST"]
     },
     {
       "ruleId": "schema/string-should-be-enum",
@@ -291,9 +246,7 @@
       "path": "/users",
       "message": "String input 'role' appears constrained but has no enum.",
       "recommendation": "Add enum values so agents can choose valid inputs without guessing API-specific strings.",
-      "evidence": [
-        "String input: role"
-      ]
+      "evidence": ["String input: role"]
     },
     {
       "ruleId": "schema/vague-boolean",
@@ -305,9 +258,7 @@
       "path": "/users",
       "message": "Boolean input 'force' is too vague for reliable agent use.",
       "recommendation": "Rename vague booleans to describe the exact behavior they enable, or replace them with a constrained enum.",
-      "evidence": [
-        "Boolean input: force"
-      ]
+      "evidence": ["Boolean input: force"]
     },
     {
       "ruleId": "docs/mutating-description-mentions-side-effects",
@@ -319,10 +270,7 @@
       "path": "/users/{id}",
       "message": "Mutating operation description does not mention side effects or state changes.",
       "recommendation": "Update the description to clearly state what side effects this operation has (e.g., \"Creates a new user account\" rather than just \"Create user\").",
-      "evidence": [
-        "Method: DELETE",
-        "No description provided"
-      ]
+      "evidence": ["Method: DELETE", "No description provided"]
     },
     {
       "ruleId": "errors/missing-error-schema",
@@ -334,9 +282,7 @@
       "path": "/users/{id}",
       "message": "Operation does not define a structured 4xx or 5xx error response schema.",
       "recommendation": "Define structured error responses with stable error codes and messages so agents can recover safely.",
-      "evidence": [
-        "No 4xx/5xx response with schema"
-      ]
+      "evidence": ["No 4xx/5xx response with schema"]
     },
     {
       "ruleId": "safety/mutating-requires-dry-run",
@@ -348,9 +294,7 @@
       "path": "/users/{id}",
       "message": "Mutating operation does not expose dry-run, preview, or validate-only mode.",
       "recommendation": "Add dry-run, preview, or validate-only support when possible. Otherwise mark the operation as guarded.",
-      "evidence": [
-        "HTTP method DELETE"
-      ]
+      "evidence": ["HTTP method DELETE"]
     },
     {
       "ruleId": "docs/weak-description",
@@ -362,9 +306,7 @@
       "path": "/emails/send",
       "message": "Description is too short to be useful for agent tool selection.",
       "recommendation": "Expand the description to clearly explain what the operation does and when to use it.",
-      "evidence": [
-        "Description length: 10 characters"
-      ]
+      "evidence": ["Description length: 10 characters"]
     },
     {
       "ruleId": "docs/weak-description",
@@ -376,9 +318,7 @@
       "path": "/payments/charge",
       "message": "Description is too short to be useful for agent tool selection.",
       "recommendation": "Expand the description to clearly explain what the operation does and when to use it.",
-      "evidence": [
-        "Description length: 14 characters"
-      ]
+      "evidence": ["Description length: 14 characters"]
     },
     {
       "ruleId": "docs/weak-description",
@@ -390,9 +330,7 @@
       "path": "/users",
       "message": "Description is too short to be useful for agent tool selection.",
       "recommendation": "Expand the description to clearly explain what the operation does and when to use it.",
-      "evidence": [
-        "Description length: 10 characters"
-      ]
+      "evidence": ["Description length: 10 characters"]
     },
     {
       "ruleId": "docs/weak-description",
@@ -404,9 +342,7 @@
       "path": "/users",
       "message": "Description is too short to be useful for agent tool selection.",
       "recommendation": "Expand the description to clearly explain what the operation does and when to use it.",
-      "evidence": [
-        "Description length: 11 characters"
-      ]
+      "evidence": ["Description length: 11 characters"]
     },
     {
       "ruleId": "docs/weak-description",
@@ -418,9 +354,7 @@
       "path": "/users/{id}",
       "message": "Description is too short to be useful for agent tool selection.",
       "recommendation": "Expand the description to clearly explain what the operation does and when to use it.",
-      "evidence": [
-        "Description length: 11 characters"
-      ]
+      "evidence": ["Description length: 11 characters"]
     }
   ]
 }

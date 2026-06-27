@@ -2,21 +2,21 @@
   "name": "toolsafe",
   "version": "0.1.0",
   "description": "Deterministic agent-readiness linter for OpenAPI APIs",
+  "keywords": [
+    "agent",
+    "ai",
+    "api",
+    "lint",
+    "llm",
+    "openapi",
+    "safety",
+    "security"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/styltsou/toolsafe.git"
   },
-  "keywords": [
-    "openapi",
-    "lint",
-    "agent",
-    "ai",
-    "llm",
-    "api",
-    "safety",
-    "security"
-  ],
   "bin": {
     "toolsafe": "./src/cli/index.ts"
   },
