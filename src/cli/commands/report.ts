@@ -4,9 +4,9 @@ import { loadConfig } from '@/config/loader';
 import type { ToolSafeConfig } from '@/config/types';
 import { resolveConfig, withAnalysis } from '@/cli/analysis';
 import type { AnalysisResult } from '@/core/types';
-import { renderJsonReport, renderMarkdownReport, renderSarifReport } from '@/reporters';
+import { renderHtmlReport, renderJsonReport, renderMarkdownReport, renderSarifReport } from '@/reporters';
 
-type ReportFormat = 'json' | 'markdown' | 'sarif';
+type ReportFormat = 'html' | 'json' | 'markdown' | 'sarif';
 
 type ReportOptions = {
   format?: string;
@@ -14,14 +14,14 @@ type ReportOptions = {
   config?: string;
 };
 
-const REPORT_FORMATS = ['json', 'markdown', 'sarif'] as const satisfies readonly ReportFormat[];
+const REPORT_FORMATS = ['html', 'json', 'markdown', 'sarif'] as const satisfies readonly ReportFormat[];
 
 export function registerReportCommand(program: Command): void {
   program
     .command('report')
-    .description('Generate a JSON, Markdown, or SARIF ToolSafe report')
+    .description('Generate an HTML, JSON, Markdown, or SARIF ToolSafe report')
     .argument('<file>', 'OpenAPI YAML or JSON file')
-    .option('--format <format>', 'Output format: json, markdown, or sarif')
+    .option('--format <format>', 'Output format: html, json, markdown, or sarif')
     .option('--out <path>', 'Write report to a file instead of stdout')
     .option('--config <path>', 'Path to toolsafe.config.json')
     .action(async (filePath: string, options: ReportOptions) => {
@@ -70,6 +70,10 @@ function parseReportFormat(value: string | undefined): ReportFormat | undefined 
 }
 
 function renderReport(result: AnalysisResult, format: ReportFormat): string {
+  if (format === 'html') {
+    return renderHtmlReport(result);
+  }
+
   if (format === 'json') {
     return renderJsonReport(result);
   }

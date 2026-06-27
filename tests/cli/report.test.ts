@@ -55,8 +55,18 @@ describe('toolsafe report CLI', () => {
     expect(output).toContain('# ToolSafe Agent-Readiness Report');
   });
 
-  test('exits 2 for invalid report formats', async () => {
+  test('prints HTML to stdout when requested', async () => {
     const result = await runCli(['report', 'examples/risky-openapi.yaml', '--format', 'html']);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('<!DOCTYPE html>');
+    expect(result.stdout).toContain('ToolSafe Agent-Readiness Report');
+    expect(result.stdout).toContain('<h2>Summary</h2>');
+    expect(result.stderr).toBe('');
+  });
+
+  test('exits 2 for invalid report formats', async () => {
+    const result = await runCli(['report', 'examples/risky-openapi.yaml', '--format', 'pdf']);
 
     expect(result.exitCode).toBe(2);
     expect(result.stdout).toBe('');

@@ -90,7 +90,7 @@ describe('config schema validation', () => {
   test('rejects unknown report.format values', () => {
     const result = ToolSafeConfigSchema.safeParse({
       report: {
-        format: 'html',
+        format: 'pdf',
       },
     });
 

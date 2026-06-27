@@ -16,7 +16,7 @@ export const ToolSafeConfigSchema = z.object({
     .optional(),
   report: z
     .object({
-      format: z.enum(['json', 'markdown', 'sarif']).optional(),
+      format: z.enum(['html', 'json', 'markdown', 'sarif']).optional(),
       out: z.string().optional(),
     })
     .optional(),
