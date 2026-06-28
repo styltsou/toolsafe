@@ -1,8 +1,7 @@
 import type { Rule } from '@/core/types';
 import { hasAnyQueryParameter } from '@/core/schema';
-import { includesAny } from '@/core/strings';
 import { createFinding } from '@/rules/findings';
-import { getOperationSearchText } from '@/rules/helpers';
+import { hasOperationIntentKeyword } from '@/rules/helpers';
 
 const LIST_KEYWORDS = [
   'list',
@@ -43,7 +42,9 @@ export const listRequiresPaginationRule: Rule = {
   defaultSeverity: 'warning',
   check: ({ tool }) => {
     const isLikelyList =
-      tool.method === 'GET' && includesAny(getOperationSearchText(tool), LIST_KEYWORDS);
+      tool.method === 'GET' &&
+      !pathEndsWithParameter(tool.path) &&
+      hasOperationIntentKeyword(tool, LIST_KEYWORDS);
 
     if (!isLikelyList || hasAnyQueryParameter(tool, PAGINATION_PARAMETERS)) {
       return [];
@@ -59,3 +60,10 @@ export const listRequiresPaginationRule: Rule = {
     ];
   },
 };
+
+function pathEndsWithParameter(path: string): boolean {
+  const segments = path.split('/').filter(Boolean);
+  const finalSegment = segments.at(-1);
+
+  return finalSegment !== undefined && /^\{[^}]+\}$/.test(finalSegment);
+}

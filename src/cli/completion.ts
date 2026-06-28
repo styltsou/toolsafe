@@ -13,7 +13,7 @@ export function generateBashCompletion(): string {
       return
     fi
 
-    case ${words[1]} in
+    case \${words[1]} in
       init)
         case $prev in
           -a|--analyze)

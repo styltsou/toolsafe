@@ -39,7 +39,6 @@ exports[`policy generator generates a stable advisory policy draft for the risky
         "Mutating operation does not expose dry-run, preview, or validate-only mode.",
       ],
       "recommendedControls": [
-        "Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").",
         "Normalize unstructured API errors before returning them to agents.",
         "Prefer dry-run, preview, or validate-only mode before mutation.",
         "Validate constrained string inputs against an allowed set.",
@@ -61,7 +60,6 @@ exports[`policy generator generates a stable advisory policy draft for the risky
       "recommendedControls": [
         "Require explicit user confirmation before execution.",
         "Require confirmation or guard metadata for destructive execution.",
-        "Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").",
         "Normalize unstructured API errors before returning them to agents.",
         "Prefer dry-run, preview, or validate-only mode before mutation.",
         "Expand the description to clearly explain what the operation does and when to use it.",
@@ -194,8 +192,6 @@ operations:
       - Mutating operation does not expose dry-run, preview, or validate-only
         mode.
     recommendedControls:
-      - Update the description to clearly state what side effects this operation
-        has (e.g., "Creates a new user account" rather than just "Create user").
       - Normalize unstructured API errors before returning them to agents.
       - Prefer dry-run, preview, or validate-only mode before mutation.
       - Validate constrained string inputs against an allowed set.
@@ -217,8 +213,6 @@ operations:
     recommendedControls:
       - Require explicit user confirmation before execution.
       - Require confirmation or guard metadata for destructive execution.
-      - Update the description to clearly state what side effects this operation
-        has (e.g., "Creates a new user account" rather than just "Create user").
       - Normalize unstructured API errors before returning them to agents.
       - Prefer dry-run, preview, or validate-only mode before mutation.
       - Expand the description to clearly explain what the operation does and

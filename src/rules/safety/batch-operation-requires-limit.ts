@@ -1,10 +1,9 @@
 import type { Rule } from '@/core/types';
-import { hasAnyInputField } from '@/core/schema';
-import { includesAny } from '@/core/strings';
+import { hasAnyInputField, hasArrayInput } from '@/core/schema';
 import { createFinding } from '@/rules/findings';
-import { getOperationSearchText } from '@/rules/helpers';
+import { hasOperationIntentKeyword } from '@/rules/helpers';
 
-const BATCH_KEYWORDS = ['batch', 'bulk', 'mass', 'bulk-update', 'bulk-delete', 'batch-create'];
+const BATCH_KEYWORDS = ['batch', 'bulk', 'mass'];
 
 const LIMIT_FIELDS = [
   'limit',
@@ -28,7 +27,7 @@ export const batchOperationRequiresLimitRule: Rule = {
   category: 'safety',
   defaultSeverity: 'warning',
   check: ({ tool }) => {
-    const isBatch = includesAny(getOperationSearchText(tool), BATCH_KEYWORDS);
+    const isBatch = hasOperationIntentKeyword(tool, BATCH_KEYWORDS) && hasArrayInput(tool);
 
     if (!isBatch) {
       return [];

@@ -1,5 +1,5 @@
 import type { Rule } from '@/core/types';
-import { getInputSchemaProperties, hasEnum, isStringSchema } from '@/core/schema';
+import { getInputSchemaProperties, hasEnum, hasSchemaKeyword, isStringSchema } from '@/core/schema';
 import { matchesNormalizedName } from '@/core/strings';
 import { createFinding } from '@/rules/findings';
 
@@ -31,6 +31,7 @@ export const stringShouldBeEnumRule: Rule = {
       (property) =>
         isStringSchema(property.schema) &&
         !hasEnum(property.schema) &&
+        !hasSchemaKeyword(property.schema, ['pattern']) &&
         matchesNormalizedName(property.name, ENUM_LIKE_NAMES),
     );
 

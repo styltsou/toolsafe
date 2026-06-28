@@ -1,20 +1,23 @@
 import type { Rule } from '@/core/types';
 import { includesAny } from '@/core/strings';
 import { createFinding } from '@/rules/findings';
-import { getOperationSearchText } from '@/rules/helpers';
 
 const MUTATING_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'] as const;
 
 const SIDE_EFFECT_VERBS = [
+  'create',
   'creates',
   'creates a',
   'creates an',
+  'update',
   'updates',
   'updates a',
   'updates an',
+  'delete',
   'deletes',
   'deletes a',
   'deletes an',
+  'remove',
   'removes',
   'removes a',
   'removes an',
@@ -32,8 +35,11 @@ const SIDE_EFFECT_VERBS = [
   'transfers',
   'publishes',
   'submits',
+  'cancel',
   'cancels',
+  'revoke',
   'revokes',
+  'terminate',
   'terminates',
 ];
 
@@ -53,9 +59,12 @@ export const mutatingDescriptionMentionsSideEffectsRule: Rule = {
       return [];
     }
 
-    const searchText = getOperationSearchText(tool);
+    const documentationText = [tool.summary, tool.description]
+      .filter((value): value is string => typeof value === 'string')
+      .join(' ')
+      .toLowerCase();
 
-    if (includesAny(searchText, SIDE_EFFECT_VERBS)) {
+    if (includesAny(documentationText, SIDE_EFFECT_VERBS)) {
       return [];
     }
 

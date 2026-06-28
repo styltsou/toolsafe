@@ -39,12 +39,10 @@ describe('default rule engine', () => {
       'safety/mutating-requires-dry-run',
       'errors/missing-error-schema',
       'schema/list-requires-pagination',
-      'docs/mutating-description-mentions-side-effects',
       'errors/missing-error-schema',
       'safety/mutating-requires-dry-run',
       'schema/string-should-be-enum',
       'schema/vague-boolean',
-      'docs/mutating-description-mentions-side-effects',
       'errors/missing-error-schema',
       'safety/mutating-requires-dry-run',
       'docs/weak-description',
@@ -94,6 +92,54 @@ describe('safety/financial-requires-idempotency', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  test('does not flag bank metadata updates as financial movement', () => {
+    const tool = makeTool({
+      method: 'PATCH',
+      path: '/accounts/{id}/bank-name',
+      name: 'updateAccountBankName',
+      summary: 'Update account bank name',
+    });
+
+    const findings = financialRequiresIdempotencyRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag read-only loyalty credit endpoints', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/loyalty/credits',
+      name: 'listLoyaltyCredits',
+      summary: 'List loyalty credits',
+    });
+
+    const findings = financialRequiresIdempotencyRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('flags refund operations without idempotency inputs', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/payments/{id}/refund',
+      name: 'refundPayment',
+      summary: 'Refund payment',
+    });
+
+    const findings = financialRequiresIdempotencyRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(1);
+  });
 });
 
 describe('safety/external-communication-requires-guard', () => {
@@ -132,6 +178,66 @@ describe('safety/external-communication-requires-guard', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  test('does not flag internal message stores without recipient fields', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/chat/messages',
+      name: 'createChatMessage',
+      summary: 'Create chat message',
+      requestBodySchema: {
+        type: 'object',
+        properties: {
+          body: { type: 'string' },
+        },
+      },
+    });
+
+    const findings = externalCommunicationRequiresGuardRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag CMS publish operations without recipient fields', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/articles/{id}/publish',
+      name: 'publishArticle',
+      summary: 'Publish article',
+    });
+
+    const findings = externalCommunicationRequiresGuardRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('flags external notifications with recipient fields', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/notifications/email',
+      name: 'sendNotificationEmail',
+      summary: 'Send notification email',
+      requestBodySchema: {
+        type: 'object',
+        properties: {
+          recipientEmail: { type: 'string' },
+        },
+      },
+    });
+
+    const findings = externalCommunicationRequiresGuardRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(1);
+  });
 });
 
 describe('safety/destructive-requires-guard', () => {
@@ -156,6 +262,59 @@ describe('safety/destructive-requires-guard', () => {
       method: 'DELETE',
       path: '/users/{id}',
       name: 'deleteUser',
+      rawOperation: {
+        'x-agent-guard': {
+          mode: 'require_confirmation',
+        },
+      },
+    });
+
+    const findings = destructiveRequiresGuardRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag destructive-sounding read-only operations', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/subscriptions/{id}/cancellation-history',
+      name: 'getCancellationHistory',
+      summary: 'Get cancellation history',
+    });
+
+    const findings = destructiveRequiresGuardRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag description-only destructive words', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/subscriptions/{id}/resume',
+      name: 'resumeSubscription',
+      summary: 'Resume subscription',
+      description: 'Resumes a subscription that was previously cancelled.',
+    });
+
+    const findings = destructiveRequiresGuardRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag destructive operations with guard metadata', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/users/{id}/deactivate',
+      name: 'deactivateUser',
       rawOperation: {
         'x-agent-guard': {
           mode: 'require_confirmation',
@@ -243,6 +402,38 @@ describe('schema/list-requires-pagination', () => {
           required: false,
         },
       ],
+    });
+
+    const findings = listRequiresPaginationRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag single-resource GET paths ending in parameters', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/users/{id}',
+      name: 'getUser',
+      summary: 'Get user',
+    });
+
+    const findings = listRequiresPaginationRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag nested single-resource GET paths ending in parameters', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/users/{id}/events/{eventId}',
+      name: 'getUserEvent',
+      summary: 'Get user event',
     });
 
     const findings = listRequiresPaginationRule.check({
@@ -340,6 +531,32 @@ describe('schema/string-should-be-enum', () => {
           },
         },
       },
+    });
+
+    const findings = stringShouldBeEnumRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag pattern-constrained strings', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/users',
+      name: 'listUsers',
+      parameters: [
+        {
+          name: 'sort',
+          in: 'query',
+          required: false,
+          schema: {
+            type: 'string',
+            pattern: '^-?[a-zA-Z]+(,-?[a-zA-Z]+)*$',
+          },
+        },
+      ],
     });
 
     const findings = stringShouldBeEnumRule.check({
@@ -573,6 +790,22 @@ describe('docs/mutating-description-mentions-side-effects', () => {
     expect(findings).toHaveLength(0);
   });
 
+  test('does not flag mutating operations with bare side-effect verbs', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/users',
+      name: 'createUser',
+      description: 'Create user',
+    });
+
+    const findings = mutatingDescriptionMentionsSideEffectsRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
   test('does not flag read-only operations', () => {
     const tool = makeTool({
       method: 'GET',
@@ -597,6 +830,15 @@ describe('safety/batch-operation-requires-limit', () => {
       path: '/users/batch',
       name: 'batchCreateUsers',
       summary: 'Batch create users',
+      requestBodySchema: {
+        type: 'object',
+        properties: {
+          users: {
+            type: 'array',
+            items: { type: 'object' },
+          },
+        },
+      },
     });
 
     const findings = batchOperationRequiresLimitRule.check({
@@ -636,6 +878,28 @@ describe('safety/batch-operation-requires-limit', () => {
       path: '/users',
       name: 'listUsers',
       summary: 'List users',
+    });
+
+    const findings = batchOperationRequiresLimitRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag batch-sounding scalar operations', () => {
+    const tool = makeTool({
+      method: 'POST',
+      path: '/jobs/bulk-status-check',
+      name: 'bulkStatusCheck',
+      summary: 'Bulk status check',
+      requestBodySchema: {
+        type: 'object',
+        properties: {
+          jobId: { type: 'string' },
+        },
+      },
     });
 
     const findings = batchOperationRequiresLimitRule.check({

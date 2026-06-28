@@ -1,8 +1,9 @@
-import type { Rule } from '@/core/types';
+import type { HttpMethod, Rule } from '@/core/types';
 import { hasAnyInputField } from '@/core/schema';
-import { includesAny } from '@/core/strings';
 import { createFinding } from '@/rules/findings';
-import { getOperationSearchText, hasOperationExtension } from '@/rules/helpers';
+import { hasOperationExtension, hasOperationIntentKeyword } from '@/rules/helpers';
+
+const MUTATING_METHODS = new Set<HttpMethod>(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 const DESTRUCTIVE_KEYWORDS = [
   'delete',
@@ -48,8 +49,9 @@ export const destructiveRequiresGuardRule: Rule = {
   category: 'safety',
   defaultSeverity: 'error',
   check: ({ tool }) => {
-    const searchText = getOperationSearchText(tool);
-    const isDestructive = tool.method === 'DELETE' || includesAny(searchText, DESTRUCTIVE_KEYWORDS);
+    const isDestructive =
+      tool.method === 'DELETE' ||
+      (MUTATING_METHODS.has(tool.method) && hasOperationIntentKeyword(tool, DESTRUCTIVE_KEYWORDS));
 
     if (!isDestructive) {
       return [];

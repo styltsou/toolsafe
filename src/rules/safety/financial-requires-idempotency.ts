@@ -1,23 +1,23 @@
 import type { HttpMethod, Rule } from '@/core/types';
 import { hasAnyInputField } from '@/core/schema';
-import { includesAny } from '@/core/strings';
 import { createFinding } from '@/rules/findings';
-import { getOperationSearchText } from '@/rules/helpers';
+import { hasOperationIntentKeyword } from '@/rules/helpers';
 
 const MUTATING_METHODS = new Set<HttpMethod>(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 const FINANCIAL_KEYWORDS = [
   'payment',
+  'payments',
   'charge',
   'refund',
   'transfer',
   'payout',
+  'payouts',
   'invoice',
+  'invoices',
   'billing',
   'subscription',
-  'credit',
-  'debit',
-  'bank',
+  'subscriptions',
 ];
 
 const IDEMPOTENCY_FIELDS = [
@@ -42,9 +42,8 @@ export const financialRequiresIdempotencyRule: Rule = {
   category: 'safety',
   defaultSeverity: 'warning',
   check: ({ tool }) => {
-    const searchText = getOperationSearchText(tool);
     const isFinancialMutation =
-      MUTATING_METHODS.has(tool.method) && includesAny(searchText, FINANCIAL_KEYWORDS);
+      MUTATING_METHODS.has(tool.method) && hasOperationIntentKeyword(tool, FINANCIAL_KEYWORDS);
 
     if (!isFinancialMutation || hasAnyInputField(tool, IDEMPOTENCY_FIELDS)) {
       return [];

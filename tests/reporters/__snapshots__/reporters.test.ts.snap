@@ -15,15 +15,15 @@ exports[`reporters renders the risky fixture as stable pretty JSON 1`] = `
     "highRiskTools": 3,
     "findingCounts": {
       "info": 5,
-      "warning": 18,
+      "warning": 16,
       "error": 1
     }
   },
   "scores": {
-    "overall": 13,
+    "overall": 21,
     "safety": 66,
     "schema": 92,
-    "docs": 79,
+    "docs": 87,
     "errors": 80,
     "agentUsability": 96,
     "auth": 100
@@ -242,21 +242,6 @@ exports[`reporters renders the risky fixture as stable pretty JSON 1`] = `
       ]
     },
     {
-      "ruleId": "docs/mutating-description-mentions-side-effects",
-      "severity": "warning",
-      "category": "docs",
-      "toolId": "createUser",
-      "toolName": "createUser",
-      "method": "POST",
-      "path": "/users",
-      "message": "Mutating operation description does not mention side effects or state changes.",
-      "recommendation": "Update the description to clearly state what side effects this operation has (e.g., \\"Creates a new user account\\" rather than just \\"Create user\\").",
-      "evidence": [
-        "Method: POST",
-        "No description provided"
-      ]
-    },
-    {
       "ruleId": "errors/missing-error-schema",
       "severity": "warning",
       "category": "errors",
@@ -310,21 +295,6 @@ exports[`reporters renders the risky fixture as stable pretty JSON 1`] = `
       "recommendation": "Rename vague booleans to describe the exact behavior they enable, or replace them with a constrained enum.",
       "evidence": [
         "Boolean input: force"
-      ]
-    },
-    {
-      "ruleId": "docs/mutating-description-mentions-side-effects",
-      "severity": "warning",
-      "category": "docs",
-      "toolId": "deleteUser",
-      "toolName": "deleteUser",
-      "method": "DELETE",
-      "path": "/users/{id}",
-      "message": "Mutating operation description does not mention side effects or state changes.",
-      "recommendation": "Update the description to clearly state what side effects this operation has (e.g., \\"Creates a new user account\\" rather than just \\"Create user\\").",
-      "evidence": [
-        "Method: DELETE",
-        "No description provided"
       ]
     },
     {
@@ -447,17 +417,17 @@ API: Risky Example API 1.0.0
 | Destructive operations | 1 |
 | High-risk operations | 3 |
 | Errors | 1 |
-| Warnings | 18 |
+| Warnings | 16 |
 | Info | 5 |
 
 ## Scores
 
 | Category | Score |
 | --- | ---: |
-| Overall | 13/100 |
+| Overall | 21/100 |
 | Safety | 66/100 |
 | Schema | 92/100 |
-| Docs | 79/100 |
+| Docs | 87/100 |
 | Errors | 80/100 |
 | Agent usability | 96/100 |
 | Auth | 100/100 |
@@ -531,11 +501,6 @@ API: Risky Example API 1.0.0
   - Recommendation: Expose limit, page, pageSize, cursor, or offset parameters to prevent unbounded agent outputs.
   - Evidence: GET operation appears to return a collection
 
-- **docs/mutating-description-mentions-side-effects**: \`POST /users\`
-  - Mutating operation description does not mention side effects or state changes.
-  - Recommendation: Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").
-  - Evidence: Method: POST; No description provided
-
 - **errors/missing-error-schema**: \`POST /users\`
   - Operation does not define a structured 4xx or 5xx error response schema.
   - Recommendation: Define structured error responses with stable error codes and messages so agents can recover safely.
@@ -555,11 +520,6 @@ API: Risky Example API 1.0.0
   - Boolean input 'force' is too vague for reliable agent use.
   - Recommendation: Rename vague booleans to describe the exact behavior they enable, or replace them with a constrained enum.
   - Evidence: Boolean input: force
-
-- **docs/mutating-description-mentions-side-effects**: \`DELETE /users/{id}\`
-  - Mutating operation description does not mention side effects or state changes.
-  - Recommendation: Update the description to clearly state what side effects this operation has (e.g., "Creates a new user account" rather than just "Create user").
-  - Evidence: Method: DELETE; No description provided
 
 - **errors/missing-error-schema**: \`DELETE /users/{id}\`
   - Operation does not define a structured 4xx or 5xx error response schema.
@@ -1131,35 +1091,6 @@ exports[`reporters SARIF output matches snapshot 1`] = `
           }
         },
         {
-          "ruleId": "docs/mutating-description-mentions-side-effects",
-          "ruleIndex": 13,
-          "level": "warning",
-          "message": {
-            "text": "Mutating operation description does not mention side effects or state changes.\\n\\nRecommendation: Update the description to clearly state what side effects this operation has (e.g., \\"Creates a new user account\\" rather than just \\"Create user\\").\\n\\nEvidence:\\n  - Method: POST\\n  - No description provided"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "examples/risky-openapi.yaml"
-                },
-                "region": {
-                  "snippet": {
-                    "text": "POST /users"
-                  }
-                }
-              }
-            }
-          ],
-          "properties": {
-            "category": "docs",
-            "toolId": "createUser",
-            "toolName": "createUser",
-            "method": "POST",
-            "path": "/users"
-          }
-        },
-        {
           "ruleId": "errors/missing-error-schema",
           "ruleIndex": 14,
           "level": "warning",
@@ -1273,35 +1204,6 @@ exports[`reporters SARIF output matches snapshot 1`] = `
             "toolName": "createUser",
             "method": "POST",
             "path": "/users"
-          }
-        },
-        {
-          "ruleId": "docs/mutating-description-mentions-side-effects",
-          "ruleIndex": 13,
-          "level": "warning",
-          "message": {
-            "text": "Mutating operation description does not mention side effects or state changes.\\n\\nRecommendation: Update the description to clearly state what side effects this operation has (e.g., \\"Creates a new user account\\" rather than just \\"Create user\\").\\n\\nEvidence:\\n  - Method: DELETE\\n  - No description provided"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "examples/risky-openapi.yaml"
-                },
-                "region": {
-                  "snippet": {
-                    "text": "DELETE /users/{id}"
-                  }
-                }
-              }
-            }
-          ],
-          "properties": {
-            "category": "docs",
-            "toolId": "deleteUser",
-            "toolName": "deleteUser",
-            "method": "DELETE",
-            "path": "/users/{id}"
           }
         },
         {
