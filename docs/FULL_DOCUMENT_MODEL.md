@@ -38,16 +38,16 @@ A rule in Vacuum or Speakeasy can:
 
 ### Contrast with ToolSafe's current model
 
-| Capability | ToolSafe today | Speakeasy / Vacuum |
-|---|---|---|
-| Document access | Flattened `NormalizedTool` fields + `operation: unknown` casts | Full typed document tree |
-| `$ref` resolution | Post-parse dereference step | Built into the graph layer |
-| Schema traversal | `schema.ts` helpers (top-level only) | Full schema tree with recursion |
-| Rule writing | `if (!match) return []` + `createFinding()` | Any JS/TS function against the full document |
-| Pre-computed indices | None (rules recompute) | `docInfo.getIndex().getOperations()`, `.getSchemas()`, etc. |
-| Custom rules | Modify source code | TypeScript files loaded at runtime |
-| JSONPath | Not supported | Core to Vacuum's rule model |
-| Line-level output | Not tracked | Built into the node graph |
+| Capability           | ToolSafe today                                                 | Speakeasy / Vacuum                                          |
+| -------------------- | -------------------------------------------------------------- | ----------------------------------------------------------- |
+| Document access      | Flattened `NormalizedTool` fields + `operation: unknown` casts | Full typed document tree                                    |
+| `$ref` resolution    | Post-parse dereference step                                    | Built into the graph layer                                  |
+| Schema traversal     | `schema.ts` helpers (top-level only)                           | Full schema tree with recursion                             |
+| Rule writing         | `if (!match) return []` + `createFinding()`                    | Any JS/TS function against the full document                |
+| Pre-computed indices | None (rules recompute)                                         | `docInfo.getIndex().getOperations()`, `.getSchemas()`, etc. |
+| Custom rules         | Modify source code                                             | TypeScript files loaded at runtime                          |
+| JSONPath             | Not supported                                                  | Core to Vacuum's rule model                                 |
+| Line-level output    | Not tracked                                                    | Built into the node graph                                   |
 
 ## Why This Matters
 
