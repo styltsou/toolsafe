@@ -192,7 +192,11 @@ function dereferenceOpenApiSource(parsed: unknown, filePath: string): unknown {
     }
 
     if (!result.schema) {
-      throw new ToolSafeError('OPENAPI_PARSE_ERROR', '$ref resolution produced no output.', filePath);
+      throw new ToolSafeError(
+        'OPENAPI_PARSE_ERROR',
+        '$ref resolution produced no output.',
+        filePath,
+      );
     }
 
     return result.schema;
