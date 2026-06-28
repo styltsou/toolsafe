@@ -70,7 +70,6 @@ describe('isAllIgnored', () => {
     const tool = { ...baseTool, operation: { 'x-toolsafe-ignore-all': 'yes' } };
     expect(isAllIgnored(tool)).toBe(false);
   });
-
 });
 
 function makeFinding(overrides: Partial<Finding>): Finding {
