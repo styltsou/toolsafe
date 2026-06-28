@@ -155,3 +155,136 @@ describe('parseOpenApi', () => {
     });
   });
 });
+
+function hasAnyRefKey(obj: unknown): boolean {
+  if (Array.isArray(obj)) {
+    return obj.some(hasAnyRefKey);
+  }
+
+  if (obj && typeof obj === 'object') {
+    const record = obj as Record<string, unknown>;
+
+    if ('$ref' in record) {
+      return true;
+    }
+
+    return Object.values(record).some(hasAnyRefKey);
+  }
+
+  return false;
+}
+
+function refTestSpec() {
+  return {
+    openapi: '3.0.0',
+    info: { title: 'Ref Test', version: '1.0.0' },
+    paths: {
+      '/users': {
+        post: {
+          operationId: 'createUser',
+          requestBody: {
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/User' },
+              },
+            },
+          },
+          responses: {
+            '201': {
+              description: 'Created',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/UserResponse' },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    components: {
+      schemas: {
+        User: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            role: { type: 'string' },
+            force: { type: 'boolean' },
+          },
+        },
+        UserResponse: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            token: { type: 'string' },
+          },
+        },
+      },
+    },
+  };
+}
+
+test('resolves $ref references in the parsed document', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'toolsafe-ref-test-'));
+  const filePath = join(directory, 'ref-test.json');
+  await writeFile(filePath, JSON.stringify(refTestSpec()));
+
+  const result = await parseOpenApi(filePath);
+
+  try {
+    expect(hasAnyRefKey(result.document)).toBe(false);
+
+    const document = result.document as Record<string, unknown>;
+    const paths = document.paths as Record<string, unknown>;
+    const usersPath = paths['/users'] as Record<string, unknown>;
+    const post = usersPath['post'] as Record<string, unknown>;
+
+    const requestBody = post['requestBody'] as Record<string, unknown>;
+    const reqContent = requestBody['content'] as Record<string, unknown>;
+    const reqJson = reqContent['application/json'] as Record<string, unknown>;
+    const reqSchema = reqJson['schema'] as Record<string, unknown>;
+    const reqProps = reqSchema['properties'] as Record<string, unknown>;
+
+    expect(reqSchema['type']).toBe('object');
+    expect(Object.keys(reqProps)).toEqual(['name', 'role', 'force']);
+    expect(reqProps['role']).toEqual({ type: 'string' });
+    expect(reqProps['force']).toEqual({ type: 'boolean' });
+
+    const responses = post['responses'] as Record<string, unknown>;
+    const res201 = responses['201'] as Record<string, unknown>;
+    const resContent = res201['content'] as Record<string, unknown>;
+    const resJson = resContent['application/json'] as Record<string, unknown>;
+    const resSchema = resJson['schema'] as Record<string, unknown>;
+    const resProps = resSchema['properties'] as Record<string, unknown>;
+
+    expect(resSchema['type']).toBe('object');
+    expect(Object.keys(resProps)).toEqual(['id', 'token']);
+  } finally {
+    await writeFile(filePath, '');
+  }
+});
+
+test('throws on unresolvable $ref', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'toolsafe-broken-ref-'));
+  const filePath = join(directory, 'broken-ref.json');
+  const spec: Record<string, unknown> = refTestSpec();
+  const paths = spec.paths as Record<string, unknown>;
+  const usersPath = paths['/users'] as Record<string, unknown>;
+  const post = usersPath['post'] as Record<string, unknown>;
+  const responses = post['responses'] as Record<string, unknown>;
+  const res201 = responses['201'] as Record<string, unknown>;
+  const resContent = res201['content'] as Record<string, unknown>;
+  const resJson = resContent['application/json'] as Record<string, unknown>;
+
+  resJson['schema'] = { $ref: '#/components/schemas/NonExistent' };
+  await writeFile(filePath, JSON.stringify(spec));
+
+  try {
+    await expect(parseOpenApi(filePath)).rejects.toBeInstanceOf(ToolSafeError);
+    await expect(parseOpenApi(filePath)).rejects.toMatchObject({
+      code: 'OPENAPI_PARSE_ERROR',
+    });
+  } finally {
+    await writeFile(filePath, '');
+  }
+});

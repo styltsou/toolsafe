@@ -113,7 +113,7 @@ export function normalizeOpenApi(document: unknown): NormalizedTool[] {
           requestBodySchema,
           responses,
           security,
-          rawOperation: operationValue,
+          operation: operationValue,
         }),
       );
     }

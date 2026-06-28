@@ -46,11 +46,11 @@ export function hasOperationIntentKeyword(
 }
 
 export function hasOperationExtension(tool: NormalizedTool, names: readonly string[]): boolean {
-  if (!isObject(tool.rawOperation)) {
+  if (!isObject(tool.operation)) {
     return false;
   }
 
-  return names.some((name) => Object.hasOwn(tool.rawOperation as Record<string, unknown>, name));
+  return names.some((name) => Object.hasOwn(tool.operation as Record<string, unknown>, name));
 }
 
 function getOperationIntentTokens(tool: NormalizedTool): Set<string> {

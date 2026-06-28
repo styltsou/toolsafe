@@ -78,7 +78,7 @@ describe('normalizeOpenApi', () => {
         oauth: ['customers:write'],
       },
     ]);
-    expect(createCustomer?.rawOperation).toBeDefined();
+    expect(createCustomer?.operation).toBeDefined();
   });
 
   test('returns an empty array for non-object documents', () => {

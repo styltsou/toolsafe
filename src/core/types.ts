@@ -33,7 +33,7 @@ export type NormalizedParameter = {
  * Minimal response shape used by rules.
  *
  * Rules only need status, description, and the selected response schema in v0;
- * media-type details remain available from `NormalizedTool.rawOperation`.
+ * media-type details remain available from `NormalizedTool.operation`.
  */
 export type NormalizedResponse = {
   statusCode: string;
@@ -61,7 +61,8 @@ export type NormalizedTool = {
   requestBodySchema?: unknown;
   responses: NormalizedResponse[];
   security?: unknown[] | undefined;
-  rawOperation: unknown;
+  /** The operation subtree from the dereferenced document, including vendor extensions. */
+  operation: unknown;
 };
 
 export type FindingSeverity = 'info' | 'warning' | 'error';

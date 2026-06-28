@@ -1,4 +1,4 @@
-import { validate } from '@scalar/openapi-parser';
+import { validate, dereference } from '@scalar/openapi-parser';
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { extname } from 'node:path';
@@ -113,8 +113,11 @@ async function fetchOpenApiFile(url: URL, fetchOptions?: FetchOptions): Promise<
 
 async function parseFromSource(source: string, filePath: string): Promise<ParsedOpenApi> {
   await validateOpenApiSource(source, filePath);
-  const document = parseOpenApiSource(source, filePath);
-  const metadata = extractMetadata(document, filePath);
+  const parsed = parseOpenApiSource(source, filePath);
+  const metadata = extractMetadata(parsed, filePath);
+  // dereference is currently synchronous — if @scalar/openapi-parser
+  // ever makes it async, this call will need an await.
+  const document = dereferenceOpenApiSource(parsed, filePath);
 
   return { filePath, document, metadata };
 }
@@ -176,6 +179,29 @@ function parseOpenApiSource(source: string, filePath: string): unknown {
     return parseYaml(source);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Could not parse OpenAPI file.';
+    throw new ToolSafeError('OPENAPI_PARSE_ERROR', message, filePath);
+  }
+}
+
+function dereferenceOpenApiSource(parsed: unknown, filePath: string): unknown {
+  try {
+    const result = dereference(parsed as Record<string, unknown>);
+
+    if (result.errors?.length) {
+      throw new ToolSafeError('OPENAPI_PARSE_ERROR', formatScalarErrors(result.errors), filePath);
+    }
+
+    if (!result.schema) {
+      throw new ToolSafeError('OPENAPI_PARSE_ERROR', '$ref resolution produced no output.', filePath);
+    }
+
+    return result.schema;
+  } catch (error) {
+    if (error instanceof ToolSafeError) {
+      throw error;
+    }
+
+    const message = error instanceof Error ? error.message : 'Could not resolve $ref references.';
     throw new ToolSafeError('OPENAPI_PARSE_ERROR', message, filePath);
   }
 }

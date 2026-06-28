@@ -45,7 +45,7 @@ function makeTool(overrides: Partial<NormalizedTool>): NormalizedTool {
     tags: [],
     parameters: [],
     responses: [],
-    rawOperation: {},
+    operation: {},
     ...overrides,
   };
 }

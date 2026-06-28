@@ -10,7 +10,7 @@ const baseTool: NormalizedTool = {
   tags: [],
   parameters: [],
   responses: [],
-  rawOperation: {},
+  operation: {},
 };
 
 describe('getIgnoredRuleIds', () => {
@@ -18,19 +18,19 @@ describe('getIgnoredRuleIds', () => {
     expect(getIgnoredRuleIds(baseTool)).toEqual([]);
   });
 
-  test('returns empty array when rawOperation is empty', () => {
-    expect(getIgnoredRuleIds({ ...baseTool, rawOperation: {} })).toEqual([]);
+  test('returns empty array when operation is empty', () => {
+    expect(getIgnoredRuleIds({ ...baseTool, operation: {} })).toEqual([]);
   });
 
   test('returns empty array for non-array value', () => {
-    const tool = { ...baseTool, rawOperation: { 'x-toolsafe-ignore': 'not-an-array' } };
+    const tool = { ...baseTool, operation: { 'x-toolsafe-ignore': 'not-an-array' } };
     expect(getIgnoredRuleIds(tool)).toEqual([]);
   });
 
   test('returns list of rule IDs from x-toolsafe-ignore', () => {
     const tool = {
       ...baseTool,
-      rawOperation: {
+      operation: {
         'x-toolsafe-ignore': ['safety/destructive-requires-guard', 'errors/missing-error-schema'],
       },
     };
@@ -43,15 +43,15 @@ describe('getIgnoredRuleIds', () => {
   test('filters out non-string entries from the array', () => {
     const tool = {
       ...baseTool,
-      rawOperation: {
+      operation: {
         'x-toolsafe-ignore': ['safety/destructive-requires-guard', 123, true],
       },
     };
     expect(getIgnoredRuleIds(tool)).toEqual(['safety/destructive-requires-guard']);
   });
 
-  test('returns empty array when rawOperation is null', () => {
-    const tool = { ...baseTool, rawOperation: null } as unknown as NormalizedTool;
+  test('returns empty array when operation is null', () => {
+    const tool = { ...baseTool, operation: null } as unknown as NormalizedTool;
     expect(getIgnoredRuleIds(tool)).toEqual([]);
   });
 });
@@ -62,22 +62,22 @@ describe('isAllIgnored', () => {
   });
 
   test('returns true when x-toolsafe-ignore-all is true', () => {
-    const tool = { ...baseTool, rawOperation: { 'x-toolsafe-ignore-all': true } };
+    const tool = { ...baseTool, operation: { 'x-toolsafe-ignore-all': true } };
     expect(isAllIgnored(tool)).toBe(true);
   });
 
   test('returns false when x-toolsafe-ignore-all is false', () => {
-    const tool = { ...baseTool, rawOperation: { 'x-toolsafe-ignore-all': false } };
+    const tool = { ...baseTool, operation: { 'x-toolsafe-ignore-all': false } };
     expect(isAllIgnored(tool)).toBe(false);
   });
 
   test('returns false when x-toolsafe-ignore-all is a non-boolean truthy value', () => {
-    const tool = { ...baseTool, rawOperation: { 'x-toolsafe-ignore-all': 'yes' } };
+    const tool = { ...baseTool, operation: { 'x-toolsafe-ignore-all': 'yes' } };
     expect(isAllIgnored(tool)).toBe(false);
   });
 
-  test('returns false when rawOperation is null', () => {
-    const tool = { ...baseTool, rawOperation: null } as unknown as NormalizedTool;
+  test('returns false when operation is null', () => {
+    const tool = { ...baseTool, operation: null } as unknown as NormalizedTool;
     expect(isAllIgnored(tool)).toBe(false);
   });
 });
@@ -106,7 +106,7 @@ function makeTool(overrides: Partial<NormalizedTool>): NormalizedTool {
     tags: [],
     parameters: [],
     responses: [],
-    rawOperation: {},
+    operation: {},
     ...overrides,
   };
 }
@@ -125,7 +125,7 @@ describe('suppressIgnoredFindings', () => {
     const tools = [
       makeTool({
         id: 'op1',
-        rawOperation: { 'x-toolsafe-ignore': ['safety/destructive-requires-guard'] },
+        operation: { 'x-toolsafe-ignore': ['safety/destructive-requires-guard'] },
       }),
     ];
 
@@ -140,7 +140,7 @@ describe('suppressIgnoredFindings', () => {
     const tools = [
       makeTool({
         id: 'op1',
-        rawOperation: { 'x-toolsafe-ignore-all': true },
+        operation: { 'x-toolsafe-ignore-all': true },
       }),
     ];
 
@@ -153,7 +153,7 @@ describe('suppressIgnoredFindings', () => {
     const f1 = makeFinding({ toolId: 'op1', ruleId: 'safety/destructive-requires-guard' });
     const f2 = makeFinding({ toolId: 'op2', ruleId: 'errors/missing-error-schema' });
     const tools = [
-      makeTool({ id: 'op1', rawOperation: { 'x-toolsafe-ignore-all': true } }),
+      makeTool({ id: 'op1', operation: { 'x-toolsafe-ignore-all': true } }),
       makeTool({ id: 'op2' }),
     ];
 
@@ -164,13 +164,13 @@ describe('suppressIgnoredFindings', () => {
 
   test('returns empty array when all findings are suppressed', () => {
     const findings = [makeFinding({ toolId: 'op1' })];
-    const tools = [makeTool({ id: 'op1', rawOperation: { 'x-toolsafe-ignore-all': true } })];
+    const tools = [makeTool({ id: 'op1', operation: { 'x-toolsafe-ignore-all': true } })];
 
     expect(suppressIgnoredFindings(findings, tools)).toEqual([]);
   });
 
   test('handles empty findings', () => {
-    const tools = [makeTool({ id: 'op1', rawOperation: { 'x-toolsafe-ignore-all': true } })];
+    const tools = [makeTool({ id: 'op1', operation: { 'x-toolsafe-ignore-all': true } })];
 
     expect(suppressIgnoredFindings([], tools)).toEqual([]);
   });
@@ -186,7 +186,7 @@ describe('suppressIgnoredFindings', () => {
     const tools = [
       makeTool({
         id: 'op1',
-        rawOperation: { 'x-toolsafe-ignore': ['nonexistent/rule'] },
+        operation: { 'x-toolsafe-ignore': ['nonexistent/rule'] },
       }),
     ];
 

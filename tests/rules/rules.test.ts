@@ -164,7 +164,7 @@ describe('safety/external-communication-requires-guard', () => {
       method: 'POST',
       path: '/emails/send',
       name: 'sendEmail',
-      rawOperation: {
+      operation: {
         'x-agent-guard': {
           mode: 'require_confirmation',
         },
@@ -262,7 +262,7 @@ describe('safety/destructive-requires-guard', () => {
       method: 'DELETE',
       path: '/users/{id}',
       name: 'deleteUser',
-      rawOperation: {
+      operation: {
         'x-agent-guard': {
           mode: 'require_confirmation',
         },
@@ -315,7 +315,7 @@ describe('safety/destructive-requires-guard', () => {
       method: 'POST',
       path: '/users/{id}/deactivate',
       name: 'deactivateUser',
-      rawOperation: {
+      operation: {
         'x-agent-guard': {
           mode: 'require_confirmation',
         },
@@ -1080,7 +1080,7 @@ function makeTool(overrides: Partial<NormalizedTool>): NormalizedTool {
     tags: [],
     parameters: [],
     responses: [],
-    rawOperation: {},
+    operation: {},
     ...overrides,
   };
 }
