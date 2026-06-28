@@ -72,7 +72,7 @@ The default rule set now has 10 rules. Milestone 7 added:
 - `schema/string-should-be-enum`
 - `schema/sensitive-response-fields`
 
-These rules keep the same deterministic, evidence-based shape as the initial rule set. They inspect operation text, explicit inputs, top-level request schemas, and top-level response schemas.
+These rules keep the same deterministic, evidence-based shape as the initial rule set. They inspect operation intent text, explicit inputs, top-level request schemas, and top-level response schemas.
 
 ### Milestone 8: Policy Draft Generator
 
@@ -170,6 +170,19 @@ ToolSafe now supports `toolsafe.config.json` for tuning without changing source:
 - Overwrite confirmation for existing files in TTY mode; silent skip in non-TTY mode.
 - Template files live in `src/cli/commands/init/` as plain JSON/YAML.
 - `--analyze` flag discovers OpenAPI specs by naming convention (`openapi.*`, `swagger.*`, `spec.*`, or in `openapi/`/`swagger/` dirs) and content sniffing (first 4KB checked for `openapi` key), then lints each and prints a summary.
+
+### Milestone 18: Rule Precision Pass
+
+Rule matching was tightened to reduce false positives while keeping deterministic output:
+
+- Added operation intent text and tokenized keyword matching so safety rules search operation IDs, generated names, methods, paths, summaries, and tags instead of arbitrary description prose.
+- `safety/destructive-requires-guard` now ignores destructive-sounding read-only operations and description-only keyword hits.
+- `safety/external-communication-requires-guard` separates high-confidence recipient channels from ambiguous verbs like `send`, `message`, and `publish`; ambiguous matches require recipient-shaped inputs.
+- `safety/financial-requires-idempotency` focuses on clearer financial action/resource keywords instead of broad `bank`, `credit`, or `debit` matches.
+- `safety/batch-operation-requires-limit` now requires collection-shaped input in addition to batch/bulk intent.
+- `schema/list-requires-pagination` skips GET paths ending in a path parameter, reducing single-resource lookup false positives.
+- `schema/string-should-be-enum` no longer flags pattern-constrained strings.
+- `docs/mutating-description-mentions-side-effects` checks summary/description prose and accepts bare side-effect verbs such as `Create user`.
 
 ## Not Implemented Yet
 

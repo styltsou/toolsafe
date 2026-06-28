@@ -24,20 +24,31 @@ Rules should not:
 
 ## Current Rule Set
 
-The current default rules cover 10 reliable checks:
+The current default rules cover 15 reliable checks:
 
-- Destructive operations should declare an explicit agent guard or confirmation signal.
+- Destructive DELETE or mutating operations should declare an explicit agent guard or confirmation signal.
 - Financial mutations should expose idempotency or deduplication inputs.
-- External communication operations should declare confirmation or guard signals.
+- External-recipient operations should declare confirmation or guard signals.
 - Mutating operations should expose dry-run, preview, or validate-only behavior when possible.
-- Likely list operations should expose pagination or limit parameters.
+- Batch operations with collection-shaped inputs should expose limits.
+- Likely collection GET operations should expose pagination or limit parameters.
 - Vague boolean inputs should be renamed or replaced with constrained values.
-- Likely constrained string inputs should expose enum values.
+- Likely constrained string inputs should expose enum values or another explicit pattern.
 - Sensitive response fields should be redacted or explicitly reviewed.
+- File uploads should expose size or content constraints.
+- Broad auth scopes should be narrowed or reviewed.
 - Operations should have summary or description text.
+- Weak descriptions should be expanded.
+- Mutating operation descriptions should mention side effects.
 - Operations should define structured 4xx or 5xx error response schemas.
 
 The rule registry in `src/rules/index.ts` defines which rules run by default. Tests assert stable default finding order for the risky example.
+
+## Heuristic Precision
+
+Rules that infer operation intent should avoid matching arbitrary description prose. ToolSafe now provides an intent-text helper that searches operation ID, generated name, method, path, summary, and tags, plus tokenized keyword matching for camelCase and path segments. This keeps rules deterministic while reducing false positives from words that merely appear in long-form documentation.
+
+Some rules add extra structural evidence before reporting. Batch findings require collection-shaped inputs, ambiguous external communication verbs require recipient-shaped inputs, and list pagination skips GET paths that end in a path parameter because those usually represent single-resource lookups.
 
 ## Finding Quality
 

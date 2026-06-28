@@ -32,6 +32,16 @@ export function hasAnyQueryParameter(tool: NormalizedTool, names: readonly strin
   );
 }
 
+export function hasArrayInput(tool: NormalizedTool): boolean {
+  return (
+    tool.parameters.some((parameter) => isArraySchema(parameter.schema)) ||
+    isArraySchema(tool.requestBodySchema) ||
+    getTopLevelSchemaProperties(tool.requestBodySchema).some((property) =>
+      isArraySchema(property.schema),
+    )
+  );
+}
+
 export function getTopLevelSchemaPropertyNames(schema: unknown): string[] {
   return getTopLevelSchemaProperties(schema).map((property) => property.name);
 }
@@ -93,6 +103,14 @@ export function hasSchemaConstraint(schema: unknown, constraintNames: readonly s
   );
 }
 
+export function hasSchemaKeyword(schema: unknown, keywordNames: readonly string[]): boolean {
+  if (!isObject(schema)) {
+    return false;
+  }
+
+  return keywordNames.some((name) => (schema as Record<string, unknown>)[name] !== undefined);
+}
+
 function getSchemaType(schema: unknown): string | undefined {
   if (!isObject(schema)) {
     return undefined;
@@ -101,6 +119,10 @@ function getSchemaType(schema: unknown): string | undefined {
   const type = (schema as ObjectSchemaLike).type;
 
   return typeof type === 'string' ? type : undefined;
+}
+
+function isArraySchema(schema: unknown): boolean {
+  return getSchemaType(schema) === 'array';
 }
 
 function unwrapArraySchema(schema: unknown): unknown {

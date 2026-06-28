@@ -1,23 +1,24 @@
 import type { HttpMethod, Rule } from '@/core/types';
 import { hasAnyInputField } from '@/core/schema';
-import { includesAny } from '@/core/strings';
 import { createFinding } from '@/rules/findings';
-import { getOperationSearchText, hasOperationExtension } from '@/rules/helpers';
+import { hasOperationExtension, hasOperationIntentKeyword } from '@/rules/helpers';
 
 const MUTATING_METHODS = new Set<HttpMethod>(['POST', 'PUT', 'PATCH', 'DELETE']);
 
-const EXTERNAL_COMMUNICATION_KEYWORDS = [
+const HIGH_CONFIDENCE_EXTERNAL_KEYWORDS = [
   'email',
+  'emails',
   'sms',
-  'message',
   'notify',
   'notification',
+  'notifications',
   'invite',
+  'invites',
   'webhook',
-  'publish',
-  'send',
-  'broadcast',
+  'webhooks',
 ];
+
+const AMBIGUOUS_EXTERNAL_KEYWORDS = ['message', 'messages', 'publish', 'send', 'broadcast'];
 
 const GUARD_FIELDS = [
   'confirm',
@@ -28,6 +29,21 @@ const GUARD_FIELDS = [
   'requireConfirmation',
   'recipientConfirmed',
   'recipient_confirmed',
+];
+
+const RECIPIENT_FIELDS = [
+  'to',
+  'recipient',
+  'recipients',
+  'recipientEmail',
+  'recipient_email',
+  'email',
+  'emailAddress',
+  'email_address',
+  'phone',
+  'phoneNumber',
+  'phone_number',
+  'address',
 ];
 
 const GUARD_EXTENSIONS = [
@@ -48,9 +64,11 @@ export const externalCommunicationRequiresGuardRule: Rule = {
   category: 'safety',
   defaultSeverity: 'warning',
   check: ({ tool }) => {
-    const searchText = getOperationSearchText(tool);
     const isExternalCommunication =
-      MUTATING_METHODS.has(tool.method) && includesAny(searchText, EXTERNAL_COMMUNICATION_KEYWORDS);
+      MUTATING_METHODS.has(tool.method) &&
+      (hasOperationIntentKeyword(tool, HIGH_CONFIDENCE_EXTERNAL_KEYWORDS) ||
+        (hasOperationIntentKeyword(tool, AMBIGUOUS_EXTERNAL_KEYWORDS) &&
+          hasAnyInputField(tool, RECIPIENT_FIELDS)));
 
     if (!isExternalCommunication) {
       return [];

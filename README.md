@@ -261,13 +261,13 @@ jobs:
 
 Rules are grouped into categories:
 
-| Category          | Focus                                                 | Example rule                        |
-| ----------------- | ----------------------------------------------------- | ----------------------------------- |
-| `safety`          | Destructive, financial, external-communication guards | `safety/destructive-requires-guard` |
-| `schema`          | Boolean clarity, enums, sensitive fields              | `schema/vague-boolean`              |
-| `docs`            | Missing or weak descriptions                          | `docs/missing-description`          |
-| `errors`          | Structured error response schemas                     | `errors/missing-error-schema`       |
-| `agent_usability` | Pagination, limits                                    | `schema/list-requires-pagination`   |
+| Category          | Focus                                              | Example rule                        |
+| ----------------- | -------------------------------------------------- | ----------------------------------- |
+| `safety`          | Guard signals, idempotency, batch limits           | `safety/destructive-requires-guard` |
+| `schema`          | Boolean clarity, enums, sensitive fields           | `schema/vague-boolean`              |
+| `docs`            | Missing, weak, or unclear side-effect descriptions | `docs/missing-description`          |
+| `errors`          | Structured error response schemas                  | `errors/missing-error-schema`       |
+| `agent_usability` | Bounded list/search outputs                        | `schema/list-requires-pagination`   |
 
 Run `toolsafe rules` to see the full list.
 
