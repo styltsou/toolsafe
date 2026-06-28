@@ -55,7 +55,10 @@ function calculateScoreForCategory(
   totalTools: number,
   category: (typeof CATEGORY_SCORE_KEYS)[number],
 ): number {
-  return calculateScore(findings.filter((finding) => finding.category === category), totalTools);
+  return calculateScore(
+    findings.filter((finding) => finding.category === category),
+    totalTools,
+  );
 }
 
 function clampScore(score: number): number {
