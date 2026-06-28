@@ -293,6 +293,31 @@ Rules are grouped into categories. The **Agent-specific?** column tells you whet
 
 Run `toolsafe rules` to see the full list with current severities.
 
+## Inline Suppression
+
+Operations can suppress specific rules or all rules using vendor extensions. This lets you adopt ToolSafe incrementally — mark known findings as accepted so CI passes while the remaining findings get addressed.
+
+**Suppress specific rules on an operation:**
+
+```yaml
+/users/{id}:
+  delete:
+    operationId: deleteUser
+    x-toolsafe-ignore:
+      - safety/destructive-requires-guard
+```
+
+**Suppress all rules on an operation:**
+
+```yaml
+/users/{id}:
+  delete:
+    operationId: deleteUser
+    x-toolsafe-ignore-all: true
+```
+
+Both extensions apply at the operation level only. Suppressed findings never appear in output, regardless of their severity.
+
 ## How rules match operations
 
 Rules use a tokenized intent-matching helper (`getOperationIntentText` / `hasOperationIntentKeyword`) that scopes keyword matching to operation IDs, names, methods, paths, summaries, and tags — deliberately excluding free-text `description` prose, which is where naive substring matching tends to produce false positives (e.g. a read-only operation whose description happens to mention "cancel" in passing). See `docs/RULES.md` for the matching approach per rule and known precision tradeoffs.
@@ -304,7 +329,7 @@ This is a heuristic, explainable approach, not a full semantic parse of API inte
 ToolSafe is early (v0.x) and the rule engine is intentionally simple right now. Rough priority order, subject to change:
 
 - **Selector-based rule matching.** Rules currently match against a tokenized text blob per operation. The plan is to move toward JSONPath-style scoped selectors per rule (closer to how Spectral/vacuum target OpenAPI documents) so a rule only ever sees the exact field it's meant to check, rather than matching across operation IDs, paths, and summaries indiscriminately. This should remove a category of false positive at the source instead of patching it rule-by-rule.
-- **Inline suppression.** A way to mark a specific operation as reviewed and intentionally accepted (e.g. an `x-toolsafe-ignore: rule-id` vendor extension), so teams can adopt ToolSafe incrementally instead of fixing every finding before CI goes green.
+- **Inline suppression.** ✅ Implemented. A way to mark a specific operation as reviewed and intentionally accepted (e.g. an `x-toolsafe-ignore: rule-id` vendor extension), so teams can adopt ToolSafe incrementally instead of fixing every finding before CI goes green.
 - **Precision validation against real-world specs.** Running and publishing results against large public OpenAPI specs (Stripe, GitHub, etc.), not just synthetic fixtures, with measured false-positive rates per rule.
 - **More complete `$ref` resolution.** Rules should see the fully dereferenced schema graph rather than relying on each rule to handle references defensively.
 - **Guard policy / eval generation maturity.** `toolsafe generate` currently produces advisory drafts; the goal is for generated guard policies and eval cases to be closer to drop-in usable rather than a starting point that needs heavy editing.
