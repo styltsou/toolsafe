@@ -1,5 +1,4 @@
 import type { NormalizedTool } from '@/core/types';
-import { isObject } from '@/core/objects';
 
 /**
  * Returns lowercased searchable text for heuristic rules.
@@ -46,11 +45,7 @@ export function hasOperationIntentKeyword(
 }
 
 export function hasOperationExtension(tool: NormalizedTool, names: readonly string[]): boolean {
-  if (!isObject(tool.operation)) {
-    return false;
-  }
-
-  return names.some((name) => Object.hasOwn(tool.operation as Record<string, unknown>, name));
+  return names.some((name) => Object.hasOwn(tool.operation, name));
 }
 
 function getOperationIntentTokens(tool: NormalizedTool): Set<string> {

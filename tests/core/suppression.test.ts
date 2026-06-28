@@ -49,11 +49,6 @@ describe('getIgnoredRuleIds', () => {
     };
     expect(getIgnoredRuleIds(tool)).toEqual(['safety/destructive-requires-guard']);
   });
-
-  test('returns empty array when operation is null', () => {
-    const tool = { ...baseTool, operation: null } as unknown as NormalizedTool;
-    expect(getIgnoredRuleIds(tool)).toEqual([]);
-  });
 });
 
 describe('isAllIgnored', () => {
@@ -76,10 +71,6 @@ describe('isAllIgnored', () => {
     expect(isAllIgnored(tool)).toBe(false);
   });
 
-  test('returns false when operation is null', () => {
-    const tool = { ...baseTool, operation: null } as unknown as NormalizedTool;
-    expect(isAllIgnored(tool)).toBe(false);
-  });
 });
 
 function makeFinding(overrides: Partial<Finding>): Finding {

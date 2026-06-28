@@ -1,15 +1,10 @@
 import type { Finding, NormalizedTool } from '@/core/types';
-import { isObject } from '@/core/objects';
 
 const IGNORE_EXTENSION = 'x-toolsafe-ignore';
 const IGNORE_ALL_EXTENSION = 'x-toolsafe-ignore-all';
 
 export function getIgnoredRuleIds(tool: NormalizedTool): string[] {
-  if (!isObject(tool.operation)) {
-    return [];
-  }
-
-  const value = (tool.operation as Record<string, unknown>)[IGNORE_EXTENSION];
+  const value = tool.operation[IGNORE_EXTENSION];
 
   if (!Array.isArray(value)) {
     return [];
@@ -19,11 +14,7 @@ export function getIgnoredRuleIds(tool: NormalizedTool): string[] {
 }
 
 export function isAllIgnored(tool: NormalizedTool): boolean {
-  if (!isObject(tool.operation)) {
-    return false;
-  }
-
-  return (tool.operation as Record<string, unknown>)[IGNORE_ALL_EXTENSION] === true;
+  return tool.operation[IGNORE_ALL_EXTENSION] === true;
 }
 
 export function suppressIgnoredFindings(findings: Finding[], tools: NormalizedTool[]): Finding[] {

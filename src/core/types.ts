@@ -16,11 +16,21 @@ export type SideEffectType =
 export type ParameterLocation = 'path' | 'query' | 'header' | 'cookie' | 'body';
 
 /**
+ * The operation subtree from the dereferenced OpenAPI document.
+ *
+ * Rules and suppression read ToolSafe vendor extensions (x-toolsafe-*)
+ * from this object. The full OpenAPI operation shape is preserved so any
+ * rule can access properties beyond the NormalizedTool fields.
+ */
+export type NormalizedOperation = Record<string, unknown>;
+
+/**
  * ToolSafe's flattened view of an OpenAPI parameter or simple body field.
  *
  * The `body` location is reserved for later schema expansion; Milestone 2 only
  * emits OpenAPI path/query/header/cookie parameters.
  */
+
 export type NormalizedParameter = {
   name: string;
   in: ParameterLocation;
@@ -62,7 +72,7 @@ export type NormalizedTool = {
   responses: NormalizedResponse[];
   security?: unknown[] | undefined;
   /** The operation subtree from the dereferenced document, including vendor extensions. */
-  operation: unknown;
+  operation: NormalizedOperation;
 };
 
 export type FindingSeverity = 'info' | 'warning' | 'error';
