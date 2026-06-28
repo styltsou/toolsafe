@@ -77,6 +77,7 @@ Scores are calculated from findings. The scoring model is intentionally simple s
 - Errors carry the largest penalty.
 - Warnings carry a smaller penalty.
 - Info findings carry the smallest penalty.
+- Penalties are averaged across all operations in the spec so scores are comparable regardless of spec size.
 - Scores are clamped to a 0-100 range.
 
 Category scores use the same idea but only count findings in that category.

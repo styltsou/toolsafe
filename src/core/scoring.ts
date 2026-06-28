@@ -31,29 +31,31 @@ export type ScoreSummary = {
  * Scores are deliberately simple: they are not a security grade, just a stable
  * signal for comparing specs and tracking improvement over time.
  */
-export function calculateScores(findings: Finding[]): ScoreSummary {
+export function calculateScores(findings: Finding[], totalTools: number): ScoreSummary {
   return {
-    overall: calculateScore(findings),
-    safety: calculateScoreForCategory(findings, 'safety'),
-    schema: calculateScoreForCategory(findings, 'schema'),
-    docs: calculateScoreForCategory(findings, 'docs'),
-    errors: calculateScoreForCategory(findings, 'errors'),
-    agentUsability: calculateScoreForCategory(findings, 'agent_usability'),
-    auth: calculateScoreForCategory(findings, 'auth'),
+    overall: calculateScore(findings, totalTools),
+    safety: calculateScoreForCategory(findings, totalTools, 'safety'),
+    schema: calculateScoreForCategory(findings, totalTools, 'schema'),
+    docs: calculateScoreForCategory(findings, totalTools, 'docs'),
+    errors: calculateScoreForCategory(findings, totalTools, 'errors'),
+    agentUsability: calculateScoreForCategory(findings, totalTools, 'agent_usability'),
+    auth: calculateScoreForCategory(findings, totalTools, 'auth'),
   };
 }
 
-export function calculateScore(findings: Finding[]): number {
+export function calculateScore(findings: Finding[], totalTools: number): number {
+  const effectiveTools = totalTools > 0 ? totalTools : 1;
   const penalty = findings.reduce((total, finding) => total + SCORE_PENALTIES[finding.severity], 0);
 
-  return clampScore(100 - penalty);
+  return clampScore(Math.round(100 - penalty / effectiveTools));
 }
 
 function calculateScoreForCategory(
   findings: Finding[],
+  totalTools: number,
   category: (typeof CATEGORY_SCORE_KEYS)[number],
 ): number {
-  return calculateScore(findings.filter((finding) => finding.category === category));
+  return calculateScore(findings.filter((finding) => finding.category === category), totalTools);
 }
 
 function clampScore(score: number): number {

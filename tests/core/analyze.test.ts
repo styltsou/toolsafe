@@ -23,12 +23,12 @@ describe('analyzeOpenApi', () => {
       },
     });
     expect(result.scores).toEqual({
-      overall: 21,
-      safety: 66,
-      schema: 92,
-      docs: 87,
-      errors: 80,
-      agentUsability: 96,
+      overall: 84,
+      safety: 93,
+      schema: 98,
+      docs: 97,
+      errors: 96,
+      agentUsability: 99,
       auth: 100,
     });
     expect(result.tools.map((tool) => [tool.toolId, tool.risk])).toEqual([

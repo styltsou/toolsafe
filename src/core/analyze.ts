@@ -36,7 +36,7 @@ export async function analyzeOpenApi(
       version: parsed.metadata.version,
     },
     summary: buildSummary(tools, findings, toolRisks),
-    scores: calculateScores(findings),
+    scores: calculateScores(findings, tools.length),
     tools: toolRisks,
     findings,
   };

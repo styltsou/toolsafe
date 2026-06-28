@@ -1,25 +1,26 @@
 # Next Steps
 
-ToolSafe is in a good state: local and remote OpenAPI parsing, normalization, 15 deterministic rules, scoring, reports (JSON/Markdown/SARIF), advisory generation (guard policies + eval ideas), config support, docs, examples, and CI are in place (115 tests, typecheck clean, lint clean).
-
-The next work should focus on making ToolSafe easier to adopt in real repositories and easier to integrate into CI/security workflows.
+ToolSafe is in a good state: local and remote OpenAPI parsing with `$ref` resolution, normalization, 15 deterministic rules, scoring, reports (JSON/Markdown/SARIF/HTML/terminal), advisory generation (guard policies + eval ideas), config support (toolsafe.config.json), init scaffolding, inline suppression via `x-toolsafe-ignore`, shell completions, docs, examples, and CI are all in place (169+ tests, typecheck clean, lint clean).
 
 ## High Priority
 
-### HTTP proxy and auth support for remote URLs
+### Weighted scoring
 
-Current remote URL support uses bare `fetch()`. Enterprise CI environments often need HTTP proxies, custom CA certificates, or authentication headers.
+The current flat 10/4/1 deduction doesn't account for operation count. A spec with 1 operation vs 100 operations gets penalized the same, making scores incomparable across API sizes.
 
-### `toolsafe init` — project scaffolding
+### Polish terminal output
 
-Generate a starter `toolsafe.config.json` and a sample GitHub Actions workflow in one command.
+The terminal reporter works but could use better grouping (by severity, by tag), color coding, and a summary table.
 
 ## Medium Priority
 
-- Polish terminal output with picocolors (better use of colors, grouping, formatting)
-- JSON schema traversal improvements for deeper rule analysis
-- Rate-limiting/pagination rule improvements for list endpoints
-- Shell completion scripts (bash/zsh)
+### Rule runner smarts for cross-operation rules
+
+The current `runRules` double-loop works fine for 15 single-operation rules. Before adding cross-operation rules (e.g. "all operations in a tag should have similar guard patterns"), the runner should pre-compute cross-operation indices once rather than making each rule re-derive them. See `docs/ARCHITECTURE_NEXT.md` for details.
+
+### Rate-limiting / pagination rule improvements
+
+The `list-requires-pagination` rule could be extended to detect additional pagination patterns (cursor-based, page-based, hybrid).
 
 ## Future (post-MVP)
 
