@@ -7,6 +7,7 @@ import { normalizeOpenApi } from '@/core/normalize';
 import { classifyToolRisks } from '@/core/risk';
 import { calculateScores } from '@/core/scoring';
 import type { AnalysisResult, Finding, NormalizedTool, ToolRiskSummary } from '@/core/types';
+import { suppressIgnoredFindings } from '@/core/suppression';
 
 /**
  * Runs ToolSafe's complete deterministic analysis pipeline for one local file.
@@ -25,6 +26,7 @@ export async function analyzeOpenApi(
   const activeRules = filterRules(defaultRules, config);
   let findings = runRules(tools, activeRules);
   findings = overrideSeverities(findings, config);
+  findings = suppressIgnoredFindings(findings, tools);
   const toolRisks = classifyToolRisks(tools);
 
   return {

@@ -44,6 +44,47 @@ Each finding includes:
 
 Findings are sorted by severity, path, method, and rule ID. This keeps reports stable and makes snapshot tests useful.
 
+## Inline Suppression
+
+Operations can suppress specific rules or all rules using vendor extensions in the OpenAPI spec. This allows teams to adopt ToolSafe incrementally — mark known/accepted findings so CI can go green while remaining findings are addressed.
+
+### Suppress specific rules
+
+Add `x-toolsafe-ignore` as a vendor extension on an operation with a list of rule IDs to suppress:
+
+```yaml
+/users/{id}:
+  delete:
+    operationId: deleteUser
+    x-toolsafe-ignore:
+      - safety/destructive-requires-guard
+    responses:
+      '204':
+        description: Deleted
+```
+
+Only findings whose rule ID appears in the list are suppressed for that operation.
+
+### Suppress all rules on an operation
+
+Add `x-toolsafe-ignore-all: true` to suppress every finding for that operation:
+
+```yaml
+/users/{id}:
+  delete:
+    operationId: deleteUser
+    x-toolsafe-ignore-all: true
+    responses:
+      '204':
+        description: Deleted
+```
+
+### Scope
+
+Both extensions apply at the operation level only. They are not inherited from the root or path-level OpenAPI objects. Findings for operations without these extensions are unaffected.
+
+Suppression is applied after rule execution and after severity overrides from `toolsafe.config.json`, so a suppressed finding never appears in the output regardless of its configured severity.
+
 ## Adding Or Changing Rules
 
 Rule implementations live under `src/rules/`. The default registry is `src/rules/index.ts`.
