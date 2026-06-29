@@ -94,4 +94,6 @@ When a rule changes, update:
 - Focused tests in `tests/rules/rules.test.ts`.
 - Analysis expectations if finding counts or scores change.
 - Report and generated-output snapshots if output changes.
-- This document if the default rule metadata changes.
+- `docs/ARCHITECTURE.md` if the heuristic precision or finding quality guidance changes.
+- `docs/RULES.md` if the default rule metadata changes.
+- `docs/GENERATION.md` if the mapping from rule IDs to policy controls or eval templates changes.

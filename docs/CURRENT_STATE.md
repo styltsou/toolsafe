@@ -1,4 +1,4 @@
-# Current State Through Milestone 10
+# Current State
 
 This document describes what is implemented now, not the full product vision.
 
@@ -104,9 +104,8 @@ The project now includes:
 
 - A README centered on the actual CLI.
 - A default rule catalog in `docs/RULES.md`.
-- Report-format documentation in `docs/REPORT_FORMAT.md`.
-- Advisory policy and eval documentation.
-- Publishing notes that keep the package private until release scope is explicit.
+- Report-format documentation in `docs/ARCHITECTURE.md`.
+- Advisory policy and eval documentation in `docs/GENERATION.md`.
 - Sample outputs under `examples/output/`.
 - GitHub Actions CI for typecheck, lint, format check, and tests.
 

@@ -328,10 +328,10 @@ This is a heuristic, explainable approach, not a full semantic parse of API inte
 
 ToolSafe is early (v0.x) and the rule engine is intentionally simple right now. Rough priority order, subject to change:
 
-- **Selector-based rule matching.** Rules currently match against a tokenized text blob per operation. The plan is to move toward JSONPath-style scoped selectors per rule (closer to how Spectral/vacuum target OpenAPI documents) so a rule only ever sees the exact field it's meant to check, rather than matching across operation IDs, paths, and summaries indiscriminately. This should remove a category of false positive at the source instead of patching it rule-by-rule.
-- **Inline suppression.** ✅ Implemented. A way to mark a specific operation as reviewed and intentionally accepted (e.g. an `x-toolsafe-ignore: rule-id` vendor extension), so teams can adopt ToolSafe incrementally instead of fixing every finding before CI goes green.
+- **Selector-based rule matching.** Rules currently match against a tokenized text blob per operation. The plan is to move toward JSONPath-style scoped selectors per rule (closer to how Spectral/vacuum target OpenAPI documents) so a rule only ever sees the exact field it's meant to check, rather than matching across operation IDs, paths, and summaries indiscriminately.
+- **Cross-operation and aggregate rules.** The current flat double loop works for single-operation rules but doesn't scale to rules that need pre-computed cross-operation indices (group by path, tag, or security scheme). The runner should compute these once and pass them to all rules. See [Future: Smarter Rule Runner](docs/ARCHITECTURE.md#future-smarter-rule-runner) in the architecture docs.
 - **Precision validation against real-world specs.** Running and publishing results against large public OpenAPI specs (Stripe, GitHub, etc.), not just synthetic fixtures, with measured false-positive rates per rule.
-- **More complete `$ref` resolution.** Rules should see the fully dereferenced schema graph rather than relying on each rule to handle references defensively.
+- **Rate-limiting / pagination rule improvements.** The `list-requires-pagination` rule could be extended to detect additional pagination patterns (cursor-based, page-based, hybrid).
 - **Guard policy / eval generation maturity.** `toolsafe generate` currently produces advisory drafts; the goal is for generated guard policies and eval cases to be closer to drop-in usable rather than a starting point that needs heavy editing.
 - **Not planned for the deterministic core, but open to exploring as opt-in:** an LLM-assisted analysis layer for the harder-to-heuristic cases (similar to how some MCP security scanners offer LLM analysis as an optional add-on alongside their deterministic checks). Would ship as a separate, clearly-labeled mode — the default CI path stays deterministic and offline.
 - **Out of scope for now:** runtime API execution/proxying, and MCP server generation from a linted spec. ToolSafe analyzes the contract; it doesn't run it or generate a server from it.
@@ -369,4 +369,4 @@ bun run examples:generate
 
 ## Documentation
 
-See [`docs/README.md`](./docs/README.md) for architecture notes, rule authoring, and report format details.
+See [`docs/README.md`](./docs/README.md) for architecture notes, rule authoring, report format details, and advisory generation docs.

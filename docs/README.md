@@ -1,18 +1,14 @@
 # ToolSafe Docs
 
-These notes explain the codebase as it exists through milestone 10. They are meant for engineers who need to understand where the pieces fit before changing behavior.
+These notes explain the codebase and are meant for engineers who need to understand where the pieces fit before changing behavior.
 
 ## Start Here
 
-1. Read [Onboarding](./ONBOARDING.md) for the quickest path through the repo.
-2. Read [Architecture](./ARCHITECTURE.md) to understand the analysis pipeline and module boundaries.
-3. Read [Current State](./CURRENT_STATE.md) for what exists through milestone 10 and what is intentionally not built yet.
-4. Read [Rules And Reports](./RULES_AND_REPORTS.md) when changing lint rules, scoring, output, or exit behavior.
-5. Read [Rules](./RULES.md) for the current default rule catalog.
-6. Read [Report Format](./REPORT_FORMAT.md) for JSON, Markdown, and terminal output shape.
-7. Read [Policy Generation](./POLICY_GENERATION.md) when changing advisory guard-policy output.
-8. Read [Eval Generation](./EVAL_GENERATION.md) when changing advisory eval ideas.
-9. Read [Publishing Notes](./PUBLISHING.md) before changing package publishing settings.
+1. [Onboarding](./ONBOARDING.md) — quickest path through the repo for first-time readers.
+2. [Architecture](./ARCHITECTURE.md) — pipeline, module boundaries, data model, scoring, report formats, and future directions.
+3. [Current State](./CURRENT_STATE.md) — what exists and what is intentionally not built yet.
+4. [Rules](./RULES.md) — the full default rule catalog with matching precision and inline suppression.
+5. [Generation](./GENERATION.md) — advisory guard policy and eval case generation.
 
 ## Primary Entry Points
 

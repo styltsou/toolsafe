@@ -14,8 +14,8 @@ It does not call the target API, use an LLM, enforce runtime policy, or generate
 2. Run `bun run src/cli/index.ts init --analyze` to scaffold config and discover OpenAPI specs in the project.
 3. Run `bun run src/cli/index.ts lint examples/risky-openapi.yaml` and look at the grouped terminal output.
 4. Run the same command with `--format json` and compare the output to the `AnalysisResult` type in `src/core/types.ts`.
-5. Run `bun run src/cli/index.ts policy examples/risky-openapi.yaml` and note the advisory language at the top.
-6. Run `bun run src/cli/index.ts evals examples/risky-openapi.yaml` and note the placeholder inputs.
+5. Run `bun run src/cli/index.ts generate --kind policy examples/risky-openapi.yaml` and note the advisory language at the top.
+6. Run `bun run src/cli/index.ts generate --kind evals examples/risky-openapi.yaml` and note the placeholder inputs.
 7. Inspect `examples/output/` to see generated sample files.
 8. Open `src/core/analyze.ts` and follow the pipeline calls in order.
 9. Open `tests/core/analyze.test.ts` to see the expected shape of the complete analysis result.
@@ -68,7 +68,7 @@ For demo output changes, run `bun run examples:generate` so `examples/output/` s
 ## Things To Avoid
 
 - Do not make CLI commands parse OpenAPI directly when `analyzeOpenApi` already provides the shared pipeline.
-- Do not add network access to parser or analyzer behavior. v0 is local-file only.
+- Do not add network access to non-fetching parser or analyzer behavior. Remote URL fetching is done by `src/parsers/openapi.ts` and should remain there.
 - Do not put rule-specific business logic in reporters.
 - Do not make generated output claim runtime enforcement or executable test certainty. Policy and eval generation are advisory.
 - Do not replace deterministic checks with LLM calls.
