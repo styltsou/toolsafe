@@ -17,7 +17,3 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
       - run: bun run lint
-      - run: bun run format
-      - uses: stefanzweifel/git-auto-commit-action@v7
-        with:
-          commit_message: "style: auto-format code"
