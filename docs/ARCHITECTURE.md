@@ -116,6 +116,7 @@ Avoid findings that require hidden assumptions. If the evidence is weak, keep th
 Rules that infer operation intent should avoid matching arbitrary description prose. ToolSafe uses an intent-text helper that searches operation ID, generated name, method, path, summary, and tags, plus tokenized keyword matching for camelCase and path segments. This keeps rules deterministic while reducing false positives from words that merely appear in long-form documentation.
 
 Some rules add extra structural evidence before reporting:
+
 - Batch findings require collection-shaped inputs.
 - Ambiguous external communication verbs (`send`, `message`, `publish`) require recipient-shaped inputs.
 - List pagination skips GET paths that end in a path parameter (single-resource lookups).
@@ -297,15 +298,15 @@ The document graph includes a node graph (every YAML/JSON node is addressable), 
 
 ### Contrast with ToolSafe's Current Model
 
-| Capability | ToolSafe today | Speakeasy / Vacuum |
-|---|---|---|
-| Document access | Flattened `NormalizedTool` fields + `operation: unknown` casts | Full typed document tree |
-| `$ref` resolution | Post-parse dereference step | Built into the graph layer |
-| Schema traversal | `schema.ts` helpers (top-level only) | Full schema tree with recursion |
-| Pre-computed indices | None (rules recompute) | `docInfo.getIndex().getOperations()`, etc. |
-| Custom rules | Modify source code | TypeScript files loaded at runtime |
-| JSONPath | Not supported | Core to Vacuum's rule model |
-| Line-level output | Not tracked | Built into the node graph |
+| Capability           | ToolSafe today                                                 | Speakeasy / Vacuum                         |
+| -------------------- | -------------------------------------------------------------- | ------------------------------------------ |
+| Document access      | Flattened `NormalizedTool` fields + `operation: unknown` casts | Full typed document tree                   |
+| `$ref` resolution    | Post-parse dereference step                                    | Built into the graph layer                 |
+| Schema traversal     | `schema.ts` helpers (top-level only)                           | Full schema tree with recursion            |
+| Pre-computed indices | None (rules recompute)                                         | `docInfo.getIndex().getOperations()`, etc. |
+| Custom rules         | Modify source code                                             | TypeScript files loaded at runtime         |
+| JSONPath             | Not supported                                                  | Core to Vacuum's rule model                |
+| Line-level output    | Not tracked                                                    | Built into the node graph                  |
 
 ### Why This Matters
 
