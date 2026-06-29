@@ -443,6 +443,217 @@ describe('schema/list-requires-pagination', () => {
 
     expect(findings).toHaveLength(0);
   });
+
+  test('does not flag list GET with cursor parameter (cursor-based pagination)', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/users',
+      name: 'listUsers',
+      summary: 'List users',
+      parameters: [
+        {
+          name: 'cursor',
+          in: 'query',
+          required: false,
+        },
+      ],
+    });
+
+    const findings = listRequiresPaginationRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag list GET with startingAfter parameter (Stripe-style cursor)', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/charges',
+      name: 'listCharges',
+      summary: 'List charges',
+      parameters: [
+        {
+          name: 'starting_after',
+          in: 'query',
+          required: false,
+        },
+      ],
+    });
+
+    const findings = listRequiresPaginationRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag list GET with pageToken parameter (Google-style pagination)', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/items',
+      name: 'listItems',
+      summary: 'List items',
+      parameters: [
+        {
+          name: 'pageToken',
+          in: 'query',
+          required: false,
+        },
+      ],
+    });
+
+    const findings = listRequiresPaginationRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('does not flag list GET with take/skip parameters', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/items',
+      name: 'getAllItems',
+      summary: 'Get all items',
+      parameters: [
+        {
+          name: 'take',
+          in: 'query',
+          required: false,
+        },
+        {
+          name: 'skip',
+          in: 'query',
+          required: false,
+        },
+      ],
+    });
+
+    const findings = listRequiresPaginationRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('flags list GET with new list keyword (getAll)', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/users',
+      name: 'getAllUsers',
+    });
+
+    const findings = listRequiresPaginationRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(1);
+  });
+
+  test('flags list GET with new list keyword (browse)', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/catalog',
+      name: 'browseCatalog',
+      summary: 'Browse catalog',
+    });
+
+    const findings = listRequiresPaginationRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(1);
+  });
+
+  test('does not flag list GET with first/last parameters (Relay-style cursor)', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/items',
+      name: 'listItems',
+      summary: 'List items',
+      parameters: [
+        {
+          name: 'first',
+          in: 'query',
+          required: false,
+        },
+        {
+          name: 'last',
+          in: 'query',
+          required: false,
+        },
+      ],
+    });
+
+    const findings = listRequiresPaginationRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
+
+  test('flags list operations with an array response and no list keywords', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/v2/users',
+      name: 'fetchUsers',
+      responses: [
+        {
+          statusCode: '200',
+          schema: {
+            type: 'array',
+            items: { type: 'string' },
+          },
+        },
+      ],
+    });
+
+    const findings = listRequiresPaginationRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(1);
+  });
+
+  test('does not flag array response with pagination parameter', () => {
+    const tool = makeTool({
+      method: 'GET',
+      path: '/v2/users',
+      name: 'fetchUsers',
+      parameters: [
+        {
+          name: 'maxResults',
+          in: 'query',
+          required: false,
+        },
+      ],
+      responses: [
+        {
+          statusCode: '200',
+          schema: {
+            type: 'array',
+            items: { type: 'string' },
+          },
+        },
+      ],
+    });
+
+    const findings = listRequiresPaginationRule.check({
+      tool,
+      allTools: [tool],
+    });
+
+    expect(findings).toHaveLength(0);
+  });
 });
 
 describe('schema/vague-boolean', () => {

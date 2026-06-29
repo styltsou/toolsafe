@@ -236,7 +236,7 @@ exports[`reporters renders the risky fixture as stable pretty JSON 1`] = `
       "method": "GET",
       "path": "/users",
       "message": "List/search operation has no pagination or limit query parameter.",
-      "recommendation": "Expose limit, page, pageSize, cursor, or offset parameters to prevent unbounded agent outputs.",
+      "recommendation": "Expose limit, page, pageSize, cursor, offset, take, startingAfter, or pageToken parameters to prevent unbounded agent outputs.",
       "evidence": [
         "GET operation appears to return a collection"
       ]
@@ -498,7 +498,7 @@ API: Risky Example API 1.0.0
 
 - **schema/list-requires-pagination**: \`GET /users\`
   - List/search operation has no pagination or limit query parameter.
-  - Recommendation: Expose limit, page, pageSize, cursor, or offset parameters to prevent unbounded agent outputs.
+  - Recommendation: Expose limit, page, pageSize, cursor, offset, take, startingAfter, or pageToken parameters to prevent unbounded agent outputs.
   - Evidence: GET operation appears to return a collection
 
 - **errors/missing-error-schema**: \`POST /users\`
@@ -1066,7 +1066,7 @@ exports[`reporters SARIF output matches snapshot 1`] = `
           "ruleIndex": 6,
           "level": "warning",
           "message": {
-            "text": "List/search operation has no pagination or limit query parameter.\\n\\nRecommendation: Expose limit, page, pageSize, cursor, or offset parameters to prevent unbounded agent outputs.\\n\\nEvidence:\\n  - GET operation appears to return a collection"
+            "text": "List/search operation has no pagination or limit query parameter.\\n\\nRecommendation: Expose limit, page, pageSize, cursor, offset, take, startingAfter, or pageToken parameters to prevent unbounded agent outputs.\\n\\nEvidence:\\n  - GET operation appears to return a collection"
           },
           "locations": [
             {
